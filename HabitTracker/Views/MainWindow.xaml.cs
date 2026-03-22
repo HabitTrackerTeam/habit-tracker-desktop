@@ -28,7 +28,7 @@ public partial class MainWindow : Window
     private async void InitializeSupabase()
     {
         var url = "https://fkhmrfueypnrbkdvqiyn.supabase.co";
-        var key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraG1yZnVleXBucmJrZHZxaXluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjI4NDksImV4cCI6MjA4OTQ5ODg0OX0.vYTxhf3RKntjXfRegb8KcNG7X5YmXKsZtohZlQtFYVQ";
+        var key = "sb_publishable_ckwd846nvtwV6oXPEuqq7w_QKFvhiQU";
 
         _supabaseClient = new Client(url, key);
         await _supabaseClient.InitializeAsync();
