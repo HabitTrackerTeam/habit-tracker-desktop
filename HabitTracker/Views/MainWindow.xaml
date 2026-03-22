@@ -8,28 +8,54 @@
         Title="MainWindow"
         Height="450"
         Width="800">
-    <Grid Background="#F0F0F0">
+    <Grid Background="#FFF4F4E9">
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Center">
-            <TextBlock Text="Habit Tracker 2026"
+            <TextBlock
                        FontSize="32"
                        FontWeight="Bold"
-                       Foreground="#2D2D2D"
-                       Margin="0,0,0,20"/>
+                       Foreground="#FF4E606C"
+                       Margin="0,0,0,20" Text="Habit Tracker"/>
 
-            <Button Content="Zaloguj się"
-                    Width="200"
-                    Height="40"
-                    Background="#007ACC"
-                    Foreground="White"
-                    Cursor="Hand"/>
+            <TextBlock 
+                Text="Email:" 
+                Margin="0,0,0,5"/>
+            <TextBox 
+                x:Name="EmailInput" 
+                Height="30" 
+                Margin="0,0,0,15" 
+                Padding="5"/>
 
-            <!-- Dodany tekst "joł" -->
-            <TextBlock Text="joł"
-                       FontSize="20"
-                       FontWeight="Bold"
-                       Foreground="#2D2D2D"
-                       Margin="0,0,0,20"/>
+            <TextBlock 
+                Text="Hasło:" 
+                Margin="0,0,0,5"/>
+            <PasswordBox 
+                x:Name="PasswordInput" 
+                Height="30" 
+                Margin="0,0,0,25" 
+                Padding="5" Password=""/>
+
+            <Button 
+                Content="Zaloguj się" 
+                Background="#FF328A5D" 
+                Foreground="White" 
+                Height="40" Margin="0,0,0,10" 
+                Click="LoginButton_Click"/>
+            
+            <Button 
+                Content="Zarejestruj się" 
+                Background="#4BB16F" 
+                Foreground="White" 
+                Height="40" 
+                Click="RegisterButton_Click"/>
+
+            <TextBlock 
+                x:Name="StatusMessage" 
+                Foreground="Red" 
+                HorizontalAlignment="Center" 
+                Margin="0,20,0,0" 
+                TextWrapping="Wrap"/>
+
         </StackPanel>
     </Grid>
 </Window>

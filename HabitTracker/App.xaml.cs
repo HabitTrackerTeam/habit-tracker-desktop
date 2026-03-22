@@ -9,5 +9,6 @@ namespace HabitTracker;
 /// </summary>
 public partial class App : Application
 {
+
 }
 
