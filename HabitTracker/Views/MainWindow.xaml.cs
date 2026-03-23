@@ -1,16 +1,6 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using HabitTracker.Services;
+﻿using System.Windows;
 using HabitTracker.ViewModels;
-using Supabase;
+
 
 namespace HabitTracker;
 
@@ -23,19 +13,27 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        _viewModel=new LoginViewModel();
-        this.DataContext=_viewModel;
+        _viewModel = new LoginViewModel();
+        this.DataContext = _viewModel;
     }
 
 
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {
-        await _viewModel.LoginAsync(PasswordInput.Password);
+        await _viewModel.LoginAsync(LoginPassword.Password);
     }
 
     private async void RegisterButton_Click(object sender, RoutedEventArgs e)
     {
-        await _viewModel.RegisterAsync(SupabaseService.Client, PasswordInput.Password);
+        await _viewModel.RegisterAsync(RegisterPassword.Password, RegisterRepeatPassword.Password);
     }
 
+    private async void SendResetLink_Click(object sender, RoutedEventArgs e)
+    {
+        await _viewModel.ResetPasswordAsync();
+    }
+
+    private void NavToRegister_Click(object sender, RoutedEventArgs e) => _viewModel.ShowRegister();
+    private void NavToLogin_Click(object sender, RoutedEventArgs e) => _viewModel.ShowLogin();
+    private void NavToForgot_Click(object sender, RoutedEventArgs e) => _viewModel.ShowForgot();
 }
