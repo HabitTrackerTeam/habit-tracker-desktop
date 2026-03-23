@@ -63,27 +63,7 @@ public partial class MainWindow : Window
 
     private async void RegisterButton_Click(object sender, RoutedEventArgs e)
     {
-        StatusMessage.Text = "Signing up...";
-        StatusMessage.Foreground = System.Windows.Media.Brushes.Black;
-
-        try
-        {
-            var email = EmailInput.Text;
-            var password = PasswordInput.Password;
-
-            var session = await _supabaseClient.Auth.SignUp(email, password);
-
-            if (session?.User != null)
-            {
-                StatusMessage.Foreground = System.Windows.Media.Brushes.Green;
-                StatusMessage.Text = "Signed up successfully! You can now sign in.";
-            }
-        }
-        catch (Exception ex)
-        {
-            StatusMessage.Foreground = System.Windows.Media.Brushes.Red;
-            StatusMessage.Text = $"Sign-up error: {ex.Message}";
-        }
+        await _viewModel.RegisterAsync(_supabaseClient, PasswordInput.Password);
     }
 
 }

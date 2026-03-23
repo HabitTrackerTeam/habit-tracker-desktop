@@ -39,5 +39,24 @@ namespace HabitTracker.ViewModels
             }
             return true;
         }
+
+        public async Task RegisterAsync(Supabase.Client client, string password)
+        {
+            if(!Validate(password)) return;
+
+            StatusMessage = "Signing up...";
+            try
+            {
+                var session = await client.Auth.SignUp(Email, password);
+                if(session?.User != null)
+                {
+                    StatusMessage = "Signed up successfully! You can now sign in.";
+                }
+            }
+            catch(Exception ex)
+            {
+                StatusMessage = $"Sign-up error: {ex.Message}";
+            }
+        }
     }
 }
