@@ -6,18 +6,37 @@ namespace HabitTracker.ViewModels
     public class LoginViewModel : ViewModelBase // Listener for input values
     {
         private string _email = string.Empty;
+        private string _nickname = string.Empty;
         private string _statusMessage = string.Empty;
 
-        public string Email
+        public string Email{get => _email;set { _email = value; OnPropertyChanged(); }}
+        public string Nickname {get => _nickname; set{_nickname = value; OnPropertyChanged();}}
+        public string StatusMessage{get => _statusMessage;set { _statusMessage = value; OnPropertyChanged(); }}
+
+        private bool _isLoginVisible = true;
+        private bool _isRegisterVisible = false;
+        private bool _isForgotVisible = false;
+
+        public bool IsLoginVisible{get => _isLoginVisible; set{_isLoginVisible = value; OnPropertyChanged();}}
+        public bool IsRegisterVisible{get => _isRegisterVisible; set{_isRegisterVisible = value; OnPropertyChanged();}}
+        public bool IsForgotVisible{get => _isForgotVisible; set{_isForgotVisible = value; OnPropertyChanged();}}
+
+        public void ShowLogin()
         {
-            get => _email;
-            set { _email = value; OnPropertyChanged(); }
+            IsLoginVisible = true; IsRegisterVisible = false; IsForgotVisible = false;
+            StatusMessage = string.Empty;
         }
 
-        public string StatusMessage
+        public void ShowRegister()
         {
-            get => _statusMessage;
-            set { _statusMessage = value; OnPropertyChanged(); }
+            IsLoginVisible = false; IsRegisterVisible = true; IsForgotVisible = false;
+            StatusMessage = string.Empty;
+        }
+
+        public void ShowForgot()
+        {
+            IsLoginVisible = false; IsRegisterVisible = false; IsForgotVisible = true;
+            StatusMessage = string.Empty;
         }
 
         public bool Validate(string password)
@@ -40,17 +59,21 @@ namespace HabitTracker.ViewModels
             return true;
         }
 
-        public async Task RegisterAsync(Supabase.Client client, string password)
+        public async Task RegisterAsync(string password, string repeatPassword)
         {
+            if (string.IsNullOrWhiteSpace(Nickname)){StatusMessage = "Nickname is required"; return;}
+            if (password != repeatPassword){StatusMessage = "Passwords do not match"; return;}
             if (!Validate(password)) return;
 
             StatusMessage = "Signing up...";
             try
             {
-                var session = await client.Auth.SignUp(Email, password);
+                var session = await SupabaseService.Client.Auth.SignUp(Email, password);
                 if (session?.User != null)
                 {
                     StatusMessage = "Signed up successfully! You can now sign in.";
+                    await Task.Delay(1500);
+                    ShowLogin();
                 }
             }
             catch (Exception ex)
@@ -77,6 +100,29 @@ namespace HabitTracker.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Error {ex.Message}";
+            }
+        }
+    
+        public async Task ResetPasswordAsync()
+        {
+            if(string.IsNullOrWhiteSpace(Email) || !Email.Contains("@"))
+            {
+                StatusMessage = "Please enter a valid email address to reset your password.";
+            }
+
+            StatusMessage = "Sending reset link...";
+
+            try
+            {
+                await SupabaseService.Client.Auth.ResetPasswordForEmail(Email);
+                StatusMessage = "Reset link sent! Check your inbox.";
+
+                await Task.Delay(1000);
+                ShowLogin();
+            }
+            catch(System.Exception ex)
+            {
+                StatusMessage = $"Error: {ex.Message}";
             }
         }
     }
