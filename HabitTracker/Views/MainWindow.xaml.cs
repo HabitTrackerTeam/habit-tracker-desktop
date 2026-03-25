@@ -106,4 +106,43 @@ public partial class MainWindow : Window
             AvatarBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF328A5D");
         }
     }
+
+    private void ThemeToggle_Click(object sender, RoutedEventArgs e)
+    {
+        var toggle = sender as System.Windows.Controls.Primitives.ToggleButton;
+        bool isDark = toggle.IsChecked == true;
+
+        if (isDark)
+        {
+            //Tryb ciemny
+            var bgBrush = new LinearGradientBrush();
+            bgBrush.StartPoint = new System.Windows.Point(0, 0);
+            bgBrush.EndPoint = new System.Windows.Point(1, 1);
+            bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF121212"), 0.0));
+            bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF1E1E1E"), 1.0));
+
+            this.Resources["AppBgBrush"] = bgBrush;
+            this.Resources["CardBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF2D2D30");
+            this.Resources["TextMainBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFE0E0E0");
+            this.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFA0A0A0");
+            this.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF1E1E1E");
+            this.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF434346");
+        }
+        else
+        {
+            //Tryb jasny
+            var bgBrush = new LinearGradientBrush();
+            bgBrush.StartPoint = new System.Windows.Point(0, 0);
+            bgBrush.EndPoint = new System.Windows.Point(1, 1);
+            bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFF4F4E9"), 0.0));
+            bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFE4E8E5"), 1.0));
+            
+            this.Resources["AppBgBrush"] = bgBrush;
+            this.Resources["CardBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("White");
+            this.Resources["TextMainBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF4E606C");
+            this.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF8B9AA2");
+            this.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFF8F9FA");
+            this.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFDDE2E5");
+        }
+    }
 }
