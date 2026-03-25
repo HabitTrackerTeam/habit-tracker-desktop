@@ -6,43 +6,123 @@
     xmlns:local="clr-namespace:HabitTracker"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="HabitTracker"
+    Icon="/Assets/logo.png"
     Width="800"
     Height="600"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    
+
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        
-        <Style TargetType="Button">
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Cursor" Value="Hand" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background"
+                    Value="#FFF8F9FA"/>
+            <Setter Property="BorderBrush"
+                    Value="#FFDDE2E5"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="Foreground"
+                    Value="#FF4E606C"/>
+            <Setter Property="FontSize"
+                    Value="14"/>
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            Padding="10,8"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="8"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="10,0"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <Style x:Key="LabelStyle" TargetType="TextBlock">
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="#FF4E606C" />
-            <Setter Property="Margin" Value="0,0,0,5" />
-            <Setter Property="FontSize" Value="13" />
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background"
+                    Value="#FFF8F9FA"/>
+            <Setter Property="BorderBrush"
+                    Value="#FFDDE2E5"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="Foreground"
+                    Value="#FF4E606C"/>
+            <Setter Property="FontSize"
+                    Value="14"/>
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border CornerRadius="8"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="10,0"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="BtnBorder"
+                                Padding="10,8"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="BtnBorder"
+                                        Property="Opacity"
+                                        Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter TargetName="BtnBorder"
+                                        Property="Opacity"
+                                        Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="LabelStyle"
+               TargetType="TextBlock">
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+            <Setter Property="Foreground"
+                    Value="#FF4E606C"/>
+            <Setter Property="Margin"
+                    Value="0,0,0,5"/>
+            <Setter Property="FontSize"
+                    Value="13"/>
         </Style>
     </Window.Resources>
-    
-    <Grid Background="#FFF4F4E9">
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0"
+                                 EndPoint="1,1">
+                <GradientStop Color="#FFF4F4E9"
+                              Offset="0.0"/>
+                <GradientStop Color="#FFE4E8E5"
+                              Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
         <Border
             Width="380"
             Padding="35,35,35,45"
@@ -55,74 +135,241 @@
                     BlurRadius="20"
                     Opacity="0.08"
                     ShadowDepth="4"
-                    Color="Black" />
+                    Color="Black"/>
             </Border.Effect>
 
             <Grid>
-                
                 <StackPanel Visibility="{Binding IsLoginVisible, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Margin="0,0,0,5" FontSize="36" FontWeight="Bold" Foreground="#FF328A5D" Text="Habit Tracker" TextAlignment="Center" />
-                    <TextBlock Margin="0,0,0,30" FontSize="14" Foreground="#FF8B9AA2" Text="Please log in to continue" TextAlignment="Center" />
+                    <Image Source="/Assets/logo.png"
+                           Height="65"
+                           Margin="0,0,0,10"
+                           HorizontalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Margin="0,0,0,5"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               Foreground="#FF328A5D"
+                               Text="Habit Tracker"
+                               TextAlignment="Center"/>
+                    <TextBlock Margin="0,0,0,30"
+                               FontSize="14"
+                               Foreground="#FF8B9AA2"
+                               Text="Please log in to continue"
+                               TextAlignment="Center"/>
 
-                    <TextBlock Style="{StaticResource LabelStyle}" Text="E-mail" />
-                    <TextBox x:Name="EmailInput" Height="38" Margin="0,0,0,15" Padding="10,8" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="14" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Style="{StaticResource LabelStyle}"
+                               Text="E-mail"/>
+                    <TextBox x:Name="EmailInput"
+                             Height="38"
+                             Margin="0,0,0,15"
+                             Padding="10,8"
+                             BorderBrush="#FFDDE2E5"
+                             BorderThickness="1"
+                             FontSize="14"
+                             Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Style="{StaticResource LabelStyle}" Text="Password" />
-                    <PasswordBox x:Name="LoginPassword" Height="38" Margin="0,0,0,15" Padding="10,8" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="14" />
+                    <TextBlock Style="{StaticResource LabelStyle}"
+                               Text="Password"/>
+                    <PasswordBox x:Name="LoginPassword"
+                                 Height="38"
+                                 Margin="0,0,0,15"
+                                 Padding="10,8"
+                                 BorderBrush="#FFDDE2E5"
+                                 BorderThickness="1"
+                                 FontSize="14"/>
 
-                    <Button Height="42" Margin="0,0,0,15" Background="#FF328A5D" Click="LoginButton_Click" Content="Sign in" />
+                    <Button Height="42"
+                            Margin="0,0,0,15"
+                            Background="#FF328A5D"
+                            Click="LoginButton_Click"
+                            Content="Sign in"/>
 
-                    <Button Height="42" Background="#FF8EAD9C" Click="NavToRegister_Click" Content="Create new account" />
+                    <Button Height="42"
+                            Background="#FF8EAD9C"
+                            Click="NavToRegister_Click"
+                            Content="Create new account"/>
 
-                    <Button Margin="0,15,0,0" HorizontalAlignment="Center" Background="Transparent" Click="NavToForgot_Click" Content="Forgot your password?" Cursor="Hand" FontSize="12" Foreground="#FF4E606C">
+                    <Button Margin="0,15,0,0"
+                            HorizontalAlignment="Center"
+                            Background="Transparent"
+                            Click="NavToForgot_Click"
+                            Content="Forgot your password?"
+                            Cursor="Hand"
+                            FontSize="12"
+                            Foreground="#FF4E606C">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <TextBlock Text="{TemplateBinding Content}" TextDecorations="Underline" />
+                                <TextBlock Text="{TemplateBinding Content}"
+                                           TextDecorations="Underline"/>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding IsRegisterVisible, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Margin="0,0,0,5" FontSize="28" FontWeight="Bold" Foreground="#FF328A5D" Text="Sign Up" TextAlignment="Center" />
-                    <TextBlock Margin="0,0,0,20" FontSize="14" Foreground="#FF8B9AA2" Text="Create your new account" TextAlignment="Center" />
+                    <TextBlock Margin="0,0,0,5"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#FF328A5D"
+                               Text="Sign Up"
+                               TextAlignment="Center"/>
+                    <TextBlock Margin="0,0,0,20"
+                               FontSize="14"
+                               Foreground="#FF8B9AA2"
+                               Text="Create your new account"
+                               TextAlignment="Center"/>
 
-                    <TextBlock Style="{StaticResource LabelStyle}" Text="Nickname" />
-                    <TextBox Height="38" Margin="0,0,0,15" Padding="10,8" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="14" Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Style="{StaticResource LabelStyle}"
+                               Text="Nickname"/>
+                    <TextBox Height="38"
+                             Margin="0,0,0,15"
+                             Padding="10,8"
+                             BorderBrush="#FFDDE2E5"
+                             BorderThickness="1"
+                             FontSize="14"
+                             Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Style="{StaticResource LabelStyle}" Text="E-mail" />
-                    <TextBox Height="38" Margin="0,0,0,15" Padding="10,8" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="14" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Style="{StaticResource LabelStyle}"
+                               Text="E-mail"/>
+                    <TextBox Height="38"
+                             Margin="0,0,0,15"
+                             Padding="10,8"
+                             BorderBrush="#FFDDE2E5"
+                             BorderThickness="1"
+                             FontSize="14"
+                             Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Style="{StaticResource LabelStyle}" Text="Password" />
-                    <PasswordBox x:Name="RegisterPassword" Height="38" Margin="0,0,0,15" Padding="10,8" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="14" />
+                    <TextBlock Style="{StaticResource LabelStyle}"
+                               Text="Password"/>
+                    <PasswordBox x:Name="RegisterPassword"
+                                 Height="38"
+                                 Margin="0,0,0,15"
+                                 Padding="10,8"
+                                 BorderBrush="#FFDDE2E5"
+                                 BorderThickness="1"
+                                 FontSize="14"/>
 
-                    <TextBlock Style="{StaticResource LabelStyle}" Text="Repeat Password" />
-                    <PasswordBox x:Name="RegisterRepeatPassword" Height="38" Margin="0,0,0,25" Padding="10,8" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="14" />
+                    <TextBlock Style="{StaticResource LabelStyle}"
+                               Text="Repeat Password"/>
+                    <PasswordBox x:Name="RegisterRepeatPassword"
+                                 Height="38"
+                                 Margin="0,0,0,25"
+                                 Padding="10,8"
+                                 BorderBrush="#FFDDE2E5"
+                                 BorderThickness="1"
+                                 FontSize="14"/>
 
-                    <Button Height="42" Margin="0,0,0,15" Background="#FF328A5D" Click="RegisterButton_Click" Content="Sign up" />
+                    <Button Height="42"
+                            Margin="0,0,0,15"
+                            Background="#FF328A5D"
+                            Click="RegisterButton_Click"
+                            Content="Sign up"/>
 
-                    <Button HorizontalAlignment="Center" Background="Transparent" Click="NavToLogin_Click" Content="Back to Login" Cursor="Hand" FontSize="13" Foreground="#FF8B9AA2">
+                    <Button HorizontalAlignment="Center"
+                            Background="Transparent"
+                            Click="NavToLogin_Click"
+                            Content="Back to Login"
+                            Cursor="Hand"
+                            FontSize="13"
+                            Foreground="#FF8B9AA2">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <TextBlock Text="{TemplateBinding Content}" TextDecorations="Underline" />
+                                <TextBlock Text="{TemplateBinding Content}"
+                                           TextDecorations="Underline"/>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding IsForgotVisible, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Margin="0,0,0,10" FontSize="28" FontWeight="Bold" Foreground="#FF328A5D" Text="Reset Password" TextAlignment="Center" />
-                    <TextBlock Margin="0,0,0,30" FontSize="14" Foreground="#FF8B9AA2" Text="Enter your email to receive a reset link" TextAlignment="Center" TextWrapping="Wrap" />
+                    <Image Source="/Assets/logo.png"
+                           Height="65"
+                           Margin="0,0,0,10"
+                           HorizontalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Margin="0,0,0,10"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#FF328A5D"
+                               Text="Reset Password"
+                               TextAlignment="Center"/>
 
-                    <TextBlock Style="{StaticResource LabelStyle}" Text="E-mail" />
-                    <TextBox Height="38" Margin="0,0,0,25" Padding="10,8" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="14" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" />
+                    <StackPanel Visibility="{Binding IsForgotEmailStep, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Margin="0,0,0,30"
+                                FontSize="14"
+                                Foreground="#FF8B9AA2"
+                                Text="Enter your email to receive a reset code"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap"/>
+                        <TextBlock Style="{StaticResource LabelStyle}"
+                                Text="E-mail"/>
+                        <TextBox Height="38"
+                                Margin="0,0,0,25"
+                                Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Height="42"
+                                Margin="0,0,0,15"
+                                Background="#FF328A5D"
+                                Click="SendResetLink_Click"
+                                Content="Send reset code"/>
+                    </StackPanel>
 
-                    <Button Height="42" Margin="0,0,0,15" Background="#FF328A5D" Click="SendResetLink_Click" Content="Send reset link" />
+                    <StackPanel Visibility="{Binding IsForgotCodeStep, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Margin="0,0,0,20"
+                                FontSize="14"
+                                Foreground="#FF8B9AA2"
+                                Text="Enter the verification code from your email"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap"/>
+                        <TextBlock Style="{StaticResource LabelStyle}"
+                                Text="Recovery Code"/>
+                        <TextBox Height="38"
+                                Margin="0,0,0,25"
+                                Text="{Binding ResetToken, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Height="42"
+                                Margin="0,0,0,15"
+                                Background="#FF328A5D"
+                                Click="VerifyOnlyCode_Click"
+                                Content="Verify code"/>
+                    </StackPanel>
 
-                    <Button HorizontalAlignment="Center" Background="Transparent" Click="NavToLogin_Click" Content="Back to Login" Cursor="Hand" FontSize="13" Foreground="#FF8B9AA2">
+                    <StackPanel Visibility="{Binding IsForgotNewPasswordStep, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Margin="0,0,0,20"
+                                FontSize="14"
+                                Foreground="#FF8B9AA2"
+                                Text="Create your new password"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap"/>
+
+                        <TextBlock Style="{StaticResource LabelStyle}"
+                                Text="New Password"/>
+                        <PasswordBox x:Name="ForgotNewPassword"
+                                Height="38"
+                                Margin="0,0,0,15"/>
+
+                        <TextBlock Style="{StaticResource LabelStyle}"
+                                Text="Repeat Password"/>
+                        <PasswordBox x:Name="ForgotRepeatPassword"
+                                Height="38"
+                                Margin="0,0,0,25"/>
+
+                        <Button Height="42"
+                                Margin="0,0,0,15"
+                                Background="#FF328A5D"
+                                Click="SaveNewPassword_Click"
+                                Content="Save new password"/>
+                    </StackPanel>
+
+                    <Button HorizontalAlignment="Center"
+                            Background="Transparent"
+                            Click="NavToLogin_Click"
+                            Content="Back to Login"
+                            Cursor="Hand"
+                            FontSize="13"
+                            Foreground="#FF8B9AA2">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <TextBlock Text="{TemplateBinding Content}" TextDecorations="Underline" />
+                                <TextBlock Text="{TemplateBinding Content}"
+                                        TextDecorations="Underline"/>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
@@ -136,8 +383,8 @@
                     FontWeight="Medium"
                     Text="{Binding StatusMessage}"
                     TextAlignment="Center"
-                    TextWrapping="Wrap" />
-                    
+                    TextWrapping="Wrap"/>
+
             </Grid>
         </Border>
     </Grid>
