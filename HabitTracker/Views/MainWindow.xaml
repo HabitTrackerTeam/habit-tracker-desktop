@@ -296,16 +296,16 @@
 
                     <StackPanel Visibility="{Binding IsForgotEmailStep, Converter={StaticResource BoolToVis}}">
                         <TextBlock Margin="0,0,0,30"
-                                FontSize="14"
-                                Foreground="#FF8B9AA2"
-                                Text="Enter your email to receive a reset code"
-                                TextAlignment="Center"
-                                TextWrapping="Wrap"/>
+                                   FontSize="14"
+                                   Foreground="#FF8B9AA2"
+                                   Text="Enter your email to receive a reset code"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"/>
                         <TextBlock Style="{StaticResource LabelStyle}"
-                                Text="E-mail"/>
+                                   Text="E-mail"/>
                         <TextBox Height="38"
-                                Margin="0,0,0,25"
-                                Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Margin="0,0,0,25"
+                                 Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Height="42"
                                 Margin="0,0,0,15"
                                 Background="#FF328A5D"
@@ -315,16 +315,16 @@
 
                     <StackPanel Visibility="{Binding IsForgotCodeStep, Converter={StaticResource BoolToVis}}">
                         <TextBlock Margin="0,0,0,20"
-                                FontSize="14"
-                                Foreground="#FF8B9AA2"
-                                Text="Enter the verification code from your email"
-                                TextAlignment="Center"
-                                TextWrapping="Wrap"/>
+                                   FontSize="14"
+                                   Foreground="#FF8B9AA2"
+                                   Text="Enter the verification code from your email"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"/>
                         <TextBlock Style="{StaticResource LabelStyle}"
-                                Text="Recovery Code"/>
+                                   Text="Recovery Code"/>
                         <TextBox Height="38"
-                                Margin="0,0,0,25"
-                                Text="{Binding ResetToken, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Margin="0,0,0,25"
+                                 Text="{Binding ResetToken, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Height="42"
                                 Margin="0,0,0,15"
                                 Background="#FF328A5D"
@@ -334,23 +334,23 @@
 
                     <StackPanel Visibility="{Binding IsForgotNewPasswordStep, Converter={StaticResource BoolToVis}}">
                         <TextBlock Margin="0,0,0,20"
-                                FontSize="14"
-                                Foreground="#FF8B9AA2"
-                                Text="Create your new password"
-                                TextAlignment="Center"
-                                TextWrapping="Wrap"/>
+                                   FontSize="14"
+                                   Foreground="#FF8B9AA2"
+                                   Text="Create your new password"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"/>
 
                         <TextBlock Style="{StaticResource LabelStyle}"
-                                Text="New Password"/>
+                                   Text="New Password"/>
                         <PasswordBox x:Name="ForgotNewPassword"
-                                Height="38"
-                                Margin="0,0,0,15"/>
+                                     Height="38"
+                                     Margin="0,0,0,15"/>
 
                         <TextBlock Style="{StaticResource LabelStyle}"
-                                Text="Repeat Password"/>
+                                   Text="Repeat Password"/>
                         <PasswordBox x:Name="ForgotRepeatPassword"
-                                Height="38"
-                                Margin="0,0,0,25"/>
+                                     Height="38"
+                                     Margin="0,0,0,25"/>
 
                         <Button Height="42"
                                 Margin="0,0,0,15"
@@ -369,7 +369,7 @@
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <TextBlock Text="{TemplateBinding Content}"
-                                        TextDecorations="Underline"/>
+                                           TextDecorations="Underline"/>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
@@ -381,6 +381,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
                     FontWeight="Medium"
+                    Foreground="{Binding StatusColor}"
                     Text="{Binding StatusMessage}"
                     TextAlignment="Center"
                     TextWrapping="Wrap"/>
