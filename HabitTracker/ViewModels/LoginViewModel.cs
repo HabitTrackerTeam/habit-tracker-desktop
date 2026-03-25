@@ -9,12 +9,13 @@ namespace HabitTracker.ViewModels
         private string _nickname = string.Empty;
         private string _statusMessage = string.Empty;
         private string _statusColor = "#FF8B9AA2";
+        private string _avatarPath = string.Empty;
 
         public string Email { get => _email; set { _email = value; OnPropertyChanged(); } }
         public string Nickname { get => _nickname; set { _nickname = value; OnPropertyChanged(); } }
         public string StatusMessage { get => _statusMessage; set { _statusMessage = value; OnPropertyChanged(); } }
         public string StatusColor { get => _statusColor; set { _statusColor = value; OnPropertyChanged(); } }
-
+        public string AvatarPath{get=>_avatarPath;set{_avatarPath=value; OnPropertyChanged();}}
         private bool _isLoginVisible = true;
         private bool _isRegisterVisible = false;
         private bool _isForgotVisible = false;

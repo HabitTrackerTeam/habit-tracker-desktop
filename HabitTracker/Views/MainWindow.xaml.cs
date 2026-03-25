@@ -1,6 +1,8 @@
-﻿using System.Windows;
+﻿using System.Drawing;
+using System.Windows;
+using System.Windows.Media.Imaging;
 using HabitTracker.ViewModels;
-
+using System.Windows.Media;
 
 namespace HabitTracker;
 
@@ -56,4 +58,24 @@ public partial class MainWindow : Window
     private void NavToRegister_Click(object sender, RoutedEventArgs e) => _viewModel.ShowRegister();
     private void NavToLogin_Click(object sender, RoutedEventArgs e) => _viewModel.ShowLogin();
     private void NavToForgot_Click(object sender, RoutedEventArgs e) => _viewModel.ShowForgot();
+
+    private void ChooseAvatar_Click(object sender, RoutedEventArgs e)
+    {
+        Microsoft.Win32.OpenFileDialog openFileDialog=new Microsoft.Win32.OpenFileDialog();
+
+        openFileDialog.Filter = "Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg";
+
+        //jesli uzytkownik wybral plik i zatwierdzil ok
+        if(openFileDialog.ShowDialog() == true)
+        {
+            string selectedFilePath = openFileDialog.FileName;
+
+            _viewModel.AvatarPath = selectedFilePath;
+
+            // wyswietlenie zdjecia w okraglej ramce
+            AvatarImageBrush.ImageSource = new BitmapImage(new Uri(selectedFilePath));
+            //sukces-zmiana koloru obramowania
+            AvatarBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF328A5D");
+        }
+    }
 }
