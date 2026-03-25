@@ -8,10 +8,12 @@ namespace HabitTracker.ViewModels
         private string _email = string.Empty;
         private string _nickname = string.Empty;
         private string _statusMessage = string.Empty;
+        private string _statusColor = "#FF8B9AA2";
 
         public string Email { get => _email; set { _email = value; OnPropertyChanged(); } }
         public string Nickname { get => _nickname; set { _nickname = value; OnPropertyChanged(); } }
         public string StatusMessage { get => _statusMessage; set { _statusMessage = value; OnPropertyChanged(); } }
+        public string StatusColor { get => _statusColor; set { _statusColor = value; OnPropertyChanged(); } }
 
         private bool _isLoginVisible = true;
         private bool _isRegisterVisible = false;
@@ -57,16 +59,19 @@ namespace HabitTracker.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Email))
             {
+                StatusColor = "#FFD32F2F";
                 StatusMessage = "Email can't be empty";
                 return false;
             }
             if (!Email.Contains("@"))
             {
+                StatusColor = "#FFD32F2F";
                 StatusMessage = "Wrong email format";
                 return false;
             }
             if (string.IsNullOrWhiteSpace(password))
             {
+                StatusColor = "#FFD32F2F";
                 StatusMessage = "Password can't be empty";
                 return false;
             }
@@ -96,27 +101,42 @@ namespace HabitTracker.ViewModels
             }
         }
 
-        public async Task LoginAsync(string password)
+        public async Task<bool> LoginAsync(string password)
         {
-            if (!Validate(password)) return;
+            if (!Validate(password))
+            {
+                return false;
+            }
 
+            StatusColor = "#FF8B9AA2"; 
             StatusMessage = "Signing in...";
+
             try
             {
-
                 var session = await SupabaseService.Client.Auth.SignIn(Email, password);
-
                 if (session?.User != null)
                 {
+                    StatusColor = "#FF328A5D";
                     StatusMessage = $"Hello {session.User.Email}";
+                    return true;
                 }
+                return false;
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                StatusMessage = $"Error {ex.Message}";
+                StatusColor = "#FFD32F2F"; 
+
+                if (ex.Message.Contains("invalid_credentials"))
+                {
+                    StatusMessage = "Invalid email or password.";
+                }
+                else
+                {
+                    StatusMessage = "An error occurred. Please try again.";
+                }
+                return false;
             }
         }
-
         public async Task ResetPasswordAsync()
         {
             if (string.IsNullOrWhiteSpace(Email) || !Email.Contains("@"))
@@ -171,7 +191,7 @@ namespace HabitTracker.ViewModels
 
                 StatusMessage = "Password updated successfully!";
                 await Task.Delay(1500);
-                ShowLogin(); 
+                ShowLogin();
             }
             catch (System.Exception)
             {
