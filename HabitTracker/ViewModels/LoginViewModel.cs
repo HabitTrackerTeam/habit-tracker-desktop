@@ -15,7 +15,7 @@ namespace HabitTracker.ViewModels
         public string Nickname { get => _nickname; set { _nickname = value; OnPropertyChanged(); } }
         public string StatusMessage { get => _statusMessage; set { _statusMessage = value; OnPropertyChanged(); } }
         public string StatusColor { get => _statusColor; set { _statusColor = value; OnPropertyChanged(); } }
-        public string AvatarPath{get=>_avatarPath;set{_avatarPath=value; OnPropertyChanged();}}
+        public string AvatarPath { get => _avatarPath; set { _avatarPath = value; OnPropertyChanged(); } }
         private bool _isLoginVisible = true;
         private bool _isRegisterVisible = false;
         private bool _isForgotVisible = false;
@@ -37,6 +37,8 @@ namespace HabitTracker.ViewModels
         public void ShowLogin()
         {
             IsLoginVisible = true; IsRegisterVisible = false; IsForgotVisible = false;
+            Nickname = string.Empty;
+            AvatarPath = string.Empty;
             StatusMessage = string.Empty;
         }
 
@@ -79,26 +81,74 @@ namespace HabitTracker.ViewModels
             return true;
         }
 
-        public async Task RegisterAsync(string password, string repeatPassword)
+        public async Task<bool> RegisterAsync(string password, string repeatPassword)
         {
-            if (string.IsNullOrWhiteSpace(Nickname)) { StatusMessage = "Nickname is required"; return; }
-            if (password != repeatPassword) { StatusMessage = "Passwords do not match"; return; }
-            if (!Validate(password)) return;
+            if (!Validate(password)) return false;
 
-            StatusMessage = "Signing up...";
+            if (string.IsNullOrWhiteSpace(Nickname))
+            {
+                StatusColor = "#FFD32F2F";
+                StatusMessage = "Nickname is required.";
+                return false;
+            }
+
+            StatusColor = "#FF8B9AA2";
+            StatusMessage = "Processing your registration...";
+
             try
             {
-                var session = await SupabaseService.Client.Auth.SignUp(Email, password);
+                string finalAvatarUrl = "";
+
+                //Wgrywanie zdjecia do Supabase Storage (jesli zostalo wybrane)
+                if (!string.IsNullOrEmpty(AvatarPath))
+                {
+                    StatusMessage = "Uploading avatar...";
+
+                    //wczytywanie pliku z dysku
+                    byte[] imageBytes = System.IO.File.ReadAllBytes(AvatarPath);
+                    string extension = System.IO.Path.GetExtension(AvatarPath);
+
+                    //generujemy losowa nazwe pliku, aby uniknąc nadpisywania
+                    string uniqueFileName = $"{Guid.NewGuid()}{extension}";
+
+                    //wysylane do avatars
+                    await SupabaseService.Client.Storage.From("avatars").Upload(imageBytes, uniqueFileName);
+
+                    //odbieramy gotowy publiczny link
+                    finalAvatarUrl = SupabaseService.Client.Storage.From("avatars").GetPublicUrl(uniqueFileName);
+                }
+
+                StatusMessage = "Creating account...";
+
+                var signUpOptions = new Supabase.Gotrue.SignUpOptions
+                {
+                    Data = new Dictionary<string, object>
+            {
+                { "nickname", Nickname },
+                { "avatar_url", finalAvatarUrl }
+            }
+                };
+
+                var session = await SupabaseService.Client.Auth.SignUp(Email, password, signUpOptions);
+
                 if (session?.User != null)
                 {
-                    StatusMessage = "Signed up successfully! You can now sign in.";
-                    await Task.Delay(1500);
-                    ShowLogin();
+                    StatusColor = "#FF328A5D";
+                    StatusMessage = "Account created successfully!";
+                    return true;
                 }
+
+                return false;
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                StatusMessage = $"Sign-up error: {ex.Message}";
+                StatusColor = "#FFD32F2F";
+
+                StatusMessage = ex.Message.Contains("User already registered")
+                    ? "This email is already taken."
+                    : "Error occurred during registration.";
+
+                return false;
             }
         }
 
@@ -109,7 +159,7 @@ namespace HabitTracker.ViewModels
                 return false;
             }
 
-            StatusColor = "#FF8B9AA2"; 
+            StatusColor = "#FF8B9AA2";
             StatusMessage = "Signing in...";
 
             try
@@ -125,7 +175,7 @@ namespace HabitTracker.ViewModels
             }
             catch (System.Exception ex)
             {
-                StatusColor = "#FFD32F2F"; 
+                StatusColor = "#FFD32F2F";
 
                 if (ex.Message.Contains("invalid_credentials"))
                 {
