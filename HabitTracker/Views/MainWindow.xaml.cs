@@ -33,6 +33,26 @@ public partial class MainWindow : Window
         await _viewModel.ResetPasswordAsync();
     }
 
+    private async void VerifyOnlyCode_Click(object sender, RoutedEventArgs e)
+    {
+        await _viewModel.VerifyCodeAsync();
+    }
+
+    private async void SaveNewPassword_Click(object sender, RoutedEventArgs e)
+    {
+        if (ForgotNewPassword.Password != ForgotRepeatPassword.Password)
+    {
+        _viewModel.StatusMessage = "Passwords do not match!";
+        return;
+    }
+
+    if (ForgotNewPassword.Password.Length < 6)
+    {
+        _viewModel.StatusMessage = "Password must be at least 6 characters.";
+        return;
+    }
+    await _viewModel.UpdatePasswordAsync(ForgotNewPassword.Password);
+    }
     private void NavToRegister_Click(object sender, RoutedEventArgs e) => _viewModel.ShowRegister();
     private void NavToLogin_Click(object sender, RoutedEventArgs e) => _viewModel.ShowLogin();
     private void NavToForgot_Click(object sender, RoutedEventArgs e) => _viewModel.ShowForgot();
