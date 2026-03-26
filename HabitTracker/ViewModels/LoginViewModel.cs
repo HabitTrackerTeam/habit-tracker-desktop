@@ -1,252 +1,287 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using HabitTracker.Services;
+using HabitTracker.Models;
+using System.Collections.ObjectModel;
+
 namespace HabitTracker.ViewModels
 {
-    public class LoginViewModel : ViewModelBase // Listener for input values
+    public class LoginViewModel : ViewModelBase
     {
+        private const string ColorError = "#FFD32F2F";
+        private const string ColorSuccess = "#FF328A5D";
+        private const string ColorInfo = "#FF8B9AA2";
+
         private string _email = string.Empty;
         private string _nickname = string.Empty;
         private string _statusMessage = string.Empty;
-        private string _statusColor = "#FF8B9AA2";
+        private string _statusColor = ColorInfo;
         private string _avatarPath = string.Empty;
+        private string _resetToken = string.Empty;
+
+        private bool _isLoginVisible = true;
+        private bool _isRegisterVisible = false;
+        private bool _isForgotVisible = false;
+        private bool _isForgotEmailStep = true;
+        private bool _isForgotCodeStep = false;
+        private bool _isForgotNewPasswordStep = false;
+        private bool _isAccountSelectionVisible = false;
+        public bool IsAccountSelectionVisible { get => _isAccountSelectionVisible; set { _isAccountSelectionVisible = value; OnPropertyChanged(); } }
+        //konta do wyswietlenia
+        private ObservableCollection<SavedAccount> _savedAccounts = new ObservableCollection<SavedAccount>();
+        public ObservableCollection<SavedAccount> SavedAccounts { get => _savedAccounts; set { _savedAccounts = value; OnPropertyChanged(); } }
 
         public string Email { get => _email; set { _email = value; OnPropertyChanged(); } }
         public string Nickname { get => _nickname; set { _nickname = value; OnPropertyChanged(); } }
         public string StatusMessage { get => _statusMessage; set { _statusMessage = value; OnPropertyChanged(); } }
         public string StatusColor { get => _statusColor; set { _statusColor = value; OnPropertyChanged(); } }
         public string AvatarPath { get => _avatarPath; set { _avatarPath = value; OnPropertyChanged(); } }
-        private bool _isLoginVisible = true;
-        private bool _isRegisterVisible = false;
-        private bool _isForgotVisible = false;
+        public string ResetToken { get => _resetToken; set { _resetToken = value; OnPropertyChanged(); } }
 
         public bool IsLoginVisible { get => _isLoginVisible; set { _isLoginVisible = value; OnPropertyChanged(); } }
         public bool IsRegisterVisible { get => _isRegisterVisible; set { _isRegisterVisible = value; OnPropertyChanged(); } }
         public bool IsForgotVisible { get => _isForgotVisible; set { _isForgotVisible = value; OnPropertyChanged(); } }
-
-        private string _resetToken = string.Empty;
-        private bool _isForgotEmailStep = true;
-        private bool _isForgotCodeStep = false;
-        private bool _isForgotNewPasswordStep = false;
-
-        public string ResetToken { get => _resetToken; set { _resetToken = value; OnPropertyChanged(); } }
         public bool IsForgotEmailStep { get => _isForgotEmailStep; set { _isForgotEmailStep = value; OnPropertyChanged(); } }
         public bool IsForgotCodeStep { get => _isForgotCodeStep; set { _isForgotCodeStep = value; OnPropertyChanged(); } }
         public bool IsForgotNewPasswordStep { get => _isForgotNewPasswordStep; set { _isForgotNewPasswordStep = value; OnPropertyChanged(); } }
 
-        public void ShowLogin()
+        //KONSTRUKTOR
+        public LoginViewModel()
         {
-            IsLoginVisible = true; IsRegisterVisible = false; IsForgotVisible = false;
-            Nickname = string.Empty;
-            AvatarPath = string.Empty;
-            StatusMessage = string.Empty;
+            var accounts = LocalAccountService.LoadSavedAccounts();
+            SavedAccounts = new ObservableCollection<SavedAccount>(accounts);
+
+            if (SavedAccounts.Count > 0)
+            {
+                ShowAccountSelection();
+            }
+            else
+            {
+                ShowLogin();
+            }
+        }
+        private void SetStatus(string message, string color = ColorInfo)
+        {
+            StatusMessage = message;
+            StatusColor = color;
         }
 
-        public void ShowRegister()
+        private void SwitchMainView(bool login, bool register, bool forgot, bool accountSelection)
         {
-            IsLoginVisible = false; IsRegisterVisible = true; IsForgotVisible = false;
-            StatusMessage = string.Empty;
+            IsLoginVisible = login;
+            IsRegisterVisible = register;
+            IsForgotVisible = forgot;
+            IsAccountSelectionVisible = accountSelection;
+            SetStatus(string.Empty);
         }
+
+
+        public void ShowLogin()
+        {
+            SwitchMainView(true, false, false, false);
+            Nickname = string.Empty;
+            AvatarPath = string.Empty;
+        }
+
+        public void ShowRegister() => SwitchMainView(false, true, false, false);
 
         public void ShowForgot()
         {
-            IsLoginVisible = false; IsRegisterVisible = false; IsForgotVisible = true;
-            IsForgotEmailStep = true; //Pokazujemy pole na email
-            IsForgotCodeStep = false; // ukrywamy pole na PIN
+            SwitchMainView(false, false, true, false);
+            IsForgotEmailStep = true;
+            IsForgotCodeStep = false;
             IsForgotNewPasswordStep = false;
-            StatusMessage = string.Empty;
             ResetToken = string.Empty;
         }
 
-        public bool Validate(string password)
+        public void ShowAccountSelection() => SwitchMainView(false, false, false, true);
+
+        private bool ValidateBasicInput(string password)
         {
             if (string.IsNullOrWhiteSpace(Email))
             {
-                StatusColor = "#FFD32F2F";
-                StatusMessage = "Email can't be empty";
+                SetStatus("Email can't be empty", ColorError);
                 return false;
             }
             if (!Email.Contains("@"))
             {
-                StatusColor = "#FFD32F2F";
-                StatusMessage = "Wrong email format";
+                SetStatus("Wrong email format", ColorError);
                 return false;
             }
             if (string.IsNullOrWhiteSpace(password))
             {
-                StatusColor = "#FFD32F2F";
-                StatusMessage = "Password can't be empty";
+                SetStatus("Password can't be empty", ColorError);
                 return false;
             }
             return true;
         }
 
-        public async Task<bool> RegisterAsync(string password, string repeatPassword)
+        public async Task<bool> RegisterAsync(string password)
         {
-            if (!Validate(password)) return false;
+            if (!ValidateBasicInput(password)) return false;
 
             if (string.IsNullOrWhiteSpace(Nickname))
             {
-                StatusColor = "#FFD32F2F";
-                StatusMessage = "Nickname is required.";
+                SetStatus("Nickname is required.", ColorError);
                 return false;
             }
 
-            StatusColor = "#FF8B9AA2";
-            StatusMessage = "Processing your registration...";
+            SetStatus("Processing your registration...");
 
             try
             {
-                string finalAvatarUrl = "";
+                string finalAvatarUrl = string.Empty;
 
-                //Wgrywanie zdjecia do Supabase Storage (jesli zostalo wybrane)
                 if (!string.IsNullOrEmpty(AvatarPath))
                 {
-                    StatusMessage = "Uploading avatar...";
-
-                    //wczytywanie pliku z dysku
+                    SetStatus("Uploading avatar...");
                     byte[] imageBytes = System.IO.File.ReadAllBytes(AvatarPath);
                     string extension = System.IO.Path.GetExtension(AvatarPath);
-
-                    //generujemy losowa nazwe pliku, aby uniknąc nadpisywania
                     string uniqueFileName = $"{Guid.NewGuid()}{extension}";
 
-                    //wysylane do avatars
                     await SupabaseService.Client.Storage.From("avatars").Upload(imageBytes, uniqueFileName);
-
-                    //odbieramy gotowy publiczny link
                     finalAvatarUrl = SupabaseService.Client.Storage.From("avatars").GetPublicUrl(uniqueFileName);
                 }
 
-                StatusMessage = "Creating account...";
+                SetStatus("Creating account...");
 
                 var signUpOptions = new Supabase.Gotrue.SignUpOptions
                 {
                     Data = new Dictionary<string, object>
-            {
-                { "nickname", Nickname },
-                { "avatar_url", finalAvatarUrl }
-            }
+                    {
+                        { "nickname", Nickname },
+                        { "avatar_url", finalAvatarUrl }
+                    }
                 };
 
                 var session = await SupabaseService.Client.Auth.SignUp(Email, password, signUpOptions);
 
                 if (session?.User != null)
                 {
-                    StatusColor = "#FF328A5D";
-                    StatusMessage = "Account created successfully!";
+                    var newAccount = new SavedAccount
+                    {
+                        Email = Email,
+                        Nickname = Nickname,
+                        AvatarUrl = finalAvatarUrl,
+                        LastLogin = DateTime.Now
+                    };
+                    LocalAccountService.SaveAccount(newAccount);
+
+                    SetStatus("Account created successfully!", ColorSuccess);
                     return true;
                 }
-
                 return false;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                StatusColor = "#FFD32F2F";
-
-                StatusMessage = ex.Message.Contains("User already registered")
-                    ? "This email is already taken."
-                    : "Error occurred during registration.";
-
+                SetStatus(ex.Message.Contains("User already registered") ? "This email is already taken." : "Error occurred during registration.", ColorError);
                 return false;
             }
         }
 
         public async Task<bool> LoginAsync(string password)
         {
-            if (!Validate(password))
-            {
-                return false;
-            }
+            if (!ValidateBasicInput(password)) return false;
 
-            StatusColor = "#FF8B9AA2";
-            StatusMessage = "Signing in...";
+            SetStatus("Signing in...");
 
             try
             {
                 var session = await SupabaseService.Client.Auth.SignIn(Email, password);
                 if (session?.User != null)
                 {
-                    StatusColor = "#FF328A5D";
-                    StatusMessage = $"Hello {session.User.Email}";
+                    string savedNickname = session.User.UserMetadata != null && session.User.UserMetadata.ContainsKey("nickname") ? session.User.UserMetadata["nickname"].ToString() : Email;
+
+                    string savedAvatar = session.User.UserMetadata != null && session.User.UserMetadata.ContainsKey("avatar_url") ? session.User.UserMetadata["avatar_url"].ToString() : "";
+
+                    //zapis/update konta na dysku
+                    var loggedAccount = new SavedAccount
+                    {
+                        Email = Email,
+                        Nickname = savedNickname,
+                        AvatarUrl = savedAvatar,
+                        LastLogin = DateTime.Now
+                    };
+                    LocalAccountService.SaveAccount(loggedAccount);
+
+                    SetStatus($"Hello {savedNickname}", ColorSuccess);
                     return true;
                 }
                 return false;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                StatusColor = "#FFD32F2F";
-
-                if (ex.Message.Contains("invalid_credentials"))
-                {
-                    StatusMessage = "Invalid email or password.";
-                }
-                else
-                {
-                    StatusMessage = "An error occurred. Please try again.";
-                }
+                SetStatus(ex.Message.Contains("invalid_credentials") ? "Invalid email or password." : "An error occurred. Please try again.", ColorError);
                 return false;
             }
         }
+
         public async Task ResetPasswordAsync()
         {
             if (string.IsNullOrWhiteSpace(Email) || !Email.Contains("@"))
             {
-                StatusMessage = "Please enter a valid email address to reset your password.";
+                SetStatus("Please enter a valid email address.", ColorError);
+                return;
             }
 
-            StatusMessage = "Sending reset code...";
+            SetStatus("Sending reset code...");
 
             try
             {
                 await SupabaseService.Client.Auth.ResetPasswordForEmail(Email);
-                StatusMessage = "Code sent! Check your inbox.";
+                SetStatus("Code sent! Check your inbox.", ColorSuccess);
 
                 IsForgotEmailStep = false;
                 IsForgotCodeStep = true;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                StatusMessage = $"Error: {ex.Message}";
+                SetStatus($"Error: {ex.Message}", ColorError);
             }
         }
 
         public async Task VerifyCodeAsync()
         {
-            if (string.IsNullOrWhiteSpace(ResetToken) || ResetToken.Length < 6) { StatusMessage = "Enter the valid code."; return; }
+            if (string.IsNullOrWhiteSpace(ResetToken) || ResetToken.Length < 6)
+            {
+                SetStatus("Enter the valid code.", ColorError);
+                return;
+            }
 
-            StatusMessage = "Verifying code...";
+            SetStatus("Verifying code...");
             try
             {
                 var session = await SupabaseService.Client.Auth.VerifyOTP(Email, ResetToken, Supabase.Gotrue.Constants.EmailOtpType.Recovery);
 
                 if (session?.User != null)
                 {
-                    StatusMessage = "Code verified!";
+                    SetStatus("Code verified!", ColorSuccess);
                     IsForgotCodeStep = false;
                     IsForgotNewPasswordStep = true;
                 }
             }
-            catch (System.Exception)
+            catch (Exception)
             {
-                StatusMessage = "Invalid code. Please try again.";
+                SetStatus("Invalid code. Please try again.", ColorError);
             }
         }
+
         public async Task UpdatePasswordAsync(string newPassword)
         {
-            StatusMessage = "Updating password...";
+            SetStatus("Updating password...");
             try
             {
                 var attrs = new Supabase.Gotrue.UserAttributes { Password = newPassword };
                 await SupabaseService.Client.Auth.Update(attrs);
 
-                StatusMessage = "Password updated successfully!";
+                SetStatus("Password updated successfully!", ColorSuccess);
                 await Task.Delay(1500);
                 ShowLogin();
             }
-            catch (System.Exception)
+            catch (Exception)
             {
-                StatusMessage = "Error occurred while updating password.";
+                SetStatus("Error occurred while updating password.", ColorError);
             }
         }
     }
