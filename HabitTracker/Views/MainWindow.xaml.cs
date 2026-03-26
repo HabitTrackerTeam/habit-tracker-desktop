@@ -3,12 +3,12 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using HabitTracker.ViewModels;
 using System.Windows.Media;
+using HabitTracker.Models;
+using System.Windows.Controls;
 
 namespace HabitTracker;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
+
 public partial class MainWindow : Window
 {
     private LoginViewModel _viewModel;
@@ -43,7 +43,7 @@ public partial class MainWindow : Window
             _viewModel.StatusMessage = "Passwords do not match!";
             return;
         }
-        bool success = await _viewModel.RegisterAsync(RegisterPassword.Password, RegisterRepeatPassword.Password);
+        bool success = await _viewModel.RegisterAsync(RegisterPassword.Password);
 
         if (success)
         {
@@ -136,7 +136,7 @@ public partial class MainWindow : Window
             bgBrush.EndPoint = new System.Windows.Point(1, 1);
             bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFF4F4E9"), 0.0));
             bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFE4E8E5"), 1.0));
-            
+
             this.Resources["AppBgBrush"] = bgBrush;
             this.Resources["CardBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("White");
             this.Resources["TextMainBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF4E606C");
@@ -144,5 +144,28 @@ public partial class MainWindow : Window
             this.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFF8F9FA");
             this.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFDDE2E5");
         }
+    }
+
+    private void SavedAccount_Click(object sender, RoutedEventArgs e)
+    {
+        var button = sender as Button;
+
+        var account = button?.DataContext as SavedAccount;
+
+        if (account != null)
+        {
+
+            _viewModel.Email = account.Email;
+            _viewModel.ShowLogin();
+
+            LoginPassword.Focus();
+        }
+    }
+
+    private void NavToAccountSelection_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.ShowAccountSelection();
+
+        LoginPassword.Password = string.Empty;
     }
 }
