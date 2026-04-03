@@ -13,7 +13,95 @@
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
 
+
         <Window.Resources>
+                <Style x:Key="SidebarMenuItemStyle"
+                       TargetType="Button">
+                        <Setter Property="Background"
+                                Value="Transparent"/>
+                        <Setter Property="Foreground"
+                                Value="{DynamicResource TextMutedBrush}"/>
+                        <Setter Property="FontWeight"
+                                Value="SemiBold"/>
+                        <Setter Property="FontSize"
+                                Value="14"/>
+                        <Setter Property="Padding"
+                                Value="15,12"/>
+                        <Setter Property="Margin"
+                                Value="0,2"/>
+                        <Setter Property="HorizontalContentAlignment"
+                                Value="Left"/>
+                        <Setter Property="BorderThickness"
+                                Value="0"/>
+                        <Setter Property="Cursor"
+                                Value="Hand"/>
+                        <Setter Property="Template">
+                                <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                                <Grid Background="Transparent">
+                                                        <Border x:Name="BgBorder"
+                                                                Background="{DynamicResource InputBgBrush}"
+                                                                CornerRadius="10"
+                                                                Opacity="0"/>
+
+                                                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                          VerticalAlignment="Center">
+                                                                <ContentPresenter.RenderTransform>
+                                                                        <TranslateTransform x:Name="ContentTransform"
+                                                                                            X="0"/>
+                                                                </ContentPresenter.RenderTransform>
+                                                        </ContentPresenter>
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                                <Setter Property="Foreground"
+                                                                        Value="{DynamicResource TextMainBrush}"/>
+
+                                                                <Trigger.EnterActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetName="BgBorder"
+                                                                                                         Storyboard.TargetProperty="Opacity"
+                                                                                                         To="1"
+                                                                                                         Duration="0:0:0.2"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="ContentTransform"
+                                                                                                         Storyboard.TargetProperty="X"
+                                                                                                         To="5"
+                                                                                                         Duration="0:0:0.2">
+                                                                                                <DoubleAnimation.EasingFunction>
+                                                                                                        <QuadraticEase EasingMode="EaseOut"/>
+                                                                                                </DoubleAnimation.EasingFunction>
+                                                                                        </DoubleAnimation>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+
+                                                                <Trigger.ExitActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetName="BgBorder"
+                                                                                                         Storyboard.TargetProperty="Opacity"
+                                                                                                         To="0"
+                                                                                                         Duration="0:0:0.2"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="ContentTransform"
+                                                                                                         Storyboard.TargetProperty="X"
+                                                                                                         To="0"
+                                                                                                         Duration="0:0:0.2">
+                                                                                                <DoubleAnimation.EasingFunction>
+                                                                                                        <QuadraticEase EasingMode="EaseOut"/>
+                                                                                                </DoubleAnimation.EasingFunction>
+                                                                                        </DoubleAnimation>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.ExitActions>
+                                                        </Trigger>
+                                                </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                </Setter.Value>
+                        </Setter>
+                </Style>
                 <LinearGradientBrush x:Key="AppBgBrush"
                                      StartPoint="0,0"
                                      EndPoint="1,1">
@@ -191,7 +279,8 @@
         </Window.Resources>
 
         <Grid Background="{DynamicResource AppBgBrush}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                <ScrollViewer Visibility="{Binding IsAuthVisible, Converter={StaticResource BoolToVis}}"
+                              VerticalScrollBarVisibility="Auto"
                               BorderThickness="0">
                         <Border Width="380"
                                 Padding="35,35,35,45"
@@ -350,7 +439,7 @@
                                                         <Button.Template>
                                                                 <ControlTemplate TargetType="Button">
                                                                         <TextBlock Text="{TemplateBinding Content}"
-                                                                                        TextDecorations="Underline"/>
+                                                                                   TextDecorations="Underline"/>
                                                                 </ControlTemplate>
                                                         </Button.Template>
                                                 </Button>
@@ -367,7 +456,7 @@
                                                         <Button.Template>
                                                                 <ControlTemplate TargetType="Button">
                                                                         <TextBlock Text="{TemplateBinding Content}"
-                                                                                        TextDecorations="Underline"/>
+                                                                                   TextDecorations="Underline"/>
                                                                 </ControlTemplate>
                                                         </Button.Template>
                                                 </Button>
@@ -597,20 +686,234 @@
                         </Border>
                 </ScrollViewer>
 
-                <StackPanel HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Margin="25"
-                            Orientation="Horizontal"
-                            Panel.ZIndex="10">
-                        <TextBlock x:Name="ThemeIcon"
-                                   Text="🌙"
-                                   Margin="0,0,8,0"
-                                   VerticalAlignment="Center"
-                                   FontSize="16"
-                                   Foreground="{DynamicResource TextMutedBrush}"/>
-                        <ToggleButton Style="{StaticResource ToggleSwitchStyle}"
-                                      Click="ThemeToggle_Click"/>
-                </StackPanel>
+                <Grid Visibility="{Binding IsDashboardVisible, Converter={StaticResource BoolToVis}}">
+                        <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="240"/>
+                                <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0"
+                                BorderBrush="{DynamicResource InputBorderBrush}"
+                                BorderThickness="0,0,1,0"
+                                Padding="25,30,20,25">
+
+                                <Grid>
+                                        <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel Grid.Row="0"
+                                                        Orientation="Horizontal"
+                                                        Margin="0,0,0,40">
+                                                <Border Width="42"
+                                                                Height="42"
+                                                                Background="#1B2A2F"
+                                                                CornerRadius="12"
+                                                                Margin="0,0,15,0">
+                                                        <TextBlock Text="🌱"
+                                                                        Foreground="#328A5D"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        FontSize="20"/>
+                                                </Border>
+                                                <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock Text="Habit Tracker"
+                                                                        FontSize="18"
+                                                                        FontWeight="Bold"
+                                                                        Foreground="#1B2A2F"/>
+                                                        <TextBlock Text="DAILY GROWTH"
+                                                                        FontSize="10"
+                                                                        FontWeight="Bold"
+                                                                        Foreground="{DynamicResource TextMutedBrush}"/>
+                                                </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Row="1">
+                                                <Border Background="#E8F0EA"
+                                                                CornerRadius="10"
+                                                                Margin="0,2"
+                                                                Padding="15,12">
+                                                        <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="⊞"
+                                                                                FontSize="18"
+                                                                                Foreground="#328A5D"
+                                                                                Margin="0,0,15,0"
+                                                                                VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Dashboard"
+                                                                                FontSize="14"
+                                                                                FontWeight="Bold"
+                                                                                Foreground="#328A5D"
+                                                                                VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                </Border>
+
+                                                <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="🔄"
+                                                                                FontSize="16"
+                                                                                Margin="0,0,15,0"
+                                                                                VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Habits Manager"
+                                                                                VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                </Button>
+                                                <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="📅"
+                                                                                FontSize="16"
+                                                                                Margin="0,0,15,0"
+                                                                                VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Calendar"
+                                                                                VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                </Button>
+                                                <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="📊"
+                                                                                FontSize="16"
+                                                                                Margin="0,0,15,0"
+                                                                                VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Statistics"
+                                                                                VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                </Button>
+                                                <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="📏"
+                                                                                FontSize="16"
+                                                                                Margin="0,0,15,0"
+                                                                                VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Measurements"
+                                                                                VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                </Button>
+                                                <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="📑"
+                                                                                FontSize="16"
+                                                                                Margin="0,0,15,0"
+                                                                                VerticalAlignment="Center"/>
+                                                                <TextBlock Text="PDF Report"
+                                                                                VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                </Button>
+                                                <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="⚙️"
+                                                                                FontSize="16"
+                                                                                Margin="0,0,15,0"
+                                                                                VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Settings"
+                                                                                VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                </Button>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Row="2">
+
+                                                <Button Background="#328A5D"
+                                                                Foreground="White"
+                                                                Margin="0,0,0,25"
+                                                                Height="48"
+                                                                Cursor="Hand"
+                                                                BorderThickness="0">
+                                                        <Button.Template>
+                                                                <ControlTemplate TargetType="Button">
+                                                                        <Border Background="{TemplateBinding Background}"
+                                                                                        CornerRadius="12"
+                                                                                        x:Name="Bg">
+                                                                                <StackPanel Orientation="Horizontal"
+                                                                                                HorizontalAlignment="Center"
+                                                                                                VerticalAlignment="Center">
+                                                                                        <TextBlock Text="+"
+                                                                                                        FontSize="18"
+                                                                                                        FontWeight="Bold"
+                                                                                                        Margin="0,0,8,0"
+                                                                                                        VerticalAlignment="Center"/>
+                                                                                        <TextBlock Text="New Habit"
+                                                                                                        FontSize="14"
+                                                                                                        FontWeight="SemiBold"
+                                                                                                        VerticalAlignment="Center"/>
+                                                                                </StackPanel>
+                                                                        </Border>
+                                                                        <ControlTemplate.Triggers>
+                                                                                <Trigger Property="IsMouseOver"
+                                                                                                Value="True">
+                                                                                        <Setter TargetName="Bg"
+                                                                                                        Property="Opacity"
+                                                                                                        Value="0.9"/>
+                                                                                </Trigger>
+                                                                        </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                        </Button.Template>
+                                                </Button>
+
+                                                <StackPanel Orientation="Horizontal"
+                                                                Margin="15,10,0,10"
+                                                                VerticalAlignment="Center"
+                                                                Cursor="Hand">
+                                                        <Border Width="24"
+                                                                        Height="24"
+                                                                        CornerRadius="12"
+                                                                        Margin="0,0,15,0">
+                                                                <Border.Background>
+                                                                        <ImageBrush ImageSource="{Binding AvatarPath}"
+                                                                                        Stretch="UniformToFill"/>
+                                                                </Border.Background>
+                                                        </Border>
+                                                        <TextBlock Text="{Binding Nickname}"
+                                                                        FontSize="13"
+                                                                        FontWeight="SemiBold"
+                                                                        Foreground="{DynamicResource TextMutedBrush}"
+                                                                        VerticalAlignment="Center"/>
+                                                </StackPanel>
+
+                                                <StackPanel Orientation="Horizontal"
+                                                                Margin="15,10,0,10"
+                                                                VerticalAlignment="Center"
+                                                                Cursor="Hand">
+                                                        <TextBlock Text="☀️"
+                                                                        FontSize="16"
+                                                                        Foreground="{DynamicResource TextMutedBrush}"
+                                                                        Margin="0,0,15,0"/>
+                                                        <TextBlock Text="Light Mode"
+                                                                        FontSize="13"
+                                                                        FontWeight="SemiBold"
+                                                                        Foreground="{DynamicResource TextMutedBrush}"
+                                                                        VerticalAlignment="Center"/>
+
+                                                        <ToggleButton Style="{StaticResource ToggleSwitchStyle}"
+                                                                        Click="ThemeToggle_Click"
+                                                                        Margin="25,0,0,0"/>
+                                                </StackPanel>
+
+                                                <Button Style="{StaticResource SidebarMenuItemStyle}"
+                                                                Click="LogoutButton_Click"
+                                                                Padding="15,10"
+                                                                Margin="0">
+                                                        <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="🚪"
+                                                                                FontSize="16"
+                                                                                Margin="0,0,15,0"
+                                                                                VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Logout"
+                                                                                FontSize="13"
+                                                                                VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                </Button>
+                                        </StackPanel>
+                                </Grid>
+                        </Border>
+                        <Grid Grid.Column="1">
+                                <TextBlock Text="Dashboard"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource TextMainBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                        </Grid>
+                </Grid>
 
         </Grid>
 </Window>

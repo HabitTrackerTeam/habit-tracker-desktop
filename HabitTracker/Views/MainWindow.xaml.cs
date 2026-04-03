@@ -23,16 +23,25 @@ public partial class MainWindow : Window
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {
         bool success = await _viewModel.LoginAsync(LoginPassword.Password);
-
+    
         if (!success)
         {
             LoginPassword.Password = string.Empty;
         }
         else
         {
-            //tutaj planowo bedzie przejscie do dashboardu
-            LoginPassword.Password = string.Empty;
+            _viewModel.ShowDashboard();
+            this.WindowState=WindowState.Maximized; //skalujemy okno, po zalogowaniu
+        
         }
+    }
+
+    private void LogoutButton_Click(object sender, RoutedEventArgs e)
+    {
+        this.WindowState = WindowState.Normal;
+        _viewModel.Email=string.Empty;
+        LoginPassword.Password = string.Empty;
+        _viewModel.ShowAccountSelection();
     }
 
     private async void RegisterButton_Click(object sender, RoutedEventArgs e)
@@ -83,8 +92,19 @@ public partial class MainWindow : Window
         }
         await _viewModel.UpdatePasswordAsync(ForgotNewPassword.Password);
     }
-    private void NavToRegister_Click(object sender, RoutedEventArgs e) => _viewModel.ShowRegister();
-    private void NavToLogin_Click(object sender, RoutedEventArgs e) => _viewModel.ShowLogin();
+    private void NavToRegister_Click(object sender, RoutedEventArgs e)
+    {   
+        _viewModel.Email = string.Empty;
+        RegisterPassword.Password = string.Empty;
+        _viewModel.ShowRegister();
+    }
+    private void NavToLogin_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.Email=string.Empty;
+        LoginPassword.Password = string.Empty;
+
+        _viewModel.ShowLogin();
+    }
     private void NavToForgot_Click(object sender, RoutedEventArgs e) => _viewModel.ShowForgot();
 
     private void ChooseAvatar_Click(object sender, RoutedEventArgs e)
@@ -159,6 +179,8 @@ public partial class MainWindow : Window
             _viewModel.ShowLogin();
 
             LoginPassword.Focus();
+
+            
         }
     }
 
