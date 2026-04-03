@@ -191,7 +191,8 @@
         </Window.Resources>
 
         <Grid Background="{DynamicResource AppBgBrush}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                <ScrollViewer Visibility="{Binding IsAuthVisible, Converter={StaticResource BoolToVis}}"
+                                VerticalScrollBarVisibility="Auto"
                               BorderThickness="0">
                         <Border Width="380"
                                 Padding="35,35,35,45"
@@ -350,7 +351,7 @@
                                                         <Button.Template>
                                                                 <ControlTemplate TargetType="Button">
                                                                         <TextBlock Text="{TemplateBinding Content}"
-                                                                                        TextDecorations="Underline"/>
+                                                                                   TextDecorations="Underline"/>
                                                                 </ControlTemplate>
                                                         </Button.Template>
                                                 </Button>
@@ -367,7 +368,7 @@
                                                         <Button.Template>
                                                                 <ControlTemplate TargetType="Button">
                                                                         <TextBlock Text="{TemplateBinding Content}"
-                                                                                        TextDecorations="Underline"/>
+                                                                                   TextDecorations="Underline"/>
                                                                 </ControlTemplate>
                                                         </Button.Template>
                                                 </Button>
@@ -597,6 +598,36 @@
                         </Border>
                 </ScrollViewer>
 
+                <Grid Visibility="{Binding IsDashboardVisible, Converter={StaticResource BoolToVis}}">
+                        <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="240"/>
+                                <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                        Background="{DynamicResource CardBgBrush}">
+                                <Border.Effect>
+                                        <DropShadowEffect BlurRadius="15"
+                                                        Opacity="0.05"
+                                                        ShadowDepth="2"
+                                                        Direction="0"/>
+                                </Border.Effect>
+
+                                <TextBlock Text="Sidebar"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Foreground="{DynamicResource TextMutedBrush}"/>
+                        </Border>
+
+                        <Grid Grid.Column="1">
+                                <TextBlock Text="Dashboard"
+                                                FontSize="24"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource TextMainBrush}"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"/>
+                        </Grid>
+                </Grid>
                 <StackPanel HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             Margin="25"

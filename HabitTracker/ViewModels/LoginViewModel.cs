@@ -9,6 +9,7 @@ namespace HabitTracker.ViewModels
 {
     public class LoginViewModel : ViewModelBase
     {
+        //Zmienne
         private const string ColorError = "#FFD32F2F";
         private const string ColorSuccess = "#FF328A5D";
         private const string ColorInfo = "#FF8B9AA2";
@@ -27,9 +28,14 @@ namespace HabitTracker.ViewModels
         private bool _isForgotCodeStep = false;
         private bool _isForgotNewPasswordStep = false;
         private bool _isAccountSelectionVisible = false;
+        private bool _isDashboardVisible = false;
+        
+
+        //Wlasciwosci
         public bool IsAccountSelectionVisible { get => _isAccountSelectionVisible; set { _isAccountSelectionVisible = value; OnPropertyChanged(); } }
         //konta do wyswietlenia
         private ObservableCollection<SavedAccount> _savedAccounts = new ObservableCollection<SavedAccount>();
+        public bool HasSavedAccounts => SavedAccounts.Count>0;
         public ObservableCollection<SavedAccount> SavedAccounts { get => _savedAccounts; set { _savedAccounts = value; OnPropertyChanged(); } }
 
         public string Email { get => _email; set { _email = value; OnPropertyChanged(); } }
@@ -38,19 +44,23 @@ namespace HabitTracker.ViewModels
         public string StatusColor { get => _statusColor; set { _statusColor = value; OnPropertyChanged(); } }
         public string AvatarPath { get => _avatarPath; set { _avatarPath = value; OnPropertyChanged(); } }
         public string ResetToken { get => _resetToken; set { _resetToken = value; OnPropertyChanged(); } }
-
+        
         public bool IsLoginVisible { get => _isLoginVisible; set { _isLoginVisible = value; OnPropertyChanged(); } }
         public bool IsRegisterVisible { get => _isRegisterVisible; set { _isRegisterVisible = value; OnPropertyChanged(); } }
         public bool IsForgotVisible { get => _isForgotVisible; set { _isForgotVisible = value; OnPropertyChanged(); } }
         public bool IsForgotEmailStep { get => _isForgotEmailStep; set { _isForgotEmailStep = value; OnPropertyChanged(); } }
         public bool IsForgotCodeStep { get => _isForgotCodeStep; set { _isForgotCodeStep = value; OnPropertyChanged(); } }
         public bool IsForgotNewPasswordStep { get => _isForgotNewPasswordStep; set { _isForgotNewPasswordStep = value; OnPropertyChanged(); } }
+        public bool IsDashboardVisible{get=>_isDashboardVisible; set{_isDashboardVisible = value; OnPropertyChanged();OnPropertyChanged(nameof(IsAuthVisible));}}
+        public bool IsAuthVisible => !IsDashboardVisible; //Gdy dashboard jest niewidoczny to wyswietla ekran logowania
 
         //KONSTRUKTOR
         public LoginViewModel()
         {
             var accounts = LocalAccountService.LoadSavedAccounts();
             SavedAccounts = new ObservableCollection<SavedAccount>(accounts);
+
+            OnPropertyChanged(nameof(HasSavedAccounts));
 
             if (SavedAccounts.Count > 0)
             {
@@ -67,35 +77,36 @@ namespace HabitTracker.ViewModels
             StatusColor = color;
         }
 
-        private void SwitchMainView(bool login, bool register, bool forgot, bool accountSelection)
+        private void SwitchMainView(bool login, bool register, bool forgot, bool accountSelection, bool dashboard)
         {
             IsLoginVisible = login;
             IsRegisterVisible = register;
             IsForgotVisible = forgot;
             IsAccountSelectionVisible = accountSelection;
+            IsDashboardVisible = dashboard;
             SetStatus(string.Empty);
         }
 
 
         public void ShowLogin()
         {
-            SwitchMainView(true, false, false, false);
+            SwitchMainView(true, false, false, false, false);
             Nickname = string.Empty;
             AvatarPath = string.Empty;
         }
 
-        public void ShowRegister() => SwitchMainView(false, true, false, false);
+        public void ShowRegister() => SwitchMainView(false, true, false, false, false);
 
         public void ShowForgot()
         {
-            SwitchMainView(false, false, true, false);
+            SwitchMainView(false, false, true, false, false);
             IsForgotEmailStep = true;
             IsForgotCodeStep = false;
             IsForgotNewPasswordStep = false;
             ResetToken = string.Empty;
         }
 
-        public void ShowAccountSelection() => SwitchMainView(false, false, false, true);
+        public void ShowAccountSelection() => SwitchMainView(false, false, false, true, false);
 
         private bool ValidateBasicInput(string password)
         {
@@ -284,5 +295,6 @@ namespace HabitTracker.ViewModels
                 SetStatus("Error occurred while updating password.", ColorError);
             }
         }
+        public void ShowDashboard()=>SwitchMainView(false,false,false,false,true);
     }
 }

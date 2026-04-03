@@ -23,15 +23,14 @@ public partial class MainWindow : Window
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {
         bool success = await _viewModel.LoginAsync(LoginPassword.Password);
-
+    
         if (!success)
         {
             LoginPassword.Password = string.Empty;
         }
         else
         {
-            //tutaj planowo bedzie przejscie do dashboardu
-            LoginPassword.Password = string.Empty;
+            _viewModel.ShowDashboard();
         }
     }
 
@@ -159,6 +158,8 @@ public partial class MainWindow : Window
             _viewModel.ShowLogin();
 
             LoginPassword.Focus();
+
+            
         }
     }
 
