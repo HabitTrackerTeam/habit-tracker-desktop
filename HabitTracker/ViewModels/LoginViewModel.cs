@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HabitTracker.Services;
 using HabitTracker.Models;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace HabitTracker.ViewModels
 {
@@ -126,11 +127,32 @@ namespace HabitTracker.ViewModels
             }
             return true;
         }
+        private bool ValidatePasswordComplexity(string password){
+            if(string.IsNullOrWhiteSpace(password) || password.Length<6){
+                SetStatus("Password must be at least 6 characters.", ColorError);
+                return false;
+            }
+            if(!Regex.IsMatch(password, @"[A-Z]")){
+                SetStatus("Password must containt at least one uppercase letter.", ColorError);
+                return false;
+            }
+            if(!Regex.IsMatch(password, @"[0-9]")){
+                SetStatus("Password must contain at least one number.", ColorError);
+                return false;
+            }
+            if(!Regex.IsMatch(password,@"[\W_]")) //znaki specjalne
+            {
+                SetStatus("Password must contain at least one special character.", ColorError);
+                return false;
+            }
+            return true;
+        }
 
         public async Task<bool> RegisterAsync(string password)
         {
             if (!ValidateBasicInput(password)) return false;
 
+            if(!ValidatePasswordComplexity(password)) return false;
             if (string.IsNullOrWhiteSpace(Nickname))
             {
                 SetStatus("Nickname is required.", ColorError);
@@ -275,8 +297,13 @@ namespace HabitTracker.ViewModels
             }
         }
 
-        public async Task UpdatePasswordAsync(string newPassword)
+        public async Task<bool> UpdatePasswordAsync(string newPassword)
         {
+            if(!ValidatePasswordComplexity(newPassword))
+            {
+                return false;
+            }
+
             SetStatus("Updating password...");
             try
             {
@@ -286,10 +313,12 @@ namespace HabitTracker.ViewModels
                 SetStatus("Password updated successfully!", ColorSuccess);
                 await Task.Delay(1500);
                 ShowLogin();
+                return true;
             }
             catch (Exception)
             {
                 SetStatus("Error occurred while updating password.", ColorError);
+                return false;
             }
         }
         public void ShowDashboard()=>SwitchMainView(false,false,false,true);

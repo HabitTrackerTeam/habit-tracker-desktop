@@ -52,11 +52,13 @@ public partial class MainWindow : Window
 
         try
         {
+            string actualPassowrd = LoginPassword.Visibility == Visibility.Visible ? LoginPassword.Password : LoginPasswordVisible.Text;
             bool success = await _viewModel.LoginAsync(LoginPassword.Password);
 
             if (!success)
             {
                 LoginPassword.Password = string.Empty;
+                LoginPasswordVisible.Text = string.Empty;
             }
             else
             {
@@ -72,20 +74,21 @@ public partial class MainWindow : Window
 
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
-        _viewModel.Email=string.Empty;
+        _viewModel.Email = string.Empty;
         LoginPassword.Password = string.Empty;
         _viewModel.ShowAccountSelection();
     }
 
     private async void RegisterButton_Click(object sender, RoutedEventArgs e)
     {
-        if (RegisterPassword.Password != RegisterRepeatPassword.Password)
+        string password = RegisterPassword.Password;
+        if (password != RegisterRepeatPassword.Password)
         {
             _viewModel.StatusColor = "#FFD32F2F";
             _viewModel.StatusMessage = "Passwords do not match!";
             return;
         }
-        bool success = await _viewModel.RegisterAsync(RegisterPassword.Password);
+        bool success = await _viewModel.RegisterAsync(password);
 
         if (success)
         {
@@ -97,7 +100,7 @@ public partial class MainWindow : Window
 
             await Task.Delay(1500);
 
-            _viewModel.ShowLogin();
+            SwitchAuthFormWithAnimation(() => _viewModel.ShowLogin(), LoginFormPanel);
         }
     }
     private async void SendResetLink_Click(object sender, RoutedEventArgs e)
@@ -123,7 +126,14 @@ public partial class MainWindow : Window
             _viewModel.StatusMessage = "Password must be at least 6 characters.";
             return;
         }
-        await _viewModel.UpdatePasswordAsync(ForgotNewPassword.Password);
+        bool updated = await _viewModel.UpdatePasswordAsync(ForgotNewPassword.Password);
+
+        if (updated)
+        {
+            ForgotNewPassword.Password = string.Empty;
+            ForgotRepeatPassword.Password = string.Empty;
+            ResetFormVisualState(LoginFormPanel);
+        }
     }
     private void NavToRegister_Click(object sender, RoutedEventArgs e)
     {
@@ -392,7 +402,24 @@ public partial class MainWindow : Window
 
             LoginPassword.Focus();
 
-            
+
+        }
+    }
+
+    private void ToggleLoginPassword_Click(object sender, RoutedEventArgs e)
+    {
+        if (LoginPassword.Visibility == Visibility.Visible)
+        {
+            LoginPasswordVisible.Text = LoginPassword.Password;
+            LoginPassword.Visibility = Visibility.Collapsed;
+            LoginPasswordVisible.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            LoginPassword.Password = LoginPasswordVisible.Text;
+            LoginPasswordVisible.Visibility = Visibility.Collapsed;
+            LoginPassword.Visibility = Visibility.Visible;
+
         }
     }
 
