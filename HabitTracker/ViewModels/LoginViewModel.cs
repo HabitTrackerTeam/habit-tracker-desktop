@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HabitTracker.Services;
 using HabitTracker.Models;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace HabitTracker.ViewModels
 {
@@ -27,12 +28,11 @@ namespace HabitTracker.ViewModels
         private bool _isForgotEmailStep = true;
         private bool _isForgotCodeStep = false;
         private bool _isForgotNewPasswordStep = false;
-        private bool _isAccountSelectionVisible = false;
         private bool _isDashboardVisible = false;
+        private bool _isLoading = false;
         
 
         //Wlasciwosci
-        public bool IsAccountSelectionVisible { get => _isAccountSelectionVisible; set { _isAccountSelectionVisible = value; OnPropertyChanged(); } }
         //konta do wyswietlenia
         private ObservableCollection<SavedAccount> _savedAccounts = new ObservableCollection<SavedAccount>();
         public bool HasSavedAccounts => SavedAccounts.Count>0;
@@ -52,6 +52,7 @@ namespace HabitTracker.ViewModels
         public bool IsForgotCodeStep { get => _isForgotCodeStep; set { _isForgotCodeStep = value; OnPropertyChanged(); } }
         public bool IsForgotNewPasswordStep { get => _isForgotNewPasswordStep; set { _isForgotNewPasswordStep = value; OnPropertyChanged(); } }
         public bool IsDashboardVisible{get=>_isDashboardVisible; set{_isDashboardVisible = value; OnPropertyChanged();OnPropertyChanged(nameof(IsAuthVisible));}}
+        public bool IsLoading { get => _isLoading; set { _isLoading = value; OnPropertyChanged(); } }
         public bool IsAuthVisible => !IsDashboardVisible; //Gdy dashboard jest niewidoczny to wyswietla ekran logowania
 
         //KONSTRUKTOR
@@ -77,12 +78,11 @@ namespace HabitTracker.ViewModels
             StatusColor = color;
         }
 
-        private void SwitchMainView(bool login, bool register, bool forgot, bool accountSelection, bool dashboard)
+        private void SwitchMainView(bool login, bool register, bool forgot, bool dashboard)
         {
             IsLoginVisible = login;
             IsRegisterVisible = register;
             IsForgotVisible = forgot;
-            IsAccountSelectionVisible = accountSelection;
             IsDashboardVisible = dashboard;
             SetStatus(string.Empty);
         }
@@ -90,23 +90,23 @@ namespace HabitTracker.ViewModels
 
         public void ShowLogin()
         {
-            SwitchMainView(true, false, false, false, false);
+            SwitchMainView(true, false, false, false);
             Nickname = string.Empty;
             AvatarPath = string.Empty;
         }
 
-        public void ShowRegister() => SwitchMainView(false, true, false, false, false);
+        public void ShowRegister() => SwitchMainView(false, true, false, false);
 
         public void ShowForgot()
         {
-            SwitchMainView(false, false, true, false, false);
+            SwitchMainView(false, false, true, false);
             IsForgotEmailStep = true;
             IsForgotCodeStep = false;
             IsForgotNewPasswordStep = false;
             ResetToken = string.Empty;
         }
 
-        public void ShowAccountSelection() => SwitchMainView(false, false, false, true, false);
+        public void ShowAccountSelection() => SwitchMainView(true, false, false, false);
 
         private bool ValidateBasicInput(string password)
         {
@@ -127,11 +127,32 @@ namespace HabitTracker.ViewModels
             }
             return true;
         }
+        private bool ValidatePasswordComplexity(string password){
+            if(string.IsNullOrWhiteSpace(password) || password.Length<6){
+                SetStatus("Password must be at least 6 characters.", ColorError);
+                return false;
+            }
+            if(!Regex.IsMatch(password, @"[A-Z]")){
+                SetStatus("Password must containt at least one uppercase letter.", ColorError);
+                return false;
+            }
+            if(!Regex.IsMatch(password, @"[0-9]")){
+                SetStatus("Password must contain at least one number.", ColorError);
+                return false;
+            }
+            if(!Regex.IsMatch(password,@"[\W_]")) //znaki specjalne
+            {
+                SetStatus("Password must contain at least one special character.", ColorError);
+                return false;
+            }
+            return true;
+        }
 
         public async Task<bool> RegisterAsync(string password)
         {
             if (!ValidateBasicInput(password)) return false;
 
+            if(!ValidatePasswordComplexity(password)) return false;
             if (string.IsNullOrWhiteSpace(Nickname))
             {
                 SetStatus("Nickname is required.", ColorError);
@@ -194,8 +215,6 @@ namespace HabitTracker.ViewModels
         public async Task<bool> LoginAsync(string password)
         {
             if (!ValidateBasicInput(password)) return false;
-
-            SetStatus("Signing in...");
 
             try
             {
@@ -278,8 +297,13 @@ namespace HabitTracker.ViewModels
             }
         }
 
-        public async Task UpdatePasswordAsync(string newPassword)
+        public async Task<bool> UpdatePasswordAsync(string newPassword)
         {
+            if(!ValidatePasswordComplexity(newPassword))
+            {
+                return false;
+            }
+
             SetStatus("Updating password...");
             try
             {
@@ -289,12 +313,14 @@ namespace HabitTracker.ViewModels
                 SetStatus("Password updated successfully!", ColorSuccess);
                 await Task.Delay(1500);
                 ShowLogin();
+                return true;
             }
             catch (Exception)
             {
                 SetStatus("Error occurred while updating password.", ColorError);
+                return false;
             }
         }
-        public void ShowDashboard()=>SwitchMainView(false,false,false,false,true);
+        public void ShowDashboard()=>SwitchMainView(false,false,false,true);
     }
 }

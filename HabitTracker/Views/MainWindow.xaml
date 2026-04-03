@@ -9,7 +9,9 @@
         Icon="/Assets/logo.png"
         Width="800"
         Height="750"
+        MinWidth="1200"
         MinHeight="600"
+        WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
 
@@ -116,6 +118,8 @@
                                  Color="#FF4E606C"/>
                 <SolidColorBrush x:Key="TextMutedBrush"
                                  Color="#FF8B9AA2"/>
+                <SolidColorBrush x:Key="AccentGreenBrush"
+                                 Color="#FF328A5D"/>
                 <SolidColorBrush x:Key="InputBgBrush"
                                  Color="#FFF8F9FA"/>
                 <SolidColorBrush x:Key="InputBorderBrush"
@@ -195,13 +199,112 @@
                         <Setter Property="Template">
                                 <Setter.Value>
                                         <ControlTemplate TargetType="TextBox">
-                                                <Border CornerRadius="8"
-                                                        Background="{TemplateBinding Background}"
-                                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                                <Grid>
+                                                        <Border x:Name="InputBorder"
+                                                                CornerRadius="10"
+                                                                Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"/>
                                                         <ScrollViewer x:Name="PART_ContentHost"
-                                                                      Margin="10,0"/>
-                                                </Border>
+                                                                      Margin="12,20,12,6"/>
+                                                        <TextBlock x:Name="FloatingLabel"
+                                                                   Text="{TemplateBinding Tag}"
+                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                   IsHitTestVisible="False"
+                                                                   Margin="12,0,0,0"
+                                                                   VerticalAlignment="Center"
+                                                                   RenderTransformOrigin="0,0.5">
+                                                                <TextBlock.RenderTransform>
+                                                                        <TransformGroup>
+                                                                                <ScaleTransform x:Name="TextLabelScale"
+                                                                                                ScaleX="1"
+                                                                                                ScaleY="1"/>
+                                                                                <TranslateTransform x:Name="TextLabelTranslate"
+                                                                                                    X="0"
+                                                                                                    Y="0"/>
+                                                                        </TransformGroup>
+                                                                </TextBlock.RenderTransform>
+                                                        </TextBlock>
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="Text"
+                                                                 Value="">
+                                                                <Setter TargetName="FloatingLabel"
+                                                                        Property="Foreground"
+                                                                        Value="{DynamicResource TextMutedBrush}"/>
+                                                                <Trigger.EnterActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleX"
+                                                                                                         To="1"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleY"
+                                                                                                         To="1"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelTranslate"
+                                                                                                         Storyboard.TargetProperty="Y"
+                                                                                                         To="0"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                                <Trigger.ExitActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleX"
+                                                                                                         To="0.86"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleY"
+                                                                                                         To="0.86"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelTranslate"
+                                                                                                         Storyboard.TargetProperty="Y"
+                                                                                                         To="-14"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.ExitActions>
+                                                        </Trigger>
+                                                        <Trigger Property="IsKeyboardFocusWithin"
+                                                                 Value="True">
+                                                                <Setter TargetName="InputBorder"
+                                                                        Property="BorderBrush"
+                                                                        Value="{DynamicResource AccentGreenBrush}"/>
+                                                                <Trigger.EnterActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleX"
+                                                                                                         To="0.86"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleY"
+                                                                                                         To="0.86"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="TextLabelTranslate"
+                                                                                                         Storyboard.TargetProperty="Y"
+                                                                                                         To="-14"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                        </Trigger>
+                                                        <MultiTrigger>
+                                                                <MultiTrigger.Conditions>
+                                                                        <Condition Property="IsKeyboardFocusWithin"
+                                                                                   Value="False"/>
+                                                                        <Condition Property="Text"
+                                                                                   Value=""/>
+                                                                </MultiTrigger.Conditions>
+                                                                <Setter TargetName="InputBorder"
+                                                                        Property="BorderBrush"
+                                                                        Value="{DynamicResource InputBorderBrush}"/>
+                                                        </MultiTrigger>
+                                                </ControlTemplate.Triggers>
                                         </ControlTemplate>
                                 </Setter.Value>
                         </Setter>
@@ -220,16 +323,114 @@
                                 Value="14"/>
                         <Setter Property="VerticalContentAlignment"
                                 Value="Center"/>
+                        <EventSetter Event="PasswordChanged"
+                                     Handler="FloatingPasswordBox_PasswordChanged"/>
                         <Setter Property="Template">
                                 <Setter.Value>
                                         <ControlTemplate TargetType="PasswordBox">
-                                                <Border CornerRadius="8"
-                                                        Background="{TemplateBinding Background}"
-                                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                                <Grid>
+                                                        <Border x:Name="PasswordInputBorder"
+                                                                CornerRadius="10"
+                                                                Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"/>
                                                         <ScrollViewer x:Name="PART_ContentHost"
-                                                                      Margin="10,0"/>
-                                                </Border>
+                                                                      Margin="12,20,12,6"/>
+                                                        <TextBlock x:Name="PasswordFloatingLabel"
+                                                                   Text="{TemplateBinding Tag}"
+                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                   IsHitTestVisible="False"
+                                                                   Margin="12,0,0,0"
+                                                                   VerticalAlignment="Center"
+                                                                   RenderTransformOrigin="0,0.5">
+                                                                <TextBlock.RenderTransform>
+                                                                        <TransformGroup>
+                                                                                <ScaleTransform x:Name="PasswordLabelScale"
+                                                                                                ScaleX="1"
+                                                                                                ScaleY="1"/>
+                                                                                <TranslateTransform x:Name="PasswordLabelTranslate"
+                                                                                                    X="0"
+                                                                                                    Y="0"/>
+                                                                        </TransformGroup>
+                                                                </TextBlock.RenderTransform>
+                                                        </TextBlock>
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="local:MainWindow.HasText"
+                                                                 Value="False">
+                                                                <Trigger.EnterActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleX"
+                                                                                                         To="1"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleY"
+                                                                                                         To="1"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelTranslate"
+                                                                                                         Storyboard.TargetProperty="Y"
+                                                                                                         To="0"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                                <Trigger.ExitActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleX"
+                                                                                                         To="0.86"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleY"
+                                                                                                         To="0.86"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelTranslate"
+                                                                                                         Storyboard.TargetProperty="Y"
+                                                                                                         To="-14"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.ExitActions>
+                                                        </Trigger>
+                                                        <Trigger Property="IsKeyboardFocusWithin"
+                                                                 Value="True">
+                                                                <Setter TargetName="PasswordInputBorder"
+                                                                        Property="BorderBrush"
+                                                                        Value="{DynamicResource AccentGreenBrush}"/>
+                                                                <Trigger.EnterActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleX"
+                                                                                                         To="0.86"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelScale"
+                                                                                                         Storyboard.TargetProperty="ScaleY"
+                                                                                                         To="0.86"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                        <DoubleAnimation Storyboard.TargetName="PasswordLabelTranslate"
+                                                                                                         Storyboard.TargetProperty="Y"
+                                                                                                         To="-14"
+                                                                                                         Duration="0:0:0.18"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                        </Trigger>
+                                                        <MultiTrigger>
+                                                                <MultiTrigger.Conditions>
+                                                                        <Condition Property="IsKeyboardFocusWithin"
+                                                                                   Value="False"/>
+                                                                        <Condition Property="local:MainWindow.HasText"
+                                                                                   Value="False"/>
+                                                                </MultiTrigger.Conditions>
+                                                                <Setter TargetName="PasswordInputBorder"
+                                                                        Property="BorderBrush"
+                                                                        Value="{DynamicResource InputBorderBrush}"/>
+                                                        </MultiTrigger>
+                                                </ControlTemplate.Triggers>
                                         </ControlTemplate>
                                 </Setter.Value>
                         </Setter>
@@ -265,426 +466,687 @@
                         </Setter>
                 </Style>
 
-                <Style x:Key="LabelStyle"
-                       TargetType="TextBlock">
+                <Style x:Key="LoginLoadingButtonStyle"
+                       TargetType="Button">
+                        <Setter Property="Width"
+                                Value="310"/>
+                        <Setter Property="Foreground"
+                                Value="White"/>
                         <Setter Property="FontWeight"
                                 Value="SemiBold"/>
+                        <Setter Property="Template">
+                                <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                                <Border x:Name="LoginBtnBorder"
+                                                        Padding="10,8"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="21"
+                                                        Opacity="1">
+                                                        <Grid>
+                                                                <ContentPresenter x:Name="LoginButtonContent"
+                                                                                  HorizontalAlignment="Center"
+                                                                                  VerticalAlignment="Center"/>
+                                                                <StackPanel x:Name="LoginLoadingState"
+                                                                            Orientation="Horizontal"
+                                                                            Visibility="Collapsed"
+                                                                            HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center">
+                                                                        <Grid Width="16"
+                                                                              Height="16"
+                                                                              Margin="0,0,8,0"
+                                                                              RenderTransformOrigin="0.5,0.5">
+                                                                                <Grid.RenderTransform>
+                                                                                        <RotateTransform x:Name="SpinnerRotate"
+                                                                                                         Angle="0"/>
+                                                                                </Grid.RenderTransform>
+                                                                                <Ellipse Stroke="White"
+                                                                                         StrokeThickness="2"
+                                                                                         StrokeDashArray="1.6,2.4"
+                                                                                         Opacity="0.95"/>
+                                                                        </Grid>
+                                                                        <TextBlock Text="Signing in..."
+                                                                                   Foreground="White"
+                                                                                   FontWeight="SemiBold"
+                                                                                   VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                        </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                                <Setter TargetName="LoginBtnBorder"
+                                                                        Property="Opacity"
+                                                                        Value="0.9"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsPressed"
+                                                                 Value="True">
+                                                                <Setter TargetName="LoginBtnBorder"
+                                                                        Property="Opacity"
+                                                                        Value="0.8"/>
+                                                        </Trigger>
+                                                        <DataTrigger Binding="{Binding IsLoading}"
+                                                                     Value="True">
+                                                                <Setter Property="IsEnabled"
+                                                                        Value="False"/>
+                                                                <Setter TargetName="LoginButtonContent"
+                                                                        Property="Visibility"
+                                                                        Value="Collapsed"/>
+                                                                <Setter TargetName="LoginLoadingState"
+                                                                        Property="Visibility"
+                                                                        Value="Visible"/>
+                                                                <DataTrigger.EnterActions>
+                                                                        <BeginStoryboard x:Name="ExpandButtonStoryboard">
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                                                                         To="360"
+                                                                                                         Duration="0:0:0.25">
+                                                                                                <DoubleAnimation.EasingFunction>
+                                                                                                        <QuadraticEase EasingMode="EaseOut"/>
+                                                                                                </DoubleAnimation.EasingFunction>
+                                                                                        </DoubleAnimation>
+                                                                                        <DoubleAnimation Storyboard.TargetName="SpinnerRotate"
+                                                                                                         Storyboard.TargetProperty="Angle"
+                                                                                                         From="0"
+                                                                                                         To="360"
+                                                                                                         Duration="0:0:0.8"
+                                                                                                         RepeatBehavior="Forever"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </DataTrigger.EnterActions>
+                                                                <DataTrigger.ExitActions>
+                                                                        <StopStoryboard BeginStoryboardName="ExpandButtonStoryboard"/>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                                                                         To="310"
+                                                                                                         Duration="0:0:0.22">
+                                                                                                <DoubleAnimation.EasingFunction>
+                                                                                                        <QuadraticEase EasingMode="EaseOut"/>
+                                                                                                </DoubleAnimation.EasingFunction>
+                                                                                        </DoubleAnimation>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </DataTrigger.ExitActions>
+                                                        </DataTrigger>
+                                                </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                </Setter.Value>
+                        </Setter>
+                </Style>
+
+                <Style x:Key="AccentLinkButtonStyle"
+                       TargetType="Button">
+                        <Setter Property="Background"
+                                Value="Transparent"/>
+                        <Setter Property="BorderThickness"
+                                Value="0"/>
+                        <Setter Property="Cursor"
+                                Value="Hand"/>
                         <Setter Property="Foreground"
-                                Value="{DynamicResource TextMainBrush}"/>
+                                Value="{DynamicResource TextMutedBrush}"/>
+                        <Setter Property="Template">
+                                <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                                <TextBlock Text="{TemplateBinding Content}"
+                                                           FontSize="{TemplateBinding FontSize}"
+                                                           FontWeight="{TemplateBinding FontWeight}">
+                                                        <TextBlock.Foreground>
+                                                                <SolidColorBrush x:Name="LinkForeground"
+                                                                                 Color="#FF8B9AA2"/>
+                                                        </TextBlock.Foreground>
+                                                </TextBlock>
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                                <Trigger.EnterActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <ColorAnimation Storyboard.TargetName="LinkForeground"
+                                                                                                        Storyboard.TargetProperty="Color"
+                                                                                                        To="#FF328A5D"
+                                                                                                        Duration="0:0:0.18"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                                <Trigger.ExitActions>
+                                                                        <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                        <ColorAnimation Storyboard.TargetName="LinkForeground"
+                                                                                                        Storyboard.TargetProperty="Color"
+                                                                                                        To="#FF8B9AA2"
+                                                                                                        Duration="0:0:0.2"/>
+                                                                                </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                </Trigger.ExitActions>
+                                                        </Trigger>
+                                                </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                </Setter.Value>
+                        </Setter>
+                </Style>
+
+                <Style x:Key="SavedAccountCardStyle"
+                       TargetType="Button">
+                        <Setter Property="Background"
+                                Value="Transparent"/>
+                        <Setter Property="BorderThickness"
+                                Value="0"/>
+                        <Setter Property="Cursor"
+                                Value="Hand"/>
                         <Setter Property="Margin"
-                                Value="0,0,0,5"/>
-                        <Setter Property="FontSize"
-                                Value="13"/>
+                                Value="10"/>
+                        <Setter Property="Template">
+                                <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                                <Border x:Name="CardHoverBg"
+                                                        Background="Transparent"
+                                                        CornerRadius="12"
+                                                        Padding="8">
+                                                        <ContentPresenter HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                                <Setter TargetName="CardHoverBg"
+                                                                        Property="Background"
+                                                                        Value="{DynamicResource InputBgBrush}"/>
+                                                        </Trigger>
+                                                </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                </Setter.Value>
+                        </Setter>
                 </Style>
         </Window.Resources>
 
         <Grid Background="{DynamicResource AppBgBrush}">
-                <ScrollViewer Visibility="{Binding IsAuthVisible, Converter={StaticResource BoolToVis}}"
-                              VerticalScrollBarVisibility="Auto"
-                              BorderThickness="0">
-                        <Border Width="380"
-                                Padding="35,35,35,45"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Margin="0,40,0,40"
-                                Background="{DynamicResource CardBgBrush}"
-                                CornerRadius="16">
+                <Grid Visibility="{Binding IsAuthVisible, Converter={StaticResource BoolToVis}}"
+                      Margin="22,16,22,16">
+                        <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4.5*"/>
+                                <ColumnDefinition Width="5.5*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Left"
+                                    Margin="34,18,40,18"
+                                    MaxWidth="560">
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0,0,0,28">
+                                        <Border Width="46"
+                                                Height="46"
+                                                CornerRadius="12"
+                                                Background="#FF1F7D33">
+                                                <Image Source="/Assets/logo.png"
+                                                       Width="28"
+                                                       Height="28"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        </Border>
+                                        <TextBlock Text="Habit Tracker"
+                                                   FontSize="20"
+                                                   FontWeight="Bold"
+                                                   Foreground="#FF1F7D33"
+                                                   Margin="14,0,0,0"
+                                                   VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <TextBlock FontSize="34"
+                                           FontWeight="Bold"
+                                           Foreground="#FF16213A"
+                                           LineHeight="42"
+                                           Margin="0,0,0,16"
+                                           TextWrapping="Wrap">
+                                        Plant habits. 
+                                        <Run Text="Harvest success."
+                                             Foreground="#FF1F7D33"
+                                             FontStyle="Italic"/>
+                                </TextBlock>
+
+                                <TextBlock Text="Your dedicated tracker for productivity and health. Stay consistent, analyze your performance, and turn small steps into lasting lifestyle changes in just a few clicks a day."
+                                           FontSize="16"
+                                           Foreground="{DynamicResource TextMutedBrush}"
+                                           Margin="0,0,0,20"
+                                           TextWrapping="Wrap"
+                                           LineHeight="24"/>
+
+                                <Border Height="300"
+                                        CornerRadius="28"
+                                        BorderBrush="#22328A5D"
+                                        BorderThickness="1"
+                                        SnapsToDevicePixels="True">
+                                        <Border.Background>
+                                                <ImageBrush ImageSource="/Assets/logo.png"
+                                                            Stretch="Uniform"
+                                                            AlignmentX="Center"
+                                                            AlignmentY="Center"
+                                                            Opacity="0.78"/>
+                                        </Border.Background>
+                                        <Border.Effect>
+                                                <DropShadowEffect BlurRadius="25"
+                                                                  ShadowDepth="2"
+                                                                  Opacity="0.06"
+                                                                  Color="#FF1B2A2F"/>
+                                        </Border.Effect>
+                                </Border>
+                        </StackPanel>
+
+                        <Border Grid.Column="1"
+                                Margin="44,18,10,18"
+                                CornerRadius="20"
+                                Background="{DynamicResource CardBgBrush}">
                                 <Border.Effect>
-                                        <DropShadowEffect BlurRadius="20"
-                                                          Opacity="0.08"
-                                                          ShadowDepth="4"
+                                        <DropShadowEffect BlurRadius="12"
+                                                          Opacity="0.04"
+                                                          ShadowDepth="2"
                                                           Color="Black"/>
                                 </Border.Effect>
-
                                 <Grid>
-                                        <StackPanel Visibility="{Binding IsAccountSelectionVisible, Converter={StaticResource BoolToVis}}">
-                                                <Image Source="/Assets/logo.png"
-                                                       Height="65"
-                                                       Margin="0,0,0,10"
-                                                       HorizontalAlignment="Center"
-                                                       RenderOptions.BitmapScalingMode="HighQuality"/>
-                                                <TextBlock Margin="0,0,0,5"
-                                                           FontSize="28"
-                                                           FontWeight="Bold"
-                                                           Foreground="#FF328A5D"
-                                                           Text="Welcome Back"
-                                                           TextAlignment="Center"/>
-                                                <TextBlock Margin="0,0,0,30"
-                                                           FontSize="14"
-                                                           Foreground="{DynamicResource TextMutedBrush}"
-                                                           Text="Select your account to continue"
-                                                           TextAlignment="Center"/>
+                                        <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <ScrollViewer Grid.Row="0"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      HorizontalScrollBarVisibility="Disabled"
+                                                      Padding="40,34,40,14">
+                                                <StackPanel>
+                                                        <StackPanel Margin="0,0,0,18">
+                                                                <StackPanel.Style>
+                                                                        <Style TargetType="StackPanel">
+                                                                                <Setter Property="Visibility"
+                                                                                        Value="Visible"/>
+                                                                                <Style.Triggers>
+                                                                                        <DataTrigger Binding="{Binding IsRegisterVisible}"
+                                                                                                     Value="True">
+                                                                                                <Setter Property="Visibility"
+                                                                                                        Value="Collapsed"/>
+                                                                                        </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                        </Style>
+                                                                </StackPanel.Style>
+                                                                <TextBlock Text="Welcome back"
+                                                                           FontSize="28"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="#FF121A2F"/>
+                                                                <TextBlock Text="Select an account or sign in manually."
+                                                                           FontSize="14"
+                                                                           Foreground="{DynamicResource TextMutedBrush}"
+                                                                           Margin="0,8,0,0"/>
+                                                        </StackPanel>
 
-                                                <ItemsControl ItemsSource="{Binding SavedAccounts}"
-                                                              HorizontalAlignment="Center"
-                                                              Margin="0,0,0,20">
-                                                        <ItemsControl.ItemsPanel>
-                                                                <ItemsPanelTemplate>
-                                                                        <WrapPanel Orientation="Horizontal"
-                                                                                   HorizontalAlignment="Center"
-                                                                                   MaxWidth="320"/>
-                                                                </ItemsPanelTemplate>
-                                                        </ItemsControl.ItemsPanel>
-                                                        <ItemsControl.ItemTemplate>
-                                                                <DataTemplate>
-                                                                        <Button Background="Transparent"
-                                                                                BorderThickness="0"
-                                                                                Cursor="Hand"
-                                                                                Click="SavedAccount_Click"
-                                                                                Margin="10">
-                                                                                <StackPanel>
-                                                                                        <Border Width="80"
-                                                                                                Height="80"
-                                                                                                CornerRadius="40"
-                                                                                                Background="{DynamicResource InputBgBrush}"
-                                                                                                BorderBrush="{DynamicResource InputBorderBrush}"
-                                                                                                BorderThickness="2"
-                                                                                                Margin="0,0,0,8">
-                                                                                                <Grid>
-                                                                                                        <Image Source="/Assets/logo.png"
-                                                                                                               Margin="20"
-                                                                                                               Opacity="0.1"/>
-                                                                                                        <Border Width="76"
-                                                                                                                Height="76"
-                                                                                                                CornerRadius="38">
-                                                                                                                <Border.Background>
-                                                                                                                        <ImageBrush ImageSource="{Binding AvatarUrl}"
-                                                                                                                                    Stretch="UniformToFill"/>
-                                                                                                                </Border.Background>
+                                                        <StackPanel Margin="0,0,0,20">
+                                                                <StackPanel.Style>
+                                                                        <Style TargetType="StackPanel">
+                                                                                <Setter Property="Visibility"
+                                                                                        Value="Collapsed"/>
+                                                                                <Style.Triggers>
+                                                                                        <MultiDataTrigger>
+                                                                                                <MultiDataTrigger.Conditions>
+                                                                                                        <Condition Binding="{Binding IsLoginVisible}"
+                                                                                                                   Value="True"/>
+                                                                                                        <Condition Binding="{Binding HasSavedAccounts}"
+                                                                                                                   Value="True"/>
+                                                                                                </MultiDataTrigger.Conditions>
+                                                                                                <Setter Property="Visibility"
+                                                                                                        Value="Visible"/>
+                                                                                        </MultiDataTrigger>
+                                                                                </Style.Triggers>
+                                                                        </Style>
+                                                                </StackPanel.Style>
+                                                                <TextBlock Text="RECENTLY ACTIVE"
+                                                                           FontSize="11"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="{DynamicResource TextMutedBrush}"
+                                                                           Margin="0,0,0,10"/>
+                                                                <ItemsControl ItemsSource="{Binding SavedAccounts}">
+                                                                        <ItemsControl.ItemsPanel>
+                                                                                <ItemsPanelTemplate>
+                                                                                        <WrapPanel Orientation="Horizontal"/>
+                                                                                </ItemsPanelTemplate>
+                                                                        </ItemsControl.ItemsPanel>
+                                                                        <ItemsControl.ItemTemplate>
+                                                                                <DataTemplate>
+                                                                                        <Button Style="{StaticResource SavedAccountCardStyle}"
+                                                                                                Click="SavedAccount_Click">
+                                                                                                <StackPanel>
+                                                                                                        <Border Width="66"
+                                                                                                                Height="66"
+                                                                                                                CornerRadius="33"
+                                                                                                                Background="{DynamicResource InputBgBrush}"
+                                                                                                                BorderBrush="{DynamicResource InputBorderBrush}"
+                                                                                                                BorderThickness="1.5"
+                                                                                                                Margin="0,0,0,6">
+                                                                                                                <Grid>
+                                                                                                                        <Image Source="/Assets/logo.png"
+                                                                                                                               Margin="14"
+                                                                                                                               Opacity="0.08"/>
+                                                                                                                        <Border Width="60"
+                                                                                                                                Height="60"
+                                                                                                                                CornerRadius="30">
+                                                                                                                                <Border.Background>
+                                                                                                                                        <ImageBrush ImageSource="{Binding AvatarUrl}"
+                                                                                                                                                    Stretch="UniformToFill"/>
+                                                                                                                                </Border.Background>
+                                                                                                                        </Border>
+                                                                                                                </Grid>
                                                                                                         </Border>
-                                                                                                </Grid>
-                                                                                        </Border>
-                                                                                        <TextBlock Text="{Binding Nickname}"
-                                                                                                   Foreground="{DynamicResource TextMainBrush}"
-                                                                                                   FontWeight="SemiBold"
-                                                                                                   TextAlignment="Center"
-                                                                                                   FontSize="14"/>
-                                                                                </StackPanel>
-                                                                        </Button>
-                                                                </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
+                                                                                                        <TextBlock Text="{Binding Nickname}"
+                                                                                                                   Foreground="{DynamicResource TextMainBrush}"
+                                                                                                                   FontWeight="SemiBold"
+                                                                                                                   FontSize="12"
+                                                                                                                   TextAlignment="Center"/>
+                                                                                                </StackPanel>
+                                                                                        </Button>
+                                                                                </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                        </StackPanel>
 
-                                                <Button HorizontalAlignment="Center"
-                                                        Background="Transparent"
-                                                        Click="NavToLogin_Click"
-                                                        Content="Log in with another account"
-                                                        Cursor="Hand"
-                                                        FontSize="13"
-                                                        Foreground="{DynamicResource TextMutedBrush}">
-                                                        <Button.Template>
-                                                                <ControlTemplate TargetType="Button">
-                                                                        <TextBlock Text="{TemplateBinding Content}"
-                                                                                   TextDecorations="Underline"/>
-                                                                </ControlTemplate>
-                                                        </Button.Template>
-                                                </Button>
-                                        </StackPanel>
+                                                        <StackPanel x:Name="LoginFormPanel"
+                                                                    Margin="0,0,0,8"
+                                                                    Visibility="{Binding IsLoginVisible, Converter={StaticResource BoolToVis}}">
+                                                                <TextBlock Text="EMAIL ADDRESS"
+                                                                           FontSize="11"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="{DynamicResource TextMutedBrush}"
+                                                                           Margin="0,0,0,8"/>
+                                                                <TextBox x:Name="EmailInput"
+                                                                         Height="56"
+                                                                         Margin="0,0,0,14"
+                                                                         Tag="E-mail"
+                                                                         Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                        <StackPanel Visibility="{Binding IsLoginVisible, Converter={StaticResource BoolToVis}}">
-                                                <Image Source="/Assets/logo.png"
-                                                       Height="65"
-                                                       Margin="0,0,0,10"
-                                                       HorizontalAlignment="Center"
-                                                       RenderOptions.BitmapScalingMode="HighQuality"/>
-                                                <TextBlock Margin="0,0,0,5"
-                                                           FontSize="36"
-                                                           FontWeight="Bold"
-                                                           Foreground="#FF328A5D"
-                                                           Text="Habit Tracker"
-                                                           TextAlignment="Center"/>
-                                                <TextBlock Margin="0,0,0,30"
-                                                           FontSize="14"
-                                                           Foreground="{DynamicResource TextMutedBrush}"
-                                                           Text="Please log in to continue"
-                                                           TextAlignment="Center"/>
+                                                                <TextBlock Text="PASSWORD"
+                                                                           FontSize="11"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="{DynamicResource TextMutedBrush}"
+                                                                           Margin="0,0,0,8"/>
+                                                                <Grid Margin="0,0,0,14">
+                                                                        <TextBox x:Name="LoginPasswordVisible"
+                                                                                 Height="56"
+                                                                                 Tag="Password"
+                                                                                 Padding="0,0,44,0"
+                                                                                 Visibility="Collapsed"/>
 
-                                                <TextBlock Style="{StaticResource LabelStyle}"
-                                                           Text="E-mail"/>
-                                                <TextBox x:Name="EmailInput"
-                                                         Height="38"
-                                                         Margin="0,0,0,15"
-                                                         Padding="10,8"
-                                                         Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                        <PasswordBox x:Name="LoginPassword"
+                                                                                     Height="56"
+                                                                                     Tag="Password"
+                                                                                     Padding="0,0,44,0"/>
 
-                                                <TextBlock Style="{StaticResource LabelStyle}"
-                                                           Text="Password"/>
-                                                <PasswordBox x:Name="LoginPassword"
-                                                             Height="38"
-                                                             Margin="0,0,0,15"
-                                                             Padding="10,8"/>
-
-                                                <Button Height="42"
-                                                        Margin="0,0,0,15"
-                                                        Background="#FF328A5D"
-                                                        Click="LoginButton_Click"
-                                                        Content="Sign in"
-                                                        Foreground="White"
-                                                        FontWeight="SemiBold"/>
-                                                <Button Height="42"
-                                                        Background="#FF8EAD9C"
-                                                        Click="NavToRegister_Click"
-                                                        Content="Create new account"
-                                                        Foreground="White"
-                                                        FontWeight="SemiBold"/>
-
-                                                <Button Margin="0,15,0,0"
-                                                        HorizontalAlignment="Center"
-                                                        Background="Transparent"
-                                                        Click="NavToForgot_Click"
-                                                        Content="Forgot your password?"
-                                                        Cursor="Hand"
-                                                        FontSize="12"
-                                                        Foreground="{DynamicResource TextMainBrush}">
-                                                        <Button.Template>
-                                                                <ControlTemplate TargetType="Button">
-                                                                        <TextBlock Text="{TemplateBinding Content}"
-                                                                                   TextDecorations="Underline"/>
-                                                                </ControlTemplate>
-                                                        </Button.Template>
-                                                </Button>
-
-                                                <Button Margin="0,15,0,0"
-                                                        HorizontalAlignment="Center"
-                                                        Background="Transparent"
-                                                        Click="NavToAccountSelection_Click"
-                                                        Content="Back to saved accounts"
-                                                        Cursor="Hand"
-                                                        FontSize="13"
-                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                        Visibility="{Binding HasSavedAccounts, Converter={StaticResource BoolToVis}}">
-                                                        <Button.Template>
-                                                                <ControlTemplate TargetType="Button">
-                                                                        <TextBlock Text="{TemplateBinding Content}"
-                                                                                   TextDecorations="Underline"/>
-                                                                </ControlTemplate>
-                                                        </Button.Template>
-                                                </Button>
-
-                                        </StackPanel>
-
-                                        <StackPanel Visibility="{Binding IsRegisterVisible, Converter={StaticResource BoolToVis}}">
-                                                <TextBlock Margin="0,0,0,5"
-                                                           FontSize="28"
-                                                           FontWeight="Bold"
-                                                           Foreground="#FF328A5D"
-                                                           Text="Sign Up"
-                                                           TextAlignment="Center"/>
-                                                <TextBlock Margin="0,0,0,20"
-                                                           FontSize="14"
-                                                           Foreground="{DynamicResource TextMutedBrush}"
-                                                           Text="Create your new account"
-                                                           TextAlignment="Center"/>
-
-                                                <Grid HorizontalAlignment="Center"
-                                                      Margin="0,0,0,25">
-                                                        <Border x:Name="AvatarBorder"
-                                                                Width="90"
-                                                                Height="90"
-                                                                CornerRadius="45"
-                                                                BorderBrush="{DynamicResource InputBorderBrush}"
-                                                                BorderThickness="2"
-                                                                Background="{DynamicResource InputBgBrush}">
-                                                                <Grid>
-                                                                        <Image Source="/Assets/logo.png"
-                                                                               Margin="20"
-                                                                               Opacity="0.3"/>
-                                                                        <Border Width="90"
-                                                                                Height="90"
-                                                                                CornerRadius="45">
-                                                                                <Border.Background>
-                                                                                        <ImageBrush x:Name="AvatarImageBrush"
-                                                                                                    Stretch="UniformToFill"/>
-                                                                                </Border.Background>
-                                                                        </Border>
-                                                                        <Button VerticalAlignment="Bottom"
+                                                                        <Button Width="34"
+                                                                                Height="34"
                                                                                 HorizontalAlignment="Right"
-                                                                                Width="28"
-                                                                                Height="28"
-                                                                                Background="#FF328A5D"
-                                                                                Padding="0"
-                                                                                Click="ChooseAvatar_Click"
-                                                                                Cursor="Hand">
-                                                                                <Button.Template>
-                                                                                        <ControlTemplate TargetType="Button">
-                                                                                                <Border CornerRadius="14"
-                                                                                                        Background="{TemplateBinding Background}">
-                                                                                                        <TextBlock Text="📷"
-                                                                                                                   Foreground="White"
-                                                                                                                   FontWeight="Bold"
-                                                                                                                   FontSize="16"
-                                                                                                                   HorizontalAlignment="Center"
-                                                                                                                   VerticalAlignment="Center"
-                                                                                                                   Margin="0,-2,0,0"/>
-                                                                                                </Border>
-                                                                                        </ControlTemplate>
-                                                                                </Button.Template>
+                                                                                VerticalAlignment="Center"
+                                                                                Margin="0,0,8,0"
+                                                                                Cursor="Hand"
+                                                                                Background="Transparent"
+                                                                                BorderThickness="0"
+                                                                                Foreground="{DynamicResource TextMutedBrush}"
+                                                                                Click="ToggleLoginPassword_Click">
+
+                                                                                <TextBlock x:Name="LoginEyeIcon"
+                                                                                           Text="👁"
+                                                                                           FontSize="15"
+                                                                                           VerticalAlignment="Center"
+                                                                                           HorizontalAlignment="Center"/>
                                                                         </Button>
                                                                 </Grid>
-                                                        </Border>
-                                                </Grid>
 
-                                                <TextBlock Style="{StaticResource LabelStyle}"
-                                                           Text="Nickname"/>
-                                                <TextBox Height="38"
-                                                         Margin="0,0,0,15"
-                                                         Padding="10,8"
-                                                         Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                <Grid Margin="0,2,0,20">
+                                                                        <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*"/>
+                                                                                <ColumnDefinition Width="Auto"/>
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <StackPanel Orientation="Horizontal"
+                                                                                    VerticalAlignment="Center">
+                                                                                <TextBlock Text="Don't have an account?"
+                                                                                           VerticalAlignment="Center"
+                                                                                           Foreground="{DynamicResource TextMainBrush}"
+                                                                                           FontSize="16"/>
+                                                                                <Button Content="Register"
+                                                                                        Click="NavToRegister_Click"
+                                                                                        Cursor="Hand"
+                                                                                        FontSize="16"
+                                                                                        FontWeight="SemiBold"
+                                                                                        Margin="6,0,0,0"
+                                                                                        VerticalAlignment="Center"
+                                                                                        Style="{StaticResource AccentLinkButtonStyle}"/>
+                                                                        </StackPanel>
+                                                                        <Button Grid.Column="1"
+                                                                                HorizontalAlignment="Right"
+                                                                                Content="Forgot password?"
+                                                                                Click="NavToForgot_Click"
+                                                                                FontSize="14"
+                                                                                Style="{StaticResource AccentLinkButtonStyle}"/>
+                                                                </Grid>
 
-                                                <TextBlock Style="{StaticResource LabelStyle}"
-                                                           Text="E-mail"/>
-                                                <TextBox Height="38"
-                                                         Margin="0,0,0,15"
-                                                         Padding="10,8"
-                                                         Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                <Button Height="56"
+                                                                        Margin="0,0,0,24"
+                                                                        HorizontalAlignment="Stretch"
+                                                                        Background="#FF1F7D33"
+                                                                        Click="LoginButton_Click"
+                                                                        Style="{StaticResource LoginLoadingButtonStyle}"
+                                                                        Content="Sign In"
+                                                                        Foreground="White"
+                                                                        FontWeight="SemiBold"/>
 
-                                                <TextBlock Style="{StaticResource LabelStyle}"
-                                                           Text="Password"/>
-                                                <PasswordBox x:Name="RegisterPassword"
-                                                             Height="38"
-                                                             Margin="0,0,0,15"
-                                                             Padding="10,8"/>
+                                                                <TextBlock x:Name="StatusMessage"
+                                                                           Margin="0,0,0,14"
+                                                                           HorizontalAlignment="Center"
+                                                                           FontWeight="Medium"
+                                                                           Foreground="{Binding StatusColor}"
+                                                                           Text="{Binding StatusMessage}"
+                                                                           TextAlignment="Center"
+                                                                           TextWrapping="Wrap"/>
+                                                        </StackPanel>
 
-                                                <TextBlock Style="{StaticResource LabelStyle}"
-                                                           Text="Repeat Password"/>
-                                                <PasswordBox x:Name="RegisterRepeatPassword"
-                                                             Height="38"
-                                                             Margin="0,0,0,25"
-                                                             Padding="10,8"/>
+                                                        <StackPanel x:Name="RegisterFormPanel"
+                                                                    Margin="0,0,0,8"
+                                                                    Visibility="{Binding IsRegisterVisible, Converter={StaticResource BoolToVis}}">
+                                                                <TextBlock Margin="0,0,0,5"
+                                                                           FontSize="32"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="#FF328A5D"
+                                                                           Text="Create profile"/>
+                                                                <TextBlock Margin="0,0,0,20"
+                                                                           FontSize="15"
+                                                                           Foreground="{DynamicResource TextMutedBrush}"
+                                                                           Text="Set up your account in a few quick steps."/>
 
-                                                <Button Height="42"
-                                                        Margin="0,0,0,15"
-                                                        Background="#FF328A5D"
-                                                        Click="RegisterButton_Click"
-                                                        Content="Sign up"
-                                                        Foreground="White"
-                                                        FontWeight="SemiBold"/>
+                                                                <Grid HorizontalAlignment="Center"
+                                                                      Margin="0,0,0,25">
+                                                                        <Border x:Name="AvatarBorder"
+                                                                                Width="90"
+                                                                                Height="90"
+                                                                                CornerRadius="45"
+                                                                                BorderBrush="{DynamicResource InputBorderBrush}"
+                                                                                BorderThickness="2"
+                                                                                Background="{DynamicResource InputBgBrush}">
+                                                                                <Grid>
+                                                                                        <Image Source="/Assets/logo.png"
+                                                                                               Margin="20"
+                                                                                               Opacity="0.3"/>
+                                                                                        <Border Width="90"
+                                                                                                Height="90"
+                                                                                                CornerRadius="45">
+                                                                                                <Border.Background>
+                                                                                                        <ImageBrush x:Name="AvatarImageBrush"
+                                                                                                                    Stretch="UniformToFill"/>
+                                                                                                </Border.Background>
+                                                                                        </Border>
+                                                                                        <Button VerticalAlignment="Bottom"
+                                                                                                HorizontalAlignment="Right"
+                                                                                                Width="28"
+                                                                                                Height="28"
+                                                                                                Background="#FF328A5D"
+                                                                                                Padding="0"
+                                                                                                Click="ChooseAvatar_Click"
+                                                                                                Cursor="Hand">
+                                                                                                <Button.Template>
+                                                                                                        <ControlTemplate TargetType="Button">
+                                                                                                                <Border CornerRadius="14"
+                                                                                                                        Background="{TemplateBinding Background}">
+                                                                                                                        <TextBlock Text="📷"
+                                                                                                                                   Foreground="White"
+                                                                                                                                   FontWeight="Bold"
+                                                                                                                                   FontSize="16"
+                                                                                                                                   HorizontalAlignment="Center"
+                                                                                                                                   VerticalAlignment="Center"
+                                                                                                                                   Margin="0,-2,0,0"/>
+                                                                                                                </Border>
+                                                                                                        </ControlTemplate>
+                                                                                                </Button.Template>
+                                                                                        </Button>
+                                                                                </Grid>
+                                                                        </Border>
+                                                                </Grid>
 
-                                                <Button HorizontalAlignment="Center"
-                                                        Background="Transparent"
-                                                        Click="NavToLogin_Click"
-                                                        Content="Back to Login"
-                                                        Cursor="Hand"
-                                                        FontSize="13"
-                                                        Foreground="{DynamicResource TextMutedBrush}">
-                                                        <Button.Template>
-                                                                <ControlTemplate TargetType="Button">
-                                                                        <TextBlock Text="{TemplateBinding Content}"
-                                                                                   TextDecorations="Underline"/>
-                                                                </ControlTemplate>
-                                                        </Button.Template>
-                                                </Button>
+                                                                <TextBox Height="50"
+                                                                         Margin="0,0,0,15"
+                                                                         Tag="Nickname"
+                                                                         Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                <TextBox Height="50"
+                                                                         Margin="0,0,0,15"
+                                                                         Tag="E-mail"
+                                                                         Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                <PasswordBox x:Name="RegisterPassword"
+                                                                             Height="50"
+                                                                             Margin="0,0,0,15"
+                                                                             Tag="Password"/>
+                                                                <PasswordBox x:Name="RegisterRepeatPassword"
+                                                                             Height="50"
+                                                                             Margin="0,0,0,25"
+                                                                             Tag="Repeat Password"/>
+
+                                                                <Button Height="48"
+                                                                        Margin="0,0,0,15"
+                                                                        Background="#FF328A5D"
+                                                                        Click="RegisterButton_Click"
+                                                                        Content="Sign up"
+                                                                        Foreground="White"
+                                                                        FontWeight="SemiBold"/>
+                                                                <TextBlock Margin="0,0,0,14"
+                                                                           HorizontalAlignment="Center"
+                                                                           FontWeight="Medium"
+                                                                           Foreground="{Binding StatusColor}"
+                                                                           Text="{Binding StatusMessage}"
+                                                                           TextAlignment="Center"
+                                                                           TextWrapping="Wrap"/>
+                                                                <Button HorizontalAlignment="Center"
+                                                                        Background="Transparent"
+                                                                        Click="NavToLogin_Click"
+                                                                        Content="Back to Login"
+                                                                        Cursor="Hand"
+                                                                        FontSize="13"
+                                                                        Style="{StaticResource AccentLinkButtonStyle}"/>
+                                                        </StackPanel>
+
+                                                        <StackPanel x:Name="ForgotFormPanel"
+                                                                    Margin="0,0,0,8"
+                                                                    Visibility="{Binding IsForgotVisible, Converter={StaticResource BoolToVis}}">
+                                                                <TextBlock Margin="0,0,0,10"
+                                                                           FontSize="32"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="#FF328A5D"
+                                                                           Text="Reset Password"/>
+
+                                                                <StackPanel Visibility="{Binding IsForgotEmailStep, Converter={StaticResource BoolToVis}}">
+                                                                        <TextBlock Margin="0,0,0,30"
+                                                                                   FontSize="14"
+                                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                                   Text="Enter your email to receive a reset code"
+                                                                                   TextWrapping="Wrap"/>
+                                                                        <TextBox Height="50"
+                                                                                 Margin="0,0,0,25"
+                                                                                 Tag="E-mail"
+                                                                                 Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                        <Button Height="48"
+                                                                                Margin="0,0,0,15"
+                                                                                Background="#FF328A5D"
+                                                                                Click="SendResetLink_Click"
+                                                                                Content="Send reset code"
+                                                                                Foreground="White"
+                                                                                FontWeight="SemiBold"/>
+                                                                </StackPanel>
+
+                                                                <StackPanel Visibility="{Binding IsForgotCodeStep, Converter={StaticResource BoolToVis}}">
+                                                                        <TextBlock Margin="0,0,0,20"
+                                                                                   FontSize="14"
+                                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                                   Text="Enter the verification code from your email"
+                                                                                   TextWrapping="Wrap"/>
+                                                                        <TextBox Height="50"
+                                                                                 Margin="0,0,0,25"
+                                                                                 Tag="Recovery Code"
+                                                                                 Text="{Binding ResetToken, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                        <Button Height="48"
+                                                                                Margin="0,0,0,15"
+                                                                                Background="#FF328A5D"
+                                                                                Click="VerifyOnlyCode_Click"
+                                                                                Content="Verify code"
+                                                                                Foreground="White"
+                                                                                FontWeight="SemiBold"/>
+                                                                </StackPanel>
+
+                                                                <StackPanel Visibility="{Binding IsForgotNewPasswordStep, Converter={StaticResource BoolToVis}}">
+                                                                        <TextBlock Margin="0,0,0,20"
+                                                                                   FontSize="14"
+                                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                                   Text="Create your new password"
+                                                                                   TextWrapping="Wrap"/>
+                                                                        <PasswordBox x:Name="ForgotNewPassword"
+                                                                                     Height="50"
+                                                                                     Tag="New Password"
+                                                                                     Margin="0,0,0,15"/>
+                                                                        <PasswordBox x:Name="ForgotRepeatPassword"
+                                                                                     Height="50"
+                                                                                     Tag="Repeat Password"
+                                                                                     Margin="0,0,0,25"/>
+                                                                        <Button Height="48"
+                                                                                Margin="0,0,0,15"
+                                                                                Background="#FF328A5D"
+                                                                                Click="SaveNewPassword_Click"
+                                                                                Content="Save new password"
+                                                                                Foreground="White"
+                                                                                FontWeight="SemiBold"/>
+                                                                </StackPanel>
+
+                                                                <Button HorizontalAlignment="Center"
+                                                                        Background="Transparent"
+                                                                        Click="NavToLogin_Click"
+                                                                        Content="Back to Login"
+                                                                        Cursor="Hand"
+                                                                        FontSize="13"
+                                                                        Style="{StaticResource AccentLinkButtonStyle}"/>
+                                                        </StackPanel>
+                                                </StackPanel>
+                                        </ScrollViewer>
+
+                                        <StackPanel Grid.Row="1"
+                                                    Orientation="Horizontal"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="40,8,0,16">
+                                                <TextBlock x:Name="LoginThemeIcon"
+                                                           Text="☀️"
+                                                           FontSize="16"
+                                                           Margin="0,0,8,0"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="LoginThemeLabel"
+                                                           Text="Light Mode"
+                                                           FontSize="14"
+                                                           Foreground="{DynamicResource TextMainBrush}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,12,0"/>
+                                                <ToggleButton x:Name="LoginThemeToggle"
+                                                              Style="{StaticResource ToggleSwitchStyle}"
+                                                              Click="ThemeToggle_Click"/>
                                         </StackPanel>
-
-                                        <StackPanel Visibility="{Binding IsForgotVisible, Converter={StaticResource BoolToVis}}">
-                                                <Image Source="/Assets/logo.png"
-                                                       Height="65"
-                                                       Margin="0,0,0,10"
-                                                       HorizontalAlignment="Center"
-                                                       RenderOptions.BitmapScalingMode="HighQuality"/>
-                                                <TextBlock Margin="0,0,0,10"
-                                                           FontSize="28"
-                                                           FontWeight="Bold"
-                                                           Foreground="#FF328A5D"
-                                                           Text="Reset Password"
-                                                           TextAlignment="Center"/>
-
-                                                <StackPanel Visibility="{Binding IsForgotEmailStep, Converter={StaticResource BoolToVis}}">
-                                                        <TextBlock Margin="0,0,0,30"
-                                                                   FontSize="14"
-                                                                   Foreground="{DynamicResource TextMutedBrush}"
-                                                                   Text="Enter your email to receive a reset code"
-                                                                   TextAlignment="Center"
-                                                                   TextWrapping="Wrap"/>
-                                                        <TextBlock Style="{StaticResource LabelStyle}"
-                                                                   Text="E-mail"/>
-                                                        <TextBox Height="38"
-                                                                 Margin="0,0,0,25"
-                                                                 Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
-                                                        <Button Height="42"
-                                                                Margin="0,0,0,15"
-                                                                Background="#FF328A5D"
-                                                                Click="SendResetLink_Click"
-                                                                Content="Send reset code"
-                                                                Foreground="White"
-                                                                FontWeight="SemiBold"/>
-                                                </StackPanel>
-
-                                                <StackPanel Visibility="{Binding IsForgotCodeStep, Converter={StaticResource BoolToVis}}">
-                                                        <TextBlock Margin="0,0,0,20"
-                                                                   FontSize="14"
-                                                                   Foreground="{DynamicResource TextMutedBrush}"
-                                                                   Text="Enter the verification code from your email"
-                                                                   TextAlignment="Center"
-                                                                   TextWrapping="Wrap"/>
-                                                        <TextBlock Style="{StaticResource LabelStyle}"
-                                                                   Text="Recovery Code"/>
-                                                        <TextBox Height="38"
-                                                                 Margin="0,0,0,25"
-                                                                 Text="{Binding ResetToken, UpdateSourceTrigger=PropertyChanged}"/>
-                                                        <Button Height="42"
-                                                                Margin="0,0,0,15"
-                                                                Background="#FF328A5D"
-                                                                Click="VerifyOnlyCode_Click"
-                                                                Content="Verify code"
-                                                                Foreground="White"
-                                                                FontWeight="SemiBold"/>
-                                                </StackPanel>
-
-                                                <StackPanel Visibility="{Binding IsForgotNewPasswordStep, Converter={StaticResource BoolToVis}}">
-                                                        <TextBlock Margin="0,0,0,20"
-                                                                   FontSize="14"
-                                                                   Foreground="{DynamicResource TextMutedBrush}"
-                                                                   Text="Create your new password"
-                                                                   TextAlignment="Center"
-                                                                   TextWrapping="Wrap"/>
-                                                        <TextBlock Style="{StaticResource LabelStyle}"
-                                                                   Text="New Password"/>
-                                                        <PasswordBox x:Name="ForgotNewPassword"
-                                                                     Height="38"
-                                                                     Margin="0,0,0,15"/>
-                                                        <TextBlock Style="{StaticResource LabelStyle}"
-                                                                   Text="Repeat Password"/>
-                                                        <PasswordBox x:Name="ForgotRepeatPassword"
-                                                                     Height="38"
-                                                                     Margin="0,0,0,25"/>
-                                                        <Button Height="42"
-                                                                Margin="0,0,0,15"
-                                                                Background="#FF328A5D"
-                                                                Click="SaveNewPassword_Click"
-                                                                Content="Save new password"
-                                                                Foreground="White"
-                                                                FontWeight="SemiBold"/>
-                                                </StackPanel>
-
-                                                <Button HorizontalAlignment="Center"
-                                                        Background="Transparent"
-                                                        Click="NavToLogin_Click"
-                                                        Content="Back to Login"
-                                                        Cursor="Hand"
-                                                        FontSize="13"
-                                                        Foreground="{DynamicResource TextMutedBrush}">
-                                                        <Button.Template>
-                                                                <ControlTemplate TargetType="Button">
-                                                                        <TextBlock Text="{TemplateBinding Content}"
-                                                                                   TextDecorations="Underline"/>
-                                                                </ControlTemplate>
-                                                        </Button.Template>
-                                                </Button>
-                                        </StackPanel>
-
-                                        <TextBlock x:Name="StatusMessage"
-                                                   Margin="0,0,0,-30"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Bottom"
-                                                   FontWeight="Medium"
-                                                   Foreground="{Binding StatusColor}"
-                                                   Text="{Binding StatusMessage}"
-                                                   TextAlignment="Center"
-                                                   TextWrapping="Wrap"/>
                                 </Grid>
                         </Border>
-                </ScrollViewer>
+                </Grid>
 
                 <Grid Visibility="{Binding IsDashboardVisible, Converter={StaticResource BoolToVis}}">
                         <Grid.ColumnDefinitions>
@@ -704,108 +1166,108 @@
                                         </Grid.RowDefinitions>
 
                                         <StackPanel Grid.Row="0"
-                                                        Orientation="Horizontal"
-                                                        Margin="0,0,0,40">
+                                                    Orientation="Horizontal"
+                                                    Margin="0,0,0,40">
                                                 <Border Width="42"
-                                                                Height="42"
-                                                                Background="#1B2A2F"
-                                                                CornerRadius="12"
-                                                                Margin="0,0,15,0">
+                                                        Height="42"
+                                                        Background="#1B2A2F"
+                                                        CornerRadius="12"
+                                                        Margin="0,0,15,0">
                                                         <TextBlock Text="🌱"
-                                                                        Foreground="#328A5D"
-                                                                        HorizontalAlignment="Center"
-                                                                        VerticalAlignment="Center"
-                                                                        FontSize="20"/>
+                                                                   Foreground="#328A5D"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="20"/>
                                                 </Border>
                                                 <StackPanel VerticalAlignment="Center">
                                                         <TextBlock Text="Habit Tracker"
-                                                                        FontSize="18"
-                                                                        FontWeight="Bold"
-                                                                        Foreground="#1B2A2F"/>
+                                                                   FontSize="18"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="#1B2A2F"/>
                                                         <TextBlock Text="DAILY GROWTH"
-                                                                        FontSize="10"
-                                                                        FontWeight="Bold"
-                                                                        Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                   FontSize="10"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="{DynamicResource TextMutedBrush}"/>
                                                 </StackPanel>
                                         </StackPanel>
 
                                         <StackPanel Grid.Row="1">
                                                 <Border Background="#E8F0EA"
-                                                                CornerRadius="10"
-                                                                Margin="0,2"
-                                                                Padding="15,12">
+                                                        CornerRadius="10"
+                                                        Margin="0,2"
+                                                        Padding="15,12">
                                                         <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="⊞"
-                                                                                FontSize="18"
-                                                                                Foreground="#328A5D"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="18"
+                                                                           Foreground="#328A5D"
+                                                                           Margin="0,0,15,0"
+                                                                           VerticalAlignment="Center"/>
                                                                 <TextBlock Text="Dashboard"
-                                                                                FontSize="14"
-                                                                                FontWeight="Bold"
-                                                                                Foreground="#328A5D"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="14"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="#328A5D"
+                                                                           VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                 </Border>
 
                                                 <Button Style="{StaticResource SidebarMenuItemStyle}">
                                                         <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="🔄"
-                                                                                FontSize="16"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="16"
+                                                                           Margin="0,0,15,0"
+                                                                           VerticalAlignment="Center"/>
                                                                 <TextBlock Text="Habits Manager"
-                                                                                VerticalAlignment="Center"/>
+                                                                           VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                 </Button>
                                                 <Button Style="{StaticResource SidebarMenuItemStyle}">
                                                         <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="📅"
-                                                                                FontSize="16"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="16"
+                                                                           Margin="0,0,15,0"
+                                                                           VerticalAlignment="Center"/>
                                                                 <TextBlock Text="Calendar"
-                                                                                VerticalAlignment="Center"/>
+                                                                           VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                 </Button>
                                                 <Button Style="{StaticResource SidebarMenuItemStyle}">
                                                         <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="📊"
-                                                                                FontSize="16"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="16"
+                                                                           Margin="0,0,15,0"
+                                                                           VerticalAlignment="Center"/>
                                                                 <TextBlock Text="Statistics"
-                                                                                VerticalAlignment="Center"/>
+                                                                           VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                 </Button>
                                                 <Button Style="{StaticResource SidebarMenuItemStyle}">
                                                         <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="📏"
-                                                                                FontSize="16"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="16"
+                                                                           Margin="0,0,15,0"
+                                                                           VerticalAlignment="Center"/>
                                                                 <TextBlock Text="Measurements"
-                                                                                VerticalAlignment="Center"/>
+                                                                           VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                 </Button>
                                                 <Button Style="{StaticResource SidebarMenuItemStyle}">
                                                         <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="📑"
-                                                                                FontSize="16"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="16"
+                                                                           Margin="0,0,15,0"
+                                                                           VerticalAlignment="Center"/>
                                                                 <TextBlock Text="PDF Report"
-                                                                                VerticalAlignment="Center"/>
+                                                                           VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                 </Button>
                                                 <Button Style="{StaticResource SidebarMenuItemStyle}">
                                                         <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="⚙️"
-                                                                                FontSize="16"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="16"
+                                                                           Margin="0,0,15,0"
+                                                                           VerticalAlignment="Center"/>
                                                                 <TextBlock Text="Settings"
-                                                                                VerticalAlignment="Center"/>
+                                                                           VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                 </Button>
                                         </StackPanel>
@@ -813,36 +1275,36 @@
                                         <StackPanel Grid.Row="2">
 
                                                 <Button Background="#328A5D"
-                                                                Foreground="White"
-                                                                Margin="0,0,0,25"
-                                                                Height="48"
-                                                                Cursor="Hand"
-                                                                BorderThickness="0">
+                                                        Foreground="White"
+                                                        Margin="0,0,0,25"
+                                                        Height="48"
+                                                        Cursor="Hand"
+                                                        BorderThickness="0">
                                                         <Button.Template>
                                                                 <ControlTemplate TargetType="Button">
                                                                         <Border Background="{TemplateBinding Background}"
-                                                                                        CornerRadius="12"
-                                                                                        x:Name="Bg">
+                                                                                CornerRadius="12"
+                                                                                x:Name="Bg">
                                                                                 <StackPanel Orientation="Horizontal"
-                                                                                                HorizontalAlignment="Center"
-                                                                                                VerticalAlignment="Center">
+                                                                                            HorizontalAlignment="Center"
+                                                                                            VerticalAlignment="Center">
                                                                                         <TextBlock Text="+"
-                                                                                                        FontSize="18"
-                                                                                                        FontWeight="Bold"
-                                                                                                        Margin="0,0,8,0"
-                                                                                                        VerticalAlignment="Center"/>
+                                                                                                   FontSize="18"
+                                                                                                   FontWeight="Bold"
+                                                                                                   Margin="0,0,8,0"
+                                                                                                   VerticalAlignment="Center"/>
                                                                                         <TextBlock Text="New Habit"
-                                                                                                        FontSize="14"
-                                                                                                        FontWeight="SemiBold"
-                                                                                                        VerticalAlignment="Center"/>
+                                                                                                   FontSize="14"
+                                                                                                   FontWeight="SemiBold"
+                                                                                                   VerticalAlignment="Center"/>
                                                                                 </StackPanel>
                                                                         </Border>
                                                                         <ControlTemplate.Triggers>
                                                                                 <Trigger Property="IsMouseOver"
-                                                                                                Value="True">
+                                                                                         Value="True">
                                                                                         <Setter TargetName="Bg"
-                                                                                                        Property="Opacity"
-                                                                                                        Value="0.9"/>
+                                                                                                Property="Opacity"
+                                                                                                Value="0.9"/>
                                                                                 </Trigger>
                                                                         </ControlTemplate.Triggers>
                                                                 </ControlTemplate>
@@ -850,56 +1312,59 @@
                                                 </Button>
 
                                                 <StackPanel Orientation="Horizontal"
-                                                                Margin="15,10,0,10"
-                                                                VerticalAlignment="Center"
-                                                                Cursor="Hand">
+                                                            Margin="15,10,0,10"
+                                                            VerticalAlignment="Center"
+                                                            Cursor="Hand">
                                                         <Border Width="24"
-                                                                        Height="24"
-                                                                        CornerRadius="12"
-                                                                        Margin="0,0,15,0">
+                                                                Height="24"
+                                                                CornerRadius="12"
+                                                                Margin="0,0,15,0">
                                                                 <Border.Background>
                                                                         <ImageBrush ImageSource="{Binding AvatarPath}"
-                                                                                        Stretch="UniformToFill"/>
+                                                                                    Stretch="UniformToFill"/>
                                                                 </Border.Background>
                                                         </Border>
                                                         <TextBlock Text="{Binding Nickname}"
-                                                                        FontSize="13"
-                                                                        FontWeight="SemiBold"
-                                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                                        VerticalAlignment="Center"/>
+                                                                   FontSize="13"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                   VerticalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <StackPanel Orientation="Horizontal"
-                                                                Margin="15,10,0,10"
-                                                                VerticalAlignment="Center"
-                                                                Cursor="Hand">
-                                                        <TextBlock Text="☀️"
-                                                                        FontSize="16"
-                                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                                        Margin="0,0,15,0"/>
-                                                        <TextBlock Text="Light Mode"
-                                                                        FontSize="13"
-                                                                        FontWeight="SemiBold"
-                                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                                        VerticalAlignment="Center"/>
+                                                            Margin="15,10,0,10"
+                                                            VerticalAlignment="Center"
+                                                            Cursor="Hand">
+                                                        <TextBlock x:Name="DashboardThemeIcon"
+                                                                   Text="☀️"
+                                                                   FontSize="16"
+                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                   Margin="0,0,15,0"/>
+                                                        <TextBlock x:Name="DashboardThemeLabel"
+                                                                   Text="Light Mode"
+                                                                   FontSize="13"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                   VerticalAlignment="Center"/>
 
-                                                        <ToggleButton Style="{StaticResource ToggleSwitchStyle}"
-                                                                        Click="ThemeToggle_Click"
-                                                                        Margin="25,0,0,0"/>
+                                                        <ToggleButton x:Name="DashboardThemeToggle"
+                                                                      Style="{StaticResource ToggleSwitchStyle}"
+                                                                      Click="ThemeToggle_Click"
+                                                                      Margin="25,0,0,0"/>
                                                 </StackPanel>
 
                                                 <Button Style="{StaticResource SidebarMenuItemStyle}"
-                                                                Click="LogoutButton_Click"
-                                                                Padding="15,10"
-                                                                Margin="0">
+                                                        Click="LogoutButton_Click"
+                                                        Padding="15,10"
+                                                        Margin="0">
                                                         <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="🚪"
-                                                                                FontSize="16"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="16"
+                                                                           Margin="0,0,15,0"
+                                                                           VerticalAlignment="Center"/>
                                                                 <TextBlock Text="Logout"
-                                                                                FontSize="13"
-                                                                                VerticalAlignment="Center"/>
+                                                                           FontSize="13"
+                                                                           VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                 </Button>
                                         </StackPanel>

@@ -1,10 +1,11 @@
-﻿using System.Drawing;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media.Imaging;
 using HabitTracker.ViewModels;
 using System.Windows.Media;
 using HabitTracker.Models;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace HabitTracker;
 
@@ -12,47 +13,82 @@ namespace HabitTracker;
 public partial class MainWindow : Window
 {
     private LoginViewModel _viewModel;
+    private bool _isFormTransitionRunning;
+
+    public static readonly DependencyProperty HasTextProperty = DependencyProperty.RegisterAttached(
+        "HasText",
+        typeof(bool),
+        typeof(MainWindow),
+        new PropertyMetadata(false));
+
+    public static bool GetHasText(DependencyObject obj) => (bool)obj.GetValue(HasTextProperty);
+
+    public static void SetHasText(DependencyObject obj, bool value) => obj.SetValue(HasTextProperty, value);
+
     public MainWindow()
     {
         InitializeComponent();
         _viewModel = new LoginViewModel();
         this.DataContext = _viewModel;
+
+        Loaded += (_, _) =>
+        {
+            ResetFormVisualState(LoginFormPanel);
+            ResetFormVisualState(RegisterFormPanel);
+            ResetFormVisualState(ForgotFormPanel);
+            UpdateThemeToggleVisuals(false);
+        };
     }
 
 
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {
-        bool success = await _viewModel.LoginAsync(LoginPassword.Password);
-    
-        if (!success)
+        if (_viewModel.IsLoading)
         {
-            LoginPassword.Password = string.Empty;
+            return;
         }
-        else
+
+        _viewModel.IsLoading = true;
+
+        try
         {
-            _viewModel.ShowDashboard();
-            this.WindowState=WindowState.Maximized; //skalujemy okno, po zalogowaniu
-        
+            string actualPassowrd = LoginPassword.Visibility == Visibility.Visible ? LoginPassword.Password : LoginPasswordVisible.Text;
+            bool success = await _viewModel.LoginAsync(LoginPassword.Password);
+
+            if (!success)
+            {
+                LoginPassword.Password = string.Empty;
+                LoginPasswordVisible.Text = string.Empty;
+            }
+            else
+            {
+                _viewModel.ShowDashboard();
+                this.WindowState = WindowState.Maximized; //skalujemy okno, po zalogowaniu
+            }
+        }
+        finally
+        {
+            _viewModel.IsLoading = false;
         }
     }
 
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
-        this.WindowState = WindowState.Normal;
-        _viewModel.Email=string.Empty;
+        _viewModel.Email = string.Empty;
         LoginPassword.Password = string.Empty;
         _viewModel.ShowAccountSelection();
     }
 
     private async void RegisterButton_Click(object sender, RoutedEventArgs e)
     {
-        if (RegisterPassword.Password != RegisterRepeatPassword.Password)
+        string password = RegisterPassword.Password;
+        if (password != RegisterRepeatPassword.Password)
         {
             _viewModel.StatusColor = "#FFD32F2F";
             _viewModel.StatusMessage = "Passwords do not match!";
             return;
         }
-        bool success = await _viewModel.RegisterAsync(RegisterPassword.Password);
+        bool success = await _viewModel.RegisterAsync(password);
 
         if (success)
         {
@@ -64,7 +100,7 @@ public partial class MainWindow : Window
 
             await Task.Delay(1500);
 
-            _viewModel.ShowLogin();
+            SwitchAuthFormWithAnimation(() => _viewModel.ShowLogin(), LoginFormPanel);
         }
     }
     private async void SendResetLink_Click(object sender, RoutedEventArgs e)
@@ -90,22 +126,170 @@ public partial class MainWindow : Window
             _viewModel.StatusMessage = "Password must be at least 6 characters.";
             return;
         }
-        await _viewModel.UpdatePasswordAsync(ForgotNewPassword.Password);
+        bool updated = await _viewModel.UpdatePasswordAsync(ForgotNewPassword.Password);
+
+        if (updated)
+        {
+            ForgotNewPassword.Password = string.Empty;
+            ForgotRepeatPassword.Password = string.Empty;
+            ResetFormVisualState(LoginFormPanel);
+        }
     }
     private void NavToRegister_Click(object sender, RoutedEventArgs e)
-    {   
+    {
         _viewModel.Email = string.Empty;
         RegisterPassword.Password = string.Empty;
-        _viewModel.ShowRegister();
+
+        SwitchAuthFormWithAnimation(() => _viewModel.ShowRegister(), RegisterFormPanel);
     }
+
     private void NavToLogin_Click(object sender, RoutedEventArgs e)
     {
-        _viewModel.Email=string.Empty;
+        _viewModel.Email = string.Empty;
         LoginPassword.Password = string.Empty;
 
+        if (RegisterFormPanel.Visibility == Visibility.Visible || ForgotFormPanel.Visibility == Visibility.Visible)
+        {
+            SwitchAuthFormWithAnimation(() => _viewModel.ShowLogin(), LoginFormPanel);
+            return;
+        }
+
         _viewModel.ShowLogin();
+        ResetFormVisualState(LoginFormPanel);
     }
-    private void NavToForgot_Click(object sender, RoutedEventArgs e) => _viewModel.ShowForgot();
+
+    private void NavToForgot_Click(object sender, RoutedEventArgs e)
+    {
+        SwitchAuthFormWithAnimation(() => _viewModel.ShowForgot(), ForgotFormPanel);
+    }
+
+    private static TranslateTransform EnsureTranslateTransform(UIElement element)
+    {
+        if (element.RenderTransform is TranslateTransform translate)
+        {
+            return translate;
+        }
+
+        var newTransform = new TranslateTransform();
+        element.RenderTransform = newTransform;
+        return newTransform;
+    }
+
+    private static void ResetFormVisualState(UIElement form)
+    {
+        var transform = EnsureTranslateTransform(form);
+        transform.BeginAnimation(TranslateTransform.XProperty, null);
+        form.BeginAnimation(UIElement.OpacityProperty, null);
+        transform.X = 0;
+        form.Opacity = 1;
+    }
+
+    private void AnimateFormOut(UIElement form, Action onCompleted)
+    {
+        var transform = EnsureTranslateTransform(form);
+
+        var slideOut = new DoubleAnimation
+        {
+            To = -40, //przesuniecie o 40 pikseli w lewo
+            Duration = TimeSpan.FromSeconds(0.25), // wykonuje sie w 1/4 sekundy, dla lepszego efektu
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn } //wolne rozpoczecie, szybsze na koncu
+        };
+
+        var fadeOut = new DoubleAnimation
+        {
+            To = 0, //zmiana widocznosci na 0
+            Duration = TimeSpan.FromSeconds(0.25),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+        };
+
+        fadeOut.Completed += (_, _) => onCompleted(); //notyfikacja gdy skonczy sie znikanie
+
+        transform.BeginAnimation(TranslateTransform.XProperty, slideOut);
+        form.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+    }
+
+    private void AnimateFormIn(UIElement form)
+    {
+        var transform = EnsureTranslateTransform(form);
+        transform.X = 40;
+        form.Opacity = 0; //formularz niewidoczny na starcie
+
+        var slideIn = new DoubleAnimation
+        {
+            To = 0,
+            Duration = TimeSpan.FromSeconds(0.28),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } //szybszy poczatek, wolniejszy koniec animacji
+        };
+
+        var fadeIn = new DoubleAnimation
+        {
+            To = 1, //widocznosc
+            Duration = TimeSpan.FromSeconds(0.28),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        transform.BeginAnimation(TranslateTransform.XProperty, slideIn);
+        form.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+    }
+
+    private StackPanel? GetCurrentAnimatedForm()
+    {
+        if (LoginFormPanel.Visibility == Visibility.Visible)
+        {
+            return LoginFormPanel;
+        }
+
+        if (RegisterFormPanel.Visibility == Visibility.Visible)
+        {
+            return RegisterFormPanel;
+        }
+
+        if (ForgotFormPanel.Visibility == Visibility.Visible)
+        {
+            return ForgotFormPanel;
+        }
+
+        return null;
+    }
+
+    private void SwitchAuthFormWithAnimation(Action switchViewAction, StackPanel targetForm)
+    {
+        if (_isFormTransitionRunning)
+        {
+            return;
+        }
+
+        var currentForm = GetCurrentAnimatedForm();
+
+        if (currentForm == null || currentForm == targetForm)
+        {
+            switchViewAction();
+            ResetFormVisualState(targetForm);
+            return;
+        }
+
+        _isFormTransitionRunning = true; //blokada ekranu na czas animacji
+
+        AnimateFormOut(currentForm, () =>
+        {
+            switchViewAction();
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                ResetFormVisualState(targetForm);
+                AnimateFormIn(targetForm);
+                _isFormTransitionRunning = false;
+            }), DispatcherPriority.Loaded);
+        });
+    }
+
+    private void FloatingPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+    {
+        if (sender is PasswordBox passwordBox)
+        {
+            SetHasText(passwordBox, !string.IsNullOrEmpty(passwordBox.Password));
+        }
+    }
 
     private void ChooseAvatar_Click(object sender, RoutedEventArgs e)
     {
@@ -132,6 +316,16 @@ public partial class MainWindow : Window
         var toggle = sender as System.Windows.Controls.Primitives.ToggleButton;
         bool isDark = toggle.IsChecked == true;
 
+        if (LoginThemeToggle != null && LoginThemeToggle.IsChecked != isDark)
+        {
+            LoginThemeToggle.IsChecked = isDark;
+        }
+
+        if (DashboardThemeToggle != null && DashboardThemeToggle.IsChecked != isDark)
+        {
+            DashboardThemeToggle.IsChecked = isDark;
+        }
+
         if (isDark)
         {
             //Tryb ciemny
@@ -147,6 +341,7 @@ public partial class MainWindow : Window
             this.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFA0A0A0");
             this.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF1E1E1E");
             this.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF434346");
+            UpdateThemeToggleVisuals(true);
         }
         else
         {
@@ -163,6 +358,33 @@ public partial class MainWindow : Window
             this.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF8B9AA2");
             this.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFF8F9FA");
             this.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFDDE2E5");
+            UpdateThemeToggleVisuals(false);
+        }
+    }
+
+    private void UpdateThemeToggleVisuals(bool isDark)
+    {
+        string icon = isDark ? "🌙" : "☀️";
+        string label = isDark ? "Dark Mode" : "Light Mode";
+
+        if (LoginThemeIcon != null)
+        {
+            LoginThemeIcon.Text = icon;
+        }
+
+        if (LoginThemeLabel != null)
+        {
+            LoginThemeLabel.Text = label;
+        }
+
+        if (DashboardThemeIcon != null)
+        {
+            DashboardThemeIcon.Text = icon;
+        }
+
+        if (DashboardThemeLabel != null)
+        {
+            DashboardThemeLabel.Text = label;
         }
     }
 
@@ -180,14 +402,25 @@ public partial class MainWindow : Window
 
             LoginPassword.Focus();
 
-            
+
         }
     }
 
-    private void NavToAccountSelection_Click(object sender, RoutedEventArgs e)
+    private void ToggleLoginPassword_Click(object sender, RoutedEventArgs e)
     {
-        _viewModel.ShowAccountSelection();
+        if (LoginPassword.Visibility == Visibility.Visible)
+        {
+            LoginPasswordVisible.Text = LoginPassword.Password;
+            LoginPassword.Visibility = Visibility.Collapsed;
+            LoginPasswordVisible.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            LoginPassword.Password = LoginPasswordVisible.Text;
+            LoginPasswordVisible.Visibility = Visibility.Collapsed;
+            LoginPassword.Visibility = Visibility.Visible;
 
-        LoginPassword.Password = string.Empty;
+        }
     }
+
 }
