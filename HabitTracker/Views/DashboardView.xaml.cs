@@ -7,9 +7,20 @@ public partial class DashboardView : System.Windows.Controls.UserControl
 {
     private LoginViewModel ViewModel => (LoginViewModel)DataContext;
 
+    private DashboardViewModel _dashboardVM;
     public DashboardView()
     {
         InitializeComponent();
+
+        _dashboardVM=new DashboardViewModel();
+
+        MainContentArea.DataContext = _dashboardVM;
+
+        this.Loaded+=DashboardView_Loaded;
+    }
+
+    private async void DashboardView_Loaded(object sender, RoutedEventArgs e){
+        await _dashboardVM.LoadHabitsAsync();
     }
 
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
