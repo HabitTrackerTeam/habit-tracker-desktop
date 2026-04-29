@@ -37,14 +37,13 @@
 
                                 <TextBlock FontSize="34"
                                            FontWeight="Bold"
-                                           Foreground="#FF16213A"
+                                           Foreground="{DynamicResource TextMainBrush}"
                                            LineHeight="42"
                                            Margin="0,0,0,16"
                                            TextWrapping="Wrap">
                                         Plant habits. 
                                         <Run Text="Harvest success."
-                                             Foreground="#FF1F7D33"
-                                             FontStyle="Italic"/>
+                                             Foreground="#FF1F7D33"/>
                                 </TextBlock>
 
                                 <TextBlock Text="Your dedicated tracker for productivity and health. Stay consistent, analyze your performance, and turn small steps into lasting lifestyle changes in just a few clicks a day."
@@ -112,7 +111,7 @@
                                                                 <TextBlock Text="Welcome back"
                                                                            FontSize="28"
                                                                            FontWeight="Bold"
-                                                                           Foreground="#FF121A2F"/>
+                                                                           Foreground="{DynamicResource TextMainBrush}"/>
                                                                 <TextBlock Text="Select an account or sign in manually."
                                                                            FontSize="14"
                                                                            Foreground="{DynamicResource TextMutedBrush}"
