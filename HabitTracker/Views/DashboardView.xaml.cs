@@ -19,9 +19,6 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         this.Loaded+=DashboardView_Loaded;
     }
 
-    private async void DashboardView_Loaded(object sender, RoutedEventArgs e){
-        await _dashboardVM.LoadHabitsAsync();
-    }
 
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
@@ -56,6 +53,33 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         if (DashboardThemeToggle != null && DashboardThemeToggle.IsChecked != isDark)
         {
             DashboardThemeToggle.IsChecked = isDark;
+        }
+    }
+
+    private async void DashboardView_Loaded(object sender, RoutedEventArgs e)
+    {
+        await _dashboardVM.LoadFormDataAsync();
+        await _dashboardVM.LoadHabitsAsync();
+    }
+
+    private async void AddHabit_Click(object sender, RoutedEventArgs e)
+    {
+        await _dashboardVM.CreateHabitAsync();
+    }
+
+    private void SidebarNewHabit_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            _dashboardVM.IsAddFormVisible = !_dashboardVM.IsAddFormVisible;
+        }
+    }
+
+    private async void SaveHabit_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            await _dashboardVM.CreateHabitAsync();
         }
     }
 }
