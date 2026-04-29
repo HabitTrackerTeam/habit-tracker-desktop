@@ -38,8 +38,8 @@ public partial class AuthView : System.Windows.Controls.UserControl
 
         try
         {
-            string actualPassowrd = LoginPassword.Visibility == Visibility.Visible ? LoginPassword.Password : LoginPasswordVisible.Text;
-            bool success = await ViewModel.LoginAsync(LoginPassword.Password);
+            string actualPassword = LoginPassword.Visibility == Visibility.Visible ? LoginPassword.Password : LoginPasswordVisible.Text;
+            bool success = await ViewModel.LoginAsync(actualPassword);
 
             if (!success)
             {
@@ -64,8 +64,9 @@ public partial class AuthView : System.Windows.Controls.UserControl
 
     private async void RegisterButton_Click(object sender, RoutedEventArgs e)
     {
-        string password = RegisterPassword.Password;
-        if (password != RegisterRepeatPassword.Password)
+        string password = RegisterPassword.Visibility == Visibility.Visible ? RegisterPassword.Password : RegisterPasswordVisible.Text;
+        string repeatPassword = RegisterRepeatPassword.Visibility == Visibility.Visible ? RegisterRepeatPassword.Password : RegisterRepeatPasswordVisible.Text;
+        if (password != repeatPassword)
         {
             ViewModel.StatusColor = "#FFD32F2F";
             ViewModel.StatusMessage = "Passwords do not match!";
@@ -76,7 +77,10 @@ public partial class AuthView : System.Windows.Controls.UserControl
         if (success)
         {
             RegisterPassword.Password = string.Empty;
+            RegisterPasswordVisible.Text = string.Empty;
             RegisterRepeatPassword.Password = string.Empty;
+            RegisterRepeatPasswordVisible.Text = string.Empty;
+            ViewModel.ResetPasswordChecklist();
 
             AvatarImageBrush.ImageSource = null;
             AvatarBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFDDE2E5");
@@ -99,23 +103,23 @@ public partial class AuthView : System.Windows.Controls.UserControl
 
     private async void SaveNewPassword_Click(object sender, RoutedEventArgs e)
     {
-        if (ForgotNewPassword.Password != ForgotRepeatPassword.Password)
+        string newPassword = ForgotNewPassword.Visibility == Visibility.Visible ? ForgotNewPassword.Password : ForgotNewPasswordVisible.Text;
+        string repeatPassword = ForgotRepeatPassword.Visibility == Visibility.Visible ? ForgotRepeatPassword.Password : ForgotRepeatPasswordVisible.Text;
+        if (newPassword != repeatPassword)
         {
             ViewModel.StatusMessage = "Passwords do not match!";
             return;
         }
 
-        if (ForgotNewPassword.Password.Length < 6)
-        {
-            ViewModel.StatusMessage = "Password must be at least 6 characters.";
-            return;
-        }
-        bool updated = await ViewModel.UpdatePasswordAsync(ForgotNewPassword.Password);
+        bool updated = await ViewModel.UpdatePasswordAsync(newPassword);
 
         if (updated)
         {
             ForgotNewPassword.Password = string.Empty;
+            ForgotNewPasswordVisible.Text = string.Empty;
             ForgotRepeatPassword.Password = string.Empty;
+            ForgotRepeatPasswordVisible.Text = string.Empty;
+            ViewModel.ResetPasswordChecklist();
             ResetFormVisualState(LoginFormPanel);
         }
     }
@@ -124,6 +128,10 @@ public partial class AuthView : System.Windows.Controls.UserControl
     {
         ViewModel.Email = string.Empty;
         RegisterPassword.Password = string.Empty;
+        RegisterPasswordVisible.Text = string.Empty;
+        RegisterRepeatPassword.Password = string.Empty;
+        RegisterRepeatPasswordVisible.Text = string.Empty;
+        ViewModel.ResetPasswordChecklist();
 
         SwitchAuthFormWithAnimation(() => ViewModel.ShowRegister(), RegisterFormPanel);
     }
@@ -132,6 +140,7 @@ public partial class AuthView : System.Windows.Controls.UserControl
     {
         ViewModel.Email = string.Empty;
         LoginPassword.Password = string.Empty;
+        ViewModel.ResetPasswordChecklist();
 
         if (RegisterFormPanel.Visibility == Visibility.Visible || ForgotFormPanel.Visibility == Visibility.Visible)
         {
@@ -145,6 +154,7 @@ public partial class AuthView : System.Windows.Controls.UserControl
 
     private void NavToForgot_Click(object sender, RoutedEventArgs e)
     {
+        ViewModel.ResetPasswordChecklist();
         SwitchAuthFormWithAnimation(() => ViewModel.ShowForgot(), ForgotFormPanel);
     }
 
@@ -351,5 +361,88 @@ public partial class AuthView : System.Windows.Controls.UserControl
             LoginPassword.Visibility = Visibility.Visible;
 
         }
+    }
+
+    private void PasswordField_PasswordChanged(object sender, RoutedEventArgs e)
+    {
+        var pb = (PasswordBox)sender;
+        ViewModel.IsPasswordChecklistVisible = pb.Password.Length > 0;
+        ViewModel.ValidatePassword(pb.Password);
+    }
+
+    private void ToggleRegisterPassword_Click(object sender, RoutedEventArgs e)
+    {
+        if (RegisterPassword.Visibility == Visibility.Visible)
+        {
+            RegisterPasswordVisible.Text = RegisterPassword.Password;
+            RegisterPassword.Visibility = Visibility.Collapsed;
+            RegisterPasswordVisible.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            RegisterPassword.Password = RegisterPasswordVisible.Text;
+            RegisterPasswordVisible.Visibility = Visibility.Collapsed;
+            RegisterPassword.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void ToggleRegisterRepeatPassword_Click(object sender, RoutedEventArgs e)
+    {
+        if (RegisterRepeatPassword.Visibility == Visibility.Visible)
+        {
+            RegisterRepeatPasswordVisible.Text = RegisterRepeatPassword.Password;
+            RegisterRepeatPassword.Visibility = Visibility.Collapsed;
+            RegisterRepeatPasswordVisible.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            RegisterRepeatPassword.Password = RegisterRepeatPasswordVisible.Text;
+            RegisterRepeatPasswordVisible.Visibility = Visibility.Collapsed;
+            RegisterRepeatPassword.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void ToggleForgotNewPassword_Click(object sender, RoutedEventArgs e)
+    {
+        if (ForgotNewPassword.Visibility == Visibility.Visible)
+        {
+            ForgotNewPasswordVisible.Text = ForgotNewPassword.Password;
+            ForgotNewPassword.Visibility = Visibility.Collapsed;
+            ForgotNewPasswordVisible.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            ForgotNewPassword.Password = ForgotNewPasswordVisible.Text;
+            ForgotNewPasswordVisible.Visibility = Visibility.Collapsed;
+            ForgotNewPassword.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void ToggleForgotRepeatPassword_Click(object sender, RoutedEventArgs e)
+    {
+        if (ForgotRepeatPassword.Visibility == Visibility.Visible)
+        {
+            ForgotRepeatPasswordVisible.Text = ForgotRepeatPassword.Password;
+            ForgotRepeatPassword.Visibility = Visibility.Collapsed;
+            ForgotRepeatPasswordVisible.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            ForgotRepeatPassword.Password = ForgotRepeatPasswordVisible.Text;
+            ForgotRepeatPasswordVisible.Visibility = Visibility.Collapsed;
+            ForgotRepeatPassword.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void RegisterPasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        ViewModel.IsPasswordChecklistVisible = RegisterPasswordVisible.Text.Length > 0;
+        ViewModel.ValidatePassword(RegisterPasswordVisible.Text);
+    }
+
+    private void ForgotNewPasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        ViewModel.IsPasswordChecklistVisible = ForgotNewPasswordVisible.Text.Length > 0;
+        ViewModel.ValidatePassword(ForgotNewPasswordVisible.Text);
     }
 }
