@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using HabitTracker.Services;
 using HabitTracker.Models;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace HabitTracker.ViewModels
 {
@@ -30,6 +30,13 @@ namespace HabitTracker.ViewModels
         private bool _isForgotNewPasswordStep = false;
         private bool _isDashboardVisible = false;
         private bool _isLoading = false;
+
+        private bool _hasMinLength;
+        private bool _hasUppercase;
+        private bool _hasLowercase;
+        private bool _hasDigit;
+        private bool _hasSpecialChar;
+        private bool _isPasswordChecklistVisible;
         
 
         //Wlasciwosci
@@ -53,7 +60,15 @@ namespace HabitTracker.ViewModels
         public bool IsForgotNewPasswordStep { get => _isForgotNewPasswordStep; set { _isForgotNewPasswordStep = value; OnPropertyChanged(); } }
         public bool IsDashboardVisible{get=>_isDashboardVisible; set{_isDashboardVisible = value; OnPropertyChanged();OnPropertyChanged(nameof(IsAuthVisible));}}
         public bool IsLoading { get => _isLoading; set { _isLoading = value; OnPropertyChanged(); } }
-        public bool IsAuthVisible => !IsDashboardVisible; //Gdy dashboard jest niewidoczny to wyswietla ekran logowania
+        public bool IsAuthVisible => !IsDashboardVisible;
+
+        public bool HasMinLength { get => _hasMinLength; set { _hasMinLength = value; OnPropertyChanged(); } }
+        public bool HasUppercase { get => _hasUppercase; set { _hasUppercase = value; OnPropertyChanged(); } }
+        public bool HasLowercase { get => _hasLowercase; set { _hasLowercase = value; OnPropertyChanged(); } }
+        public bool HasDigit { get => _hasDigit; set { _hasDigit = value; OnPropertyChanged(); } }
+        public bool HasSpecialChar { get => _hasSpecialChar; set { _hasSpecialChar = value; OnPropertyChanged(); } }
+        public bool IsPasswordValid => HasMinLength && HasUppercase && HasLowercase && HasDigit && HasSpecialChar;
+        public bool IsPasswordChecklistVisible { get => _isPasswordChecklistVisible; set { _isPasswordChecklistVisible = value; OnPropertyChanged(); } }
 
         //KONSTRUKTOR
         public LoginViewModel()
@@ -127,32 +142,36 @@ namespace HabitTracker.ViewModels
             }
             return true;
         }
-        private bool ValidatePasswordComplexity(string password){
-            if(string.IsNullOrWhiteSpace(password) || password.Length<6){
-                SetStatus("Password must be at least 6 characters.", ColorError);
-                return false;
-            }
-            if(!Regex.IsMatch(password, @"[A-Z]")){
-                SetStatus("Password must containt at least one uppercase letter.", ColorError);
-                return false;
-            }
-            if(!Regex.IsMatch(password, @"[0-9]")){
-                SetStatus("Password must contain at least one number.", ColorError);
-                return false;
-            }
-            if(!Regex.IsMatch(password,@"[\W_]")) //znaki specjalne
-            {
-                SetStatus("Password must contain at least one special character.", ColorError);
-                return false;
-            }
-            return true;
+        public void ValidatePassword(string password)
+        {
+            HasMinLength = password.Length >= 6;
+            HasUppercase = password.Any(char.IsUpper);
+            HasLowercase = password.Any(char.IsLower);
+            HasDigit = password.Any(char.IsDigit);
+            HasSpecialChar = password.Any(c => !char.IsLetterOrDigit(c));
+            OnPropertyChanged(nameof(IsPasswordValid));
+        }
+
+        public void ResetPasswordChecklist()
+        {
+            HasMinLength = false;
+            HasUppercase = false;
+            HasLowercase = false;
+            HasDigit = false;
+            HasSpecialChar = false;
+            IsPasswordChecklistVisible = false;
+            OnPropertyChanged(nameof(IsPasswordValid));
         }
 
         public async Task<bool> RegisterAsync(string password)
         {
             if (!ValidateBasicInput(password)) return false;
 
-            if(!ValidatePasswordComplexity(password)) return false;
+            if (!IsPasswordValid)
+            {
+                SetStatus("Password does not meet all requirements.", ColorError);
+                return false;
+            }
             if (string.IsNullOrWhiteSpace(Nickname))
             {
                 SetStatus("Nickname is required.", ColorError);
@@ -299,8 +318,9 @@ namespace HabitTracker.ViewModels
 
         public async Task<bool> UpdatePasswordAsync(string newPassword)
         {
-            if(!ValidatePasswordComplexity(newPassword))
+            if (!IsPasswordValid)
             {
+                SetStatus("Password does not meet all requirements.", ColorError);
                 return false;
             }
 
