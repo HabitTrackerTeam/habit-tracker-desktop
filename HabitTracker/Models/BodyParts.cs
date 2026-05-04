@@ -10,6 +10,11 @@ namespace HabitTracker.Models
         public string Id { get; set; }
 
         [Column("body_part")]
-        public string Name { get; set; } 
+        public string BodyPartName { get; set; } 
+
+        [Column("name")]
+        public string Name { get; set; }
+        
+        public string DisplayName => !string.IsNullOrEmpty(Name) ? Name : BodyPartName;
     }
 }

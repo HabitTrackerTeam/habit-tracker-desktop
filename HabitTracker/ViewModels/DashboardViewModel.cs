@@ -39,6 +39,119 @@ namespace HabitTracker.ViewModels{
             set { _isAddFormVisible = value; OnPropertyChanged(); } 
         }
 
+        private bool _isHabitsVisible = true;
+        public bool IsHabitsVisible
+        {
+            get => _isHabitsVisible;
+            set { _isHabitsVisible = value; OnPropertyChanged(); }
+        }
+
+        private bool _isMeasurementsVisible = false;
+        public bool IsMeasurementsVisible
+        {
+            get => _isMeasurementsVisible;
+            set { _isMeasurementsVisible = value; OnPropertyChanged(); }
+        }
+
+        public ObservableCollection<BodyParts> BodyParts { get; set; } = new();
+        public ObservableCollection<CircumferenceLogs> MeasurementLogs { get; set; } = new();
+
+        private BodyParts _selectedBodyPart;
+        public BodyParts SelectedBodyPart 
+        { 
+            get => _selectedBodyPart; 
+            set { _selectedBodyPart = value; OnPropertyChanged(); } 
+        }
+
+        private double _measurementValue;
+        public double MeasurementValue 
+        { 
+            get => _measurementValue; 
+            set { _measurementValue = value; OnPropertyChanged(); } 
+        }
+
+        public async Task LoadMeasurementsAsync()
+        {
+            try
+            {
+                IsLoading = true;
+                var parts = await SupabaseService.Client.From<BodyParts>().Get();
+                BodyParts = new ObservableCollection<BodyParts>(parts.Models);
+                OnPropertyChanged(nameof(BodyParts));
+                if (BodyParts.Any()) SelectedBodyPart = BodyParts.First();
+
+                var logs = await SupabaseService.Client.From<CircumferenceLogs>().Get();
+                MeasurementLogs = new ObservableCollection<CircumferenceLogs>(logs.Models);
+                OnPropertyChanged(nameof(MeasurementLogs));
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Failed to load measurements: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        public async Task SaveMeasurementAsync()
+        {
+            if (SelectedBodyPart == null || MeasurementValue <= 0)
+            {
+                System.Windows.MessageBox.Show("Please select a body part and enter a valid measurement in cm.");
+                return;
+            }
+
+            try
+            {
+                IsLoading = true;
+                var session = new MeasurementSessions
+                {
+                    UserId = SupabaseService.Client.Auth.CurrentUser.Id,
+                    MeasurementDate = DateTime.UtcNow,
+                    AdditionalNotes = ""
+                };
+                var sessionResponse = await SupabaseService.Client.From<MeasurementSessions>().Insert(session);
+                var createdSession = sessionResponse.Models.FirstOrDefault();
+
+                if (createdSession != null)
+                {
+                    var log = new CircumferenceLogs
+                    {
+                        SessionId = createdSession.Id,
+                        BodyPartId = SelectedBodyPart.Id,
+                        Value = MeasurementValue
+                    };
+                    await SupabaseService.Client.From<CircumferenceLogs>().Insert(log);
+
+                    MeasurementValue = 0;
+                    await LoadMeasurementsAsync();
+                    System.Windows.MessageBox.Show("Measurement saved successfully!");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Error saving measurement: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        public void SwitchToMeasurements()
+        {
+            IsHabitsVisible = false;
+            IsMeasurementsVisible = true;
+            _ = LoadMeasurementsAsync();
+        }
+
+        public void SwitchToHabits()
+        {
+            IsMeasurementsVisible = false;
+            IsHabitsVisible = true;
+        }
+
         private void SetStatus(string message, string color = "#FFFFFF")
         {
             // Implementacja metody SetStatus

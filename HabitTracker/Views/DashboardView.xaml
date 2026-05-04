@@ -34,21 +34,17 @@
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="1">
-                                        <Border Background="{DynamicResource InputBgBrush}" CornerRadius="10" Margin="0,2"
-                                                Padding="15,12">
+                                        <Button x:Name="NavDashboard" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToHabits_Click">
                                                 <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="⊞" FontSize="18"
-                                                                Foreground="#328A5D"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
                                                         <TextBlock Text="Dashboard" FontSize="14"
-                                                                FontWeight="Bold"
-                                                                Foreground="#328A5D"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
-                                        </Border>
+                                        </Button>
 
-                                        <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                        <Button x:Name="NavHabits" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToHabits_Click">
                                                 <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="🔄" FontSize="16"
                                                                 Margin="0,0,15,0"
@@ -75,7 +71,7 @@
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
-                                        <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                        <Button x:Name="NavMeasurements" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToMeasurements_Click">
                                                 <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="📏" FontSize="16"
                                                                 Margin="0,0,15,0"
@@ -193,13 +189,14 @@
                         </Grid>
                 </Border>
                 <Grid Grid.Column="1" x:Name="MainContentArea" Margin="40,20,20,20">
-                        <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                        <Grid Visibility="{Binding IsHabitsVisible, Converter={StaticResource BoolToVis}}">
+                                <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                <StackPanel Grid.Row="0" Margin="0,0,0,20">
                                 <TextBlock Text="Your Habits" FontSize="28" FontWeight="Bold"
                                         Foreground="{DynamicResource TextMainBrush}" />
                                 <TextBlock Text="What are you planning to achieve today?"
@@ -350,6 +347,56 @@
                                         </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                         </ScrollViewer>
+                        </Grid>
+
+                        <Grid Visibility="{Binding IsMeasurementsVisible, Converter={StaticResource BoolToVis}}">
+                                <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                        <TextBlock Text="Body Measurements" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                        <TextBlock Text="Track your physical progress (in cm)" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+                                </StackPanel>
+
+                                <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="0,0,0,25" Padding="20">
+                                        <StackPanel>
+                                                <TextBlock Text="Add New Measurement" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,15" />
+                                                <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <ComboBox Grid.Column="0" ItemsSource="{Binding BodyParts}" SelectedItem="{Binding SelectedBodyPart}" DisplayMemberPath="DisplayName" Margin="0,0,10,0" Height="38" VerticalContentAlignment="Center" />
+                                                        <TextBox Grid.Column="1" Text="{Binding MeasurementValue, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,10,0" Height="38" VerticalContentAlignment="Center" Tag="Value (cm)" />
+                                                        <Button Grid.Column="2" Content="Save" Click="SaveMeasurement_Click" Background="#FF328A5D" Foreground="White" FontWeight="Bold" Padding="20,0" Height="38" BorderThickness="0" Cursor="Hand" />
+                                                </Grid>
+                                        </StackPanel>
+                                </Border>
+
+                                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                                        <ItemsControl ItemsSource="{Binding MeasurementLogs}">
+                                                <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="0,0,0,15" Padding="20">
+                                                                        <Grid>
+                                                                                <Grid.ColumnDefinitions>
+                                                                                        <ColumnDefinition Width="*" />
+                                                                                        <ColumnDefinition Width="Auto" />
+                                                                                </Grid.ColumnDefinitions>
+                                                                                <TextBlock Grid.Column="0" Text="{Binding BodyPart.DisplayName}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" />
+                                                                                <TextBlock Grid.Column="1" Text="{Binding Value, StringFormat={}{0} cm}" FontSize="16" FontWeight="Bold" Foreground="#FF328A5D" VerticalAlignment="Center" />
+                                                                        </Grid>
+                                                                </Border>
+                                                        </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                </ScrollViewer>
+                        </Grid>
                 </Grid>
         </Grid>
 </UserControl>
