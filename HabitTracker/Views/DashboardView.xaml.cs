@@ -154,12 +154,4 @@ public partial class DashboardView : System.Windows.Controls.UserControl
             }
         }
     }
-
-    private async void SaveMeasurement_Click(object sender, RoutedEventArgs e)
-    {
-        if (_dashboardVM != null)
-        {
-            await _dashboardVM.SaveMeasurementAsync();
-        }
-    }
 }

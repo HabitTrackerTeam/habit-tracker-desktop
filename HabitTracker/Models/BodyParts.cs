@@ -12,9 +12,6 @@ namespace HabitTracker.Models
         [Column("body_part")]
         public string BodyPartName { get; set; } 
 
-        [Column("name")]
-        public string Name { get; set; }
-        
-        public string DisplayName => !string.IsNullOrEmpty(Name) ? Name : BodyPartName;
+        public string DisplayName => BodyPartName;
     }
 }
