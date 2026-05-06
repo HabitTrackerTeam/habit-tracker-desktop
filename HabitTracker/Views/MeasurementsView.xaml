@@ -1,0 +1,136 @@
+<UserControl x:Class="HabitTracker.Views.MeasurementsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:HabitTracker.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <!-- Przekierowujemy wywołanie Save do Parent UserControl (DashboardView) po którym szukamy nazwy, lub używamy eventów. 
+         Ponieważ to view używa DataContext ten sam co parent, Command będzie lepszy, ale puki co przekażemy click event do rodzica. -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Body Measurements" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+            <TextBlock Text="Track your physical progress (in cm)" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="0,0,0,25" Padding="20">
+            <StackPanel>
+                <TextBlock Text="New Measurement Session" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,15" />
+
+                <!-- Zmieniono na listę rozwijaną z wyborem daty jako labelka -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                    <TextBlock Text="Date: " VerticalAlignment="Center" Margin="0,0,5,0" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding MeasurementDate, StringFormat=dd/MM/yyyy}" VerticalAlignment="Center" Foreground="{DynamicResource TextMainBrush}" FontWeight="SemiBold"/>
+                </StackPanel>
+
+                <Grid Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableBodyParts}" SelectedItem="{Binding SelectedBodyPartToAdd}" DisplayMemberPath="DisplayName" Margin="0,0,15,0" Height="42" Padding="15,0" VerticalContentAlignment="Center" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1">
+                        <ComboBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8"/>
+                            </Style>
+                        </ComboBox.Resources>
+                    </ComboBox>
+
+                    <Button Grid.Column="1" Content="Add" Command="{Binding AddMeasurementCommand}" Background="#FF328A5D" Foreground="White" FontWeight="Bold" Padding="30,0" Height="42" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding CurrentSessionMeasurements}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" 
+                                           Text="{Binding BodyPartName}" 
+                                           VerticalAlignment="Center" 
+                                           Foreground="{DynamicResource TextMainBrush}" 
+                                           FontSize="14"/>
+
+                                <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1" CornerRadius="8" Width="120" Height="42" Padding="0">
+                                    <Grid>
+                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" 
+                                                 Style="{x:Null}"
+                                                 Padding="0"
+                                                 Margin="0"
+                                                 VerticalContentAlignment="Center"
+                                                 HorizontalContentAlignment="Center"
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 Foreground="{DynamicResource TextMainBrush}"
+                                                 FontSize="14" />
+                                    </Grid>
+                                </Border>
+                                <TextBlock Grid.Column="2" Text="cm" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="10,0,15,0" FontSize="14"/>
+
+                                <Button Grid.Column="3" Content="✕" Command="{Binding DataContext.RemoveMeasurementCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" Background="#FFD9534F" Foreground="White" FontWeight="Bold" Width="42" Height="42" BorderThickness="0" Cursor="Hand" ToolTip="Remove">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="8"/>
+                                        </Style>
+                                    </Button.Resources>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Button Content="Save Measurements" Click="SaveMeasurement_Click" Background="#FF328A5D" Foreground="White" FontWeight="Bold" Padding="30,0" Height="42" BorderThickness="0" Cursor="Hand" Margin="0,15,0,0">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+            <ItemsControl ItemsSource="{Binding MeasurementLogs}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="0,0,0,15" Padding="20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding BodyPart.DisplayName}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                    <TextBlock Text="{Binding Session.MeasurementDate, StringFormat=dd/MM/yyyy}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="2" Text="{Binding Value, StringFormat={}{0} cm}" FontSize="16" FontWeight="Bold" Foreground="#FF328A5D" VerticalAlignment="Center" Margin="15,0,0,0" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

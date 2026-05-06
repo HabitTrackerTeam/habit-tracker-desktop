@@ -1,0 +1,24 @@
+<Window
+        x:Class="HabitTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:HabitTracker"
+        xmlns:views="clr-namespace:HabitTracker.Views"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Title="HabitTracker"
+        Icon="/Assets/logo.png"
+        Width="800"
+        Height="750"
+        MinWidth="1200"
+        MinHeight="600"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d">
+
+        <Grid Background="{DynamicResource AppBgBrush}">
+                <views:AuthView x:Name="AuthViewControl"/>
+                <views:DashboardView x:Name="DashboardViewControl"/>
+        </Grid>
+
+</Window>
