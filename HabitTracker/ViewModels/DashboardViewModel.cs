@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using HabitTracker.Models;
 using HabitTracker.Services;
+using System.Windows.Input;
+using HabitTracker.Commands;
 
 namespace HabitTracker.ViewModels{
     public class DashboardViewModel:ViewModelBase{
@@ -56,18 +58,75 @@ namespace HabitTracker.ViewModels{
         public ObservableCollection<BodyParts> BodyParts { get; set; } = new();
         public ObservableCollection<CircumferenceLogs> MeasurementLogs { get; set; } = new();
 
-        private BodyParts _selectedBodyPart;
-        public BodyParts SelectedBodyPart 
-        { 
-            get => _selectedBodyPart; 
-            set { _selectedBodyPart = value; OnPropertyChanged(); } 
+        public ObservableCollection<BodyParts> AvailableBodyParts { get; set; } = new();
+        public ObservableCollection<MeasurementItemViewModel> CurrentSessionMeasurements { get; set; } = new();
+
+        private BodyParts _selectedBodyPartToAdd;
+        public BodyParts SelectedBodyPartToAdd
+        {
+            get => _selectedBodyPartToAdd;
+            set
+            {
+                _selectedBodyPartToAdd = value;
+                OnPropertyChanged();
+            }
         }
 
-        private double _measurementValue;
-        public double MeasurementValue 
-        { 
-            get => _measurementValue; 
-            set { _measurementValue = value; OnPropertyChanged(); } 
+        public ICommand AddMeasurementCommand { get; }
+        public ICommand RemoveMeasurementCommand { get; }
+
+        private DateTime _measurementDate = DateTime.Now;
+        public DateTime MeasurementDate
+        {
+            get => _measurementDate;
+            set { _measurementDate = value; OnPropertyChanged(); }
+        }
+
+        public DashboardViewModel()
+        {
+            AddMeasurementCommand = new RelayCommand(ExecuteAddMeasurement, CanExecuteAddMeasurement);
+            RemoveMeasurementCommand = new RelayCommand(ExecuteRemoveMeasurement);
+        }
+
+        private bool CanExecuteAddMeasurement(object obj)
+        {
+            return SelectedBodyPartToAdd != null;
+        }
+
+        private void ExecuteAddMeasurement(object obj)
+        {
+            if (SelectedBodyPartToAdd != null)
+            {
+                var bodyPart = SelectedBodyPartToAdd;
+
+                CurrentSessionMeasurements.Add(new MeasurementItemViewModel
+                {
+                    BodyPartId = bodyPart.Id,
+                    BodyPartName = bodyPart.DisplayName
+                });
+
+                AvailableBodyParts.Remove(bodyPart);
+                SelectedBodyPartToAdd = AvailableBodyParts.FirstOrDefault();
+            }
+        }
+
+        private void ExecuteRemoveMeasurement(object obj)
+        {
+            if (obj is MeasurementItemViewModel item)
+            {
+                CurrentSessionMeasurements.Remove(item);
+
+                var bodyPart = BodyParts.FirstOrDefault(bp => bp.Id == item.BodyPartId);
+                if (bodyPart != null)
+                {
+                    AvailableBodyParts.Add(bodyPart);
+                }
+
+                if (SelectedBodyPartToAdd == null)
+                {
+                    SelectedBodyPartToAdd = AvailableBodyParts.FirstOrDefault();
+                }
+            }
         }
 
         public async Task LoadMeasurementsAsync()
@@ -78,7 +137,15 @@ namespace HabitTracker.ViewModels{
                 var parts = await SupabaseService.Client.From<BodyParts>().Get();
                 BodyParts = new ObservableCollection<BodyParts>(parts.Models);
                 OnPropertyChanged(nameof(BodyParts));
-                if (BodyParts.Any()) SelectedBodyPart = BodyParts.First();
+
+                AvailableBodyParts.Clear();
+                foreach(var part in BodyParts)
+                {
+                    AvailableBodyParts.Add(part);
+                }
+                SelectedBodyPartToAdd = AvailableBodyParts.FirstOrDefault();
+
+                CurrentSessionMeasurements.Clear();
 
                 var logs = await SupabaseService.Client.From<CircumferenceLogs>().Get();
                 MeasurementLogs = new ObservableCollection<CircumferenceLogs>(logs.Models);
@@ -96,9 +163,16 @@ namespace HabitTracker.ViewModels{
 
         public async Task SaveMeasurementAsync()
         {
-            if (SelectedBodyPart == null || MeasurementValue <= 0)
+            if (!CurrentSessionMeasurements.Any())
             {
-                System.Windows.MessageBox.Show("Please select a body part and enter a valid measurement in cm.");
+                System.Windows.MessageBox.Show("Please add at least one measurement to the session.");
+                return;
+            }
+
+            var validItems = CurrentSessionMeasurements.Where(i => i.Value.HasValue && i.Value.Value > 0).ToList();
+            if (validItems.Count != CurrentSessionMeasurements.Count)
+            {
+                System.Windows.MessageBox.Show("All added measurements must have a valid value greater than 0 before saving.");
                 return;
             }
 
@@ -108,7 +182,7 @@ namespace HabitTracker.ViewModels{
                 var session = new MeasurementSessions
                 {
                     UserId = SupabaseService.Client.Auth.CurrentUser.Id,
-                    MeasurementDate = DateTime.UtcNow,
+                    MeasurementDate = MeasurementDate,
                     AdditionalNotes = ""
                 };
                 var sessionResponse = await SupabaseService.Client.From<MeasurementSessions>().Insert(session);
@@ -116,17 +190,30 @@ namespace HabitTracker.ViewModels{
 
                 if (createdSession != null)
                 {
-                    var log = new CircumferenceLogs
+                    foreach (var item in validItems)
                     {
-                        SessionId = createdSession.Id,
-                        BodyPartId = SelectedBodyPart.Id,
-                        Value = MeasurementValue
-                    };
-                    await SupabaseService.Client.From<CircumferenceLogs>().Insert(log);
+                        var log = new CircumferenceLogs
+                        {
+                            SessionId = createdSession.Id,
+                            BodyPartId = item.BodyPartId,
+                            Value = item.Value.Value
+                        };
+                        await SupabaseService.Client.From<CircumferenceLogs>().Insert(log);
+                    }
 
-                    MeasurementValue = 0;
+                    CurrentSessionMeasurements.Clear();
+
+                    AvailableBodyParts.Clear();
+                    foreach (var part in BodyParts)
+                    {
+                        AvailableBodyParts.Add(part);
+                    }
+                    SelectedBodyPartToAdd = AvailableBodyParts.FirstOrDefault();
+
+                    MeasurementDate = DateTime.Now;
+
                     await LoadMeasurementsAsync();
-                    System.Windows.MessageBox.Show("Measurement saved successfully!");
+                    System.Windows.MessageBox.Show("Measurements saved successfully!");
                 }
             }
             catch (Exception ex)
