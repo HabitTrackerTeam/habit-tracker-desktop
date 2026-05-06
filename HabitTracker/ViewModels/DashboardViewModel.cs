@@ -1,11 +1,13 @@
 //Plik odpowiedzialny za pobieranie nawyków i podawanie ich dalej
 using System;
+using System.Globalization;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
 using HabitTracker.Models;
 using HabitTracker.Services;
 using System.Windows.Input;
+using System.Windows.Threading;
 using HabitTracker.Commands;
 
 namespace HabitTracker.ViewModels{
@@ -29,6 +31,16 @@ namespace HabitTracker.ViewModels{
             set{_habits = value; OnPropertyChanged();}
         }
 
+        // Built-in habits (to be populated from DB by backend data)
+        public ObservableCollection<string> BuiltInHabits { get; set; } = new();
+        private string _selectedBuiltInHabit;
+        public string SelectedBuiltInHabit { get => _selectedBuiltInHabit; set { _selectedBuiltInHabit = value; OnPropertyChanged(); } }
+
+        private bool _isBuiltInMode = true;
+        public bool IsBuiltInMode { get => _isBuiltInMode; set { _isBuiltInMode = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsCustomMode)); } }
+
+        public bool IsCustomMode => !_isBuiltInMode;
+
         private bool _isLoading;
         public bool IsLoading{
             get=>_isLoading;
@@ -41,7 +53,7 @@ namespace HabitTracker.ViewModels{
             set { _isAddFormVisible = value; OnPropertyChanged(); } 
         }
 
-        private bool _isHabitsVisible = true;
+        private bool _isHabitsVisible = false;
         public bool IsHabitsVisible
         {
             get => _isHabitsVisible;
@@ -53,6 +65,13 @@ namespace HabitTracker.ViewModels{
         {
             get => _isMeasurementsVisible;
             set { _isMeasurementsVisible = value; OnPropertyChanged(); }
+        }
+
+        private bool _isDashboardContent = true;
+        public bool IsDashboardContent
+        {
+            get => _isDashboardContent;
+            set { _isDashboardContent = value; OnPropertyChanged(); }
         }
 
         public ObservableCollection<BodyParts> BodyParts { get; set; } = new();
@@ -86,6 +105,12 @@ namespace HabitTracker.ViewModels{
         {
             AddMeasurementCommand = new RelayCommand(ExecuteAddMeasurement, CanExecuteAddMeasurement);
             RemoveMeasurementCommand = new RelayCommand(ExecuteRemoveMeasurement);
+            // Initialize today's date and start timer to update it every minute
+            UpdateTodayDate();
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMinutes(1);
+            timer.Tick += (s, e) => UpdateTodayDate();
+            timer.Start();
         }
 
         private bool CanExecuteAddMeasurement(object obj)
@@ -230,6 +255,8 @@ namespace HabitTracker.ViewModels{
         {
             IsHabitsVisible = false;
             IsMeasurementsVisible = true;
+            IsAddFormVisible = false;
+            IsDashboardContent = false;
             _ = LoadMeasurementsAsync();
         }
 
@@ -237,6 +264,16 @@ namespace HabitTracker.ViewModels{
         {
             IsMeasurementsVisible = false;
             IsHabitsVisible = true;
+            IsAddFormVisible = true;
+            IsDashboardContent = false;
+        }
+
+        public void SwitchToDashboard()
+        {
+            IsMeasurementsVisible = false;
+            IsHabitsVisible = false;
+            IsAddFormVisible = false;
+            IsDashboardContent = true;
         }
 
         private void SetStatus(string message, string color = "#FFFFFF")
@@ -297,6 +334,25 @@ namespace HabitTracker.ViewModels{
             }
         }
 
+        // Add a habit chosen from the built-in list
+        public async Task AddBuiltInHabitAsync()
+        {
+            if (string.IsNullOrWhiteSpace(SelectedBuiltInHabit))
+            {
+                System.Windows.MessageBox.Show("Please select a habit from the list.");
+                return;
+            }
+
+            // Set name and delegate to CreateHabitAsync to reuse validation/creation logic
+            NewHabitName = SelectedBuiltInHabit;
+
+            // Ensure there is a category/type selected
+            if (SelectedCategory == null) SelectedCategory = Categories.FirstOrDefault();
+            if (SelectedType == null) SelectedType = HabitTypes.FirstOrDefault();
+
+            await CreateHabitAsync();
+        }
+
         //Dodawanie nawyku
         public async Task CreateHabitAsync(){
             if(string.IsNullOrWhiteSpace(NewHabitName) || SelectedCategory == null || SelectedType == null){
@@ -336,5 +392,16 @@ namespace HabitTracker.ViewModels{
             finally{IsLoading = false;}
         }
         
+        private string _todayDate;
+        public string TodayDate
+        {
+            get => _todayDate;
+            set { _todayDate = value; OnPropertyChanged(); }
+        }
+
+        private void UpdateTodayDate()
+        {
+            TodayDate = DateTime.Now.ToString("yyyy-MM-dd, dddd", CultureInfo.GetCultureInfo("en-US"));
+        }
     }
 }

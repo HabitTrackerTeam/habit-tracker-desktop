@@ -68,11 +68,44 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         await _dashboardVM.CreateHabitAsync();
     }
 
+    private void ChooseBuiltIn_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            _dashboardVM.IsBuiltInMode = true;
+        }
+    }
+
+    private void ChooseCustom_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            _dashboardVM.IsBuiltInMode = false;
+        }
+    }
+
+    private async void AddBuiltIn_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            await _dashboardVM.AddBuiltInHabitAsync();
+        }
+    }
+
     private void SidebarNewHabit_Click(object sender, RoutedEventArgs e)
     {
         if (_dashboardVM != null)
         {
             _dashboardVM.IsAddFormVisible = !_dashboardVM.IsAddFormVisible;
+        }
+    }
+
+    private void SwitchToDashboard_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            _dashboardVM.SwitchToDashboard();
+            UpdateSidebar(NavDashboard);
         }
     }
 

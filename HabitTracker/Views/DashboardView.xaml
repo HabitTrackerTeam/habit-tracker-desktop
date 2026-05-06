@@ -35,7 +35,7 @@
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="1">
-                                        <Button x:Name="NavDashboard" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToHabits_Click">
+                                        <Button x:Name="NavDashboard" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToDashboard_Click">
                                                 <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="⊞" FontSize="18"
                                                                 Margin="0,0,15,0"
@@ -103,44 +103,7 @@
 
                                 <StackPanel Grid.Row="2">
 
-                                        <Button Background="#328A5D" Foreground="White"
-                                                Margin="0,0,0,25" Height="48" Cursor="Hand"
-                                                BorderThickness="0" Click="SidebarNewHabit_Click">
-                                                <Button.Template>
-                                                        <ControlTemplate TargetType="Button">
-                                                                <Border
-                                                                        Background="{TemplateBinding Background}"
-                                                                        CornerRadius="12"
-                                                                        x:Name="Bg">
-                                                                        <StackPanel
-                                                                                Orientation="Horizontal"
-                                                                                HorizontalAlignment="Center"
-                                                                                VerticalAlignment="Center">
-                                                                                <TextBlock Text="+"
-                                                                                        FontSize="18"
-                                                                                        FontWeight="Bold"
-                                                                                        Margin="0,0,8,0"
-                                                                                        VerticalAlignment="Center" />
-                                                                                <TextBlock
-                                                                                        Text="New Habit"
-                                                                                        FontSize="14"
-                                                                                        FontWeight="SemiBold"
-                                                                                        VerticalAlignment="Center" />
-                                                                        </StackPanel>
-                                                                </Border>
-                                                                <ControlTemplate.Triggers>
-                                                                        <Trigger
-                                                                                Property="IsMouseOver"
-                                                                                Value="True">
-                                                                                <Setter
-                                                                                        TargetName="Bg"
-                                                                                        Property="Opacity"
-                                                                                        Value="0.9" />
-                                                                        </Trigger>
-                                                                </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                </Button.Template>
-                                        </Button>
+                                        <!-- New Habit button removed from sidebar; adding now only in Habits Manager -->
 
                                         <StackPanel Orientation="Horizontal" Margin="15,10,0,10"
                                                 VerticalAlignment="Center" Cursor="Hand">
@@ -198,9 +161,9 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                                <TextBlock Text="Your Habits" FontSize="28" FontWeight="Bold"
+                                <TextBlock Text="Habits Manager" FontSize="28" FontWeight="Bold"
                                         Foreground="{DynamicResource TextMainBrush}" />
-                                <TextBlock Text="What are you planning to achieve today?"
+                                <TextBlock Text="What are you planning to achieve?"
                                         FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
                                 <ProgressBar IsIndeterminate="True" Height="4" Margin="0,10,0,0"
                                         Foreground="#FF328A5D"
@@ -211,45 +174,96 @@
                                 CornerRadius="15" Margin="0,0,0,25" Padding="20"
                                 Visibility="{Binding IsAddFormVisible, Converter={StaticResource BoolToVis}}">
                                 <StackPanel>
-                                        <TextBlock Text="Create New Habit" FontSize="16"
+                                        <TextBlock Text="Add New Habit" FontSize="16"
                                                 FontWeight="Bold"
                                                 Foreground="{DynamicResource TextMainBrush}"
                                                 Margin="0,0,0,15" />
-                                        <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
 
-                                                <TextBox
-                                                        Text="{Binding NewHabitName, UpdateSourceTrigger=PropertyChanged}"
-                                                        Margin="0,0,10,0"
-                                                        VerticalContentAlignment="Center"
-                                                        Height="50" Padding="10,0"
-                                                        Tag="Habit name (e.g. Morning Run)..." />
+                                        <!-- Mode selection: Built-in list vs Custom -->
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                <Button Content="From List" Width="110" Margin="0,0,10,0" Click="ChooseBuiltIn_Click" />
+                                                <Button Content="Custom" Width="110" Click="ChooseCustom_Click" />
+                                        </StackPanel>
 
-                                                <ComboBox Grid.Column="1"
-                                                        ItemsSource="{Binding Categories}"
-                                                        SelectedItem="{Binding SelectedCategory}"
-                                                        DisplayMemberPath="Name" Width="140"
-                                                        Margin="0,0,10,0" Height="38"
-                                                        VerticalContentAlignment="Center" />
+                                        <!-- Built-in mode -->
+                                        <StackPanel Visibility="{Binding IsBuiltInMode, Converter={StaticResource BoolToVis}}">
+                                                        <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
 
-                                                <ComboBox Grid.Column="2"
-                                                        ItemsSource="{Binding HabitTypes}"
-                                                        SelectedItem="{Binding SelectedType}"
-                                                        DisplayMemberPath="Type" Width="120"
-                                                        Margin="0,0,10,0" Height="38"
-                                                        VerticalContentAlignment="Center" />
+                                                                <Grid>
+                                                                        <ComboBox x:Name="BuiltInCombo" ItemsSource="{Binding BuiltInHabits}"
+                                                                                  SelectedItem="{Binding SelectedBuiltInHabit}"
+                                                                                  Margin="0,0,10,0" Height="50" Padding="10,8" VerticalContentAlignment="Center" FontSize="14" />
 
-                                                <Button Grid.Column="3" Content="Save Habit"
-                                                        Click="SaveHabit_Click"
-                                                        Background="#FF328A5D" Foreground="White"
-                                                        FontWeight="Bold" Padding="20,0" Height="38"
-                                                        BorderThickness="0" Cursor="Hand" />
-                                        </Grid>
+                                                                        <TextBlock Text="Choose a habit from the list"
+                                                                                   IsHitTestVisible="False"
+                                                                                   Margin="14,0,10,0"
+                                                                                   VerticalAlignment="Center"
+                                                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                                                   FontSize="14">
+                                                                                <TextBlock.Style>
+                                                                                        <Style TargetType="TextBlock">
+                                                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                                                <Style.Triggers>
+                                                                                                        <DataTrigger Binding="{Binding SelectedItem, ElementName=BuiltInCombo}" Value="{x:Null}">
+                                                                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                                                        </DataTrigger>
+                                                                                                </Style.Triggers>
+                                                                                        </Style>
+                                                                                </TextBlock.Style>
+                                                                        </TextBlock>
+                                                                </Grid>
+
+                                                                <Button Grid.Column="1" Content="Add Selected"
+                                                                        Click="AddBuiltIn_Click"
+                                                                        Background="#FF328A5D" Foreground="White"
+                                                                        FontWeight="Bold" Padding="18,0" Height="50"
+                                                                        BorderThickness="0" Cursor="Hand" />
+                                                        </Grid>
+                                        </StackPanel>
+
+                                        <!-- Custom mode -->
+                                        <StackPanel Visibility="{Binding IsCustomMode, Converter={StaticResource BoolToVis}}">
+                                                <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBox
+                                                                Text="{Binding NewHabitName, UpdateSourceTrigger=PropertyChanged}"
+                                                                Margin="0,0,10,0"
+                                                                VerticalContentAlignment="Center"
+                                                                Height="50" Padding="10,8"
+                                                                FontSize="14"
+                                                                Tag="Habit name (e.g. Morning Run)..." />
+
+                                                        <ComboBox Grid.Column="1"
+                                                                ItemsSource="{Binding Categories}"
+                                                                SelectedItem="{Binding SelectedCategory}"
+                                                                DisplayMemberPath="Name" Width="140"
+                                                                Margin="0,0,10,0" Height="50" Padding="10,8"
+                                                                VerticalContentAlignment="Center" FontSize="14" />
+
+                                                        <ComboBox Grid.Column="2"
+                                                                ItemsSource="{Binding HabitTypes}"
+                                                                SelectedItem="{Binding SelectedType}"
+                                                                DisplayMemberPath="Type" Width="120"
+                                                                Margin="0,0,10,0" Height="50" Padding="10,8"
+                                                                VerticalContentAlignment="Center" FontSize="14" />
+
+                                                        <Button Grid.Column="3" Content="Save Habit"
+                                                                Click="SaveHabit_Click"
+                                                                Background="#FF328A5D" Foreground="White"
+                                                                FontWeight="Bold" Padding="20,0" Height="50"
+                                                                BorderThickness="0" Cursor="Hand" />
+                                                </Grid>
+                                        </StackPanel>
                                 </StackPanel>
                         </Border>
 
@@ -348,6 +362,57 @@
                                         </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                         </ScrollViewer>
+                        </Grid>
+
+                        <!-- Dashboard personal habits visualization -->
+                        <Grid Visibility="{Binding IsDashboardContent, Converter={StaticResource BoolToVis}}">
+                                <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="2*" />
+                                        <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                        <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Dashboard" FontSize="28" FontWeight="Bold"
+                                                   Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding TodayDate}" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
+
+                                <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}"
+                                        CornerRadius="12" Padding="16" Margin="0,8,0,0">
+                                        <StackPanel>
+                                                <TextBlock Text="My Habits" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,8" />
+                                                <TextBlock Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap">
+                                                        Personal habits will appear here.
+                                                        <LineBreak/>
+                                                        Select from the built-in list or create your own in the Habits Manager.
+                                                </TextBlock>
+
+                                                <ItemsControl ItemsSource="{Binding Habits}" Margin="0,12,0,0">
+                                                        <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                        <StackPanel Orientation="Horizontal" Margin="0,6,0,6" VerticalAlignment="Center">
+                                                                                <CheckBox Width="20" Height="20" Margin="0,0,10,0" />
+                                                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                                                                                <TextBox Width="100" Margin="10,0,0,0" />
+                                                                        </StackPanel>
+                                                                </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                        </StackPanel>
+                                </Border>
+
+                                <!-- Notes area: 1/3 height under habits -->
+                                <Border Grid.Row="2" Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="12" Margin="0,12,0,0">
+                                        <StackPanel>
+                                                <TextBlock Text="My Notes" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,8" />
+                                                <TextBox AcceptsReturn="True" TextWrapping="Wrap" Height="120" VerticalScrollBarVisibility="Auto" />
+                                        </StackPanel>
+                                </Border>
                         </Grid>
 
                         <views:MeasurementsView Visibility="{Binding IsMeasurementsVisible, Converter={StaticResource BoolToVis}}" />
