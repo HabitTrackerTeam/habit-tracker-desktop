@@ -103,11 +103,34 @@ public partial class DashboardView : System.Windows.Controls.UserControl
     {
         if (_dashboardVM != null)
         {
-            _dashboardVM.IsSettingsVisible = true;
-            _dashboardVM.IsHabitsVisible = false;
-            _dashboardVM.IsMeasurementsVisible = false;
-            _dashboardVM.IsDashboardContent = false;
+            _dashboardVM.SwitchToSettings();
             UpdateSidebar(NavSettings);
+        }
+    }
+    private void SwitchToCalendar_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            _dashboardVM.SwitchToCalendar();
+            UpdateSidebar(NavCalendar);
+        }
+    }
+
+    private void SwitchToStatistics_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            _dashboardVM.SwitchToStatistics();
+            UpdateSidebar(NavStatistics);
+        }
+    }
+
+    private void SwitchToPdfReport_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            _dashboardVM.SwitchToPdfReport();
+            UpdateSidebar(NavPdfReport);
         }
     }
     private void SwitchToDashboard_Click(object sender, RoutedEventArgs e)
@@ -154,56 +177,28 @@ public partial class DashboardView : System.Windows.Controls.UserControl
     
     private void UpdateSidebar(System.Windows.Controls.Button activeBtn)
     {
-        // Remove the active style and reset properties
-        if (NavDashboard != null)
+        // Reset all sidebar buttons' visuals
+        var buttons = new[] { NavDashboard, NavHabits, NavCalendar, NavStatistics, NavMeasurements, NavPdfReport, NavSettings };
+        foreach (var b in buttons)
         {
-            NavDashboard.ClearValue(System.Windows.Controls.Button.BackgroundProperty);
-            if(NavDashboard.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
+            if (b == null) continue;
+            b.ClearValue(System.Windows.Controls.Button.BackgroundProperty);
+            if (b.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
             {
-                if(sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
-                if(sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty); tb2.ClearValue(System.Windows.Controls.TextBlock.FontWeightProperty); }
-            }
-        }
-        
-        if (NavHabits != null)
-        {
-            NavHabits.ClearValue(System.Windows.Controls.Button.BackgroundProperty);
-            if(NavHabits.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
-            {
-                if(sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
-                if(sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty); tb2.ClearValue(System.Windows.Controls.TextBlock.FontWeightProperty); }
-            }
-        }
-        
-        if (NavMeasurements != null)
-        {
-            NavMeasurements.ClearValue(System.Windows.Controls.Button.BackgroundProperty);
-            if(NavMeasurements.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
-            {
-                if(sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
-                if(sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty); tb2.ClearValue(System.Windows.Controls.TextBlock.FontWeightProperty); }
+                if (sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
+                if (sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty); tb2.ClearValue(System.Windows.Controls.TextBlock.FontWeightProperty); }
             }
         }
 
-        if (NavSettings != null)
-        {
-            NavSettings.ClearValue(System.Windows.Controls.Button.BackgroundProperty);
-            if(NavSettings.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
-            {
-                if(sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
-                if(sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty); tb2.ClearValue(System.Windows.Controls.TextBlock.FontWeightProperty); }
-            }
-        }
-        
         // Apply active style (Green)
-        if(activeBtn != null)
+        if (activeBtn != null)
         {
             activeBtn.SetResourceReference(System.Windows.Controls.Button.BackgroundProperty, "InputBgBrush");
-            if(activeBtn.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
+            if (activeBtn.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
             {
                 var greenBrush = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#328A5D"));
-                if(sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.Foreground = greenBrush;
-                if(sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.Foreground = greenBrush; tb2.FontWeight = FontWeights.Bold; }
+                if (sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.Foreground = greenBrush;
+                if (sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.Foreground = greenBrush; tb2.FontWeight = FontWeights.Bold; }
             }
         }
     }

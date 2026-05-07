@@ -66,12 +66,32 @@ namespace HabitTracker.ViewModels{
             get => _isMeasurementsVisible;
             set { _isMeasurementsVisible = value; OnPropertyChanged(); }
         }
-
         private bool _isSettingsVisible = false;
         public bool IsSettingsVisible
         {
             get => _isSettingsVisible;
             set { _isSettingsVisible = value; OnPropertyChanged(); }
+        }
+
+        private bool _isCalendarVisible = false;
+        public bool IsCalendarVisible
+        {
+            get => _isCalendarVisible;
+            set { _isCalendarVisible = value; OnPropertyChanged(); }
+        }
+
+        private bool _isStatisticsVisible = false;
+        public bool IsStatisticsVisible
+        {
+            get => _isStatisticsVisible;
+            set { _isStatisticsVisible = value; OnPropertyChanged(); }
+        }
+
+        private bool _isPdfReportVisible = false;
+        public bool IsPdfReportVisible
+        {
+            get => _isPdfReportVisible;
+            set { _isPdfReportVisible = value; OnPropertyChanged(); }
         }
 
         private bool _isDashboardContent = true;
@@ -264,6 +284,10 @@ namespace HabitTracker.ViewModels{
             IsMeasurementsVisible = true;
             IsAddFormVisible = false;
             IsDashboardContent = false;
+            IsSettingsVisible = false;
+            IsCalendarVisible = false;
+            IsStatisticsVisible = false;
+            IsPdfReportVisible = false;
             _ = LoadMeasurementsAsync();
         }
 
@@ -273,6 +297,10 @@ namespace HabitTracker.ViewModels{
             IsHabitsVisible = true;
             IsAddFormVisible = true;
             IsDashboardContent = false;
+            IsSettingsVisible = false;
+            IsCalendarVisible = false;
+            IsStatisticsVisible = false;
+            IsPdfReportVisible = false;
         }
 
         public void SwitchToDashboard()
@@ -281,6 +309,58 @@ namespace HabitTracker.ViewModels{
             IsHabitsVisible = false;
             IsAddFormVisible = false;
             IsDashboardContent = true;
+            IsSettingsVisible = false;
+            IsCalendarVisible = false;
+            IsStatisticsVisible = false;
+            IsPdfReportVisible = false;
+        }
+
+        public void SwitchToSettings()
+        {
+            IsMeasurementsVisible = false;
+            IsHabitsVisible = false;
+            IsAddFormVisible = false;
+            IsDashboardContent = false;
+            IsSettingsVisible = true;
+            IsCalendarVisible = false;
+            IsStatisticsVisible = false;
+            IsPdfReportVisible = false;
+        }
+
+        public void SwitchToCalendar()
+        {
+            IsMeasurementsVisible = false;
+            IsHabitsVisible = false;
+            IsAddFormVisible = false;
+            IsDashboardContent = false;
+            IsSettingsVisible = false;
+            IsCalendarVisible = true;
+            IsStatisticsVisible = false;
+            IsPdfReportVisible = false;
+        }
+
+        public void SwitchToStatistics()
+        {
+            IsMeasurementsVisible = false;
+            IsHabitsVisible = false;
+            IsAddFormVisible = false;
+            IsDashboardContent = false;
+            IsSettingsVisible = false;
+            IsCalendarVisible = false;
+            IsStatisticsVisible = true;
+            IsPdfReportVisible = false;
+        }
+
+        public void SwitchToPdfReport()
+        {
+            IsMeasurementsVisible = false;
+            IsHabitsVisible = false;
+            IsAddFormVisible = false;
+            IsDashboardContent = false;
+            IsSettingsVisible = false;
+            IsCalendarVisible = false;
+            IsStatisticsVisible = false;
+            IsPdfReportVisible = true;
         }
 
         private void SetStatus(string message, string color = "#FFFFFF")

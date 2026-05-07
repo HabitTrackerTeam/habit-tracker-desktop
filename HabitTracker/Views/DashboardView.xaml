@@ -37,10 +37,10 @@
                                 <StackPanel Grid.Row="1">
                                         <Button x:Name="NavDashboard" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToDashboard_Click">
                                                 <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Text="⊞" FontSize="18"
+                                                        <TextBlock Text="🏠" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="Dashboard" FontSize="14"
+                                                        <TextBlock Text="Dashboard"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -54,7 +54,7 @@
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
-                                        <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                        <Button x:Name="NavCalendar" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToCalendar_Click">
                                                 <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="📅" FontSize="16"
                                                                 Margin="0,0,15,0"
@@ -63,7 +63,7 @@
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
-                                        <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                        <Button x:Name="NavStatistics" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToStatistics_Click">
                                                 <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="📊" FontSize="16"
                                                                 Margin="0,0,15,0"
@@ -81,7 +81,7 @@
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
-                                        <Button Style="{StaticResource SidebarMenuItemStyle}">
+                                        <Button x:Name="NavPdfReport" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToPdfReport_Click">
                                                 <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="📑" FontSize="16"
                                                                 Margin="0,0,15,0"
@@ -417,6 +417,63 @@
 
                         <views:MeasurementsView Visibility="{Binding IsMeasurementsVisible, Converter={StaticResource BoolToVis}}" />
 
+                        <!-- Calendar Section -->
+                        <Grid Visibility="{Binding IsCalendarVisible, Converter={StaticResource BoolToVis}}">
+                                <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                        <TextBlock Text="Calendar" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                        <TextBlock Text="Track your habits over time" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+                                </StackPanel>
+
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                                        <TextBlock Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="20">
+                                                Calendar content will be added here.
+                                        </TextBlock>
+                                </ScrollViewer>
+                        </Grid>
+
+                        <!-- Statistics Section -->
+                        <Grid Visibility="{Binding IsStatisticsVisible, Converter={StaticResource BoolToVis}}">
+                                <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                        <TextBlock Text="Statistics" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                        <TextBlock Text="View your progress and achievements" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+                                </StackPanel>
+
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                                        <TextBlock Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="20">
+                                                Statistics content will be added here.
+                                        </TextBlock>
+                                </ScrollViewer>
+                        </Grid>
+
+                        <!-- PDF Report Section -->
+                        <Grid Visibility="{Binding IsPdfReportVisible, Converter={StaticResource BoolToVis}}">
+                                <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                        <TextBlock Text="PDF Report" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                        <TextBlock Text="Generate and download your reports" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+                                </StackPanel>
+
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                                        <TextBlock Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="20">
+                                                PDF Report content will be added here.
+                                        </TextBlock>
+                                </ScrollViewer>
+                        </Grid>
+
                         <!-- Settings Section -->
                         <Grid Visibility="{Binding IsSettingsVisible, Converter={StaticResource BoolToVis}}">
                                 <Grid.RowDefinitions>
@@ -424,14 +481,14 @@
                                         <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Text="Ustawienia" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,20" />
+                                <TextBlock Text="Settings" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,20" />
 
                                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
                                         <StackPanel Orientation="Vertical">
                                                 <!-- Profile Section -->
                                                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
                                                         <StackPanel>
-                                                                <TextBlock Text="Profil użytkownika" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
+                                                                <TextBlock Text="User Profile" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
                                                                 <Grid>
                                                                         <Grid.ColumnDefinitions>
                                                                                 <ColumnDefinition Width="Auto" />
@@ -445,13 +502,13 @@
 
                                                                         <!-- Profile Info -->
                                                                         <StackPanel Grid.Column="1">
-                                                                                <TextBox Tag="Imię i nazwisko" Text="Jan Kowalski" Height="45" Padding="10,8" FontSize="14" Margin="0,0,0,12" />
-                                                                                <TextBlock Text="Adres e-mail" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" FontSize="12" Margin="0,0,0,4" />
-                                                                                <TextBlock Text="jan.kowalski@example.com" Foreground="{DynamicResource TextMainBrush}" FontSize="14" Margin="0,0,0,12" />
+                                                                                <TextBox Tag="Full Name" Text="John Doe" Height="45" Padding="10,8" FontSize="14" Margin="0,0,0,12" />
+                                                                                <TextBlock Text="Email Address" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" FontSize="12" Margin="0,0,0,4" />
+                                                                                <TextBlock Text="john.doe@example.com" Foreground="{DynamicResource TextMainBrush}" FontSize="14" Margin="0,0,0,12" />
 
                                                                                 <StackPanel Orientation="Horizontal">
-                                                                                        <Button Content="Zmień hasło" Width="120" Padding="10,8" Margin="0,0,10,0" Style="{StaticResource AccentLinkButtonStyle}" />
-                                                                                        <Button Content="Zmień avatar" Width="120" Padding="10,8" Style="{StaticResource AccentLinkButtonStyle}" />
+                                                                                        <Button Content="Change Password" Width="120" Padding="10,8" Margin="0,0,10,0" Style="{StaticResource AccentLinkButtonStyle}" />
+                                                                                        <Button Content="Change Avatar" Width="120" Padding="10,8" Style="{StaticResource AccentLinkButtonStyle}" />
                                                                                 </StackPanel>
                                                                         </StackPanel>
                                                                 </Grid>
@@ -461,10 +518,10 @@
                                                 <!-- General Settings -->
                                                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
                                                         <StackPanel>
-                                                                <TextBlock Text="Ogólne" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
+                                                                <TextBlock Text="General" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
 
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
-                                                                        <TextBlock Text="Język" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                                                        <TextBlock Text="Language" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
                                                                         <ComboBox Width="240">
                                                                                 <ComboBoxItem IsSelected="True">Polski</ComboBoxItem>
                                                                                 <ComboBoxItem>English</ComboBoxItem>
@@ -473,7 +530,7 @@
                                                                 </StackPanel>
 
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
-                                                                        <TextBlock Text="Początek tygodnia" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                                                        <TextBlock Text="Week Start" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
                                                                         <ComboBox Width="240">
                                                                                 <ComboBoxItem>Poniedziałek</ComboBoxItem>
                                                                                 <ComboBoxItem IsSelected="True">Niedziela</ComboBoxItem>
@@ -481,7 +538,7 @@
                                                                 </StackPanel>
 
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                        <TextBlock Text="Jednostki" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                                                        <TextBlock Text="Units" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
                                                                         <ComboBox Width="240">
                                                                                 <ComboBoxItem IsSelected="True">kg / ml</ComboBoxItem>
                                                                                 <ComboBoxItem>lb / oz</ComboBoxItem>
@@ -493,7 +550,7 @@
                                                 <!-- Notifications -->
                                                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
                                                         <StackPanel>
-                                                                <TextBlock Text="Powiadomienia" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
+                                                                <TextBlock Text="Notifications" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
 
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
                                                                         <TextBlock Text="Daily Reminder" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
@@ -501,7 +558,7 @@
                                                                 </StackPanel>
 
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
-                                                                        <TextBlock Text="Godzina przypomnienia" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                                                        <TextBlock Text="Reminder Time" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
                                                                         <ComboBox Width="240">
                                                                                 <ComboBoxItem>08:00</ComboBoxItem>
                                                                                 <ComboBoxItem>12:00</ComboBoxItem>
@@ -510,7 +567,7 @@
                                                                 </StackPanel>
 
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                        <TextBlock Text="Dźwięki / Wibracje" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                                                        <TextBlock Text="Sounds / Vibrations" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
                                                                         <StackPanel Orientation="Horizontal">
                                                                                 <ToggleButton Style="{StaticResource ToggleSwitchStyle}" Width="44" Height="24" IsChecked="True" Margin="0,0,8,0" />
                                                                                 <ToggleButton Style="{StaticResource ToggleSwitchStyle}" Width="44" Height="24" IsChecked="False" />
@@ -522,9 +579,9 @@
                                                 <!-- About -->
                                                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20">
                                                         <StackPanel>
-                                                                <TextBlock Text="Informacje o aplikacji" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,12" />
+                                                                <TextBlock Text="About the App" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,12" />
                                                                 <TextBlock Text="HabitTracker" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                                                                <TextBlock Text="Wersja: 1.0.0" Margin="0,6,0,0" Foreground="{DynamicResource TextMutedBrush}" />
+                                                                <TextBlock Text="Version: 1.0.0" Margin="0,6,0,0" Foreground="{DynamicResource TextMutedBrush}" />
                                                                 <TextBlock Text="© 2026 Habit Tracker" Margin="0,6,0,0" Foreground="{DynamicResource TextMutedBrush}" />
                                                         </StackPanel>
                                                 </Border>
