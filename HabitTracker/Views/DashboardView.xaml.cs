@@ -99,7 +99,17 @@ public partial class DashboardView : System.Windows.Controls.UserControl
             _dashboardVM.IsAddFormVisible = !_dashboardVM.IsAddFormVisible;
         }
     }
-
+    private void SwitchToSettings_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null)
+        {
+            _dashboardVM.IsSettingsVisible = true;
+            _dashboardVM.IsHabitsVisible = false;
+            _dashboardVM.IsMeasurementsVisible = false;
+            _dashboardVM.IsDashboardContent = false;
+            UpdateSidebar(NavSettings);
+        }
+    }
     private void SwitchToDashboard_Click(object sender, RoutedEventArgs e)
     {
         if (_dashboardVM != null)
@@ -169,6 +179,16 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         {
             NavMeasurements.ClearValue(System.Windows.Controls.Button.BackgroundProperty);
             if(NavMeasurements.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
+            {
+                if(sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
+                if(sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty); tb2.ClearValue(System.Windows.Controls.TextBlock.FontWeightProperty); }
+            }
+        }
+
+        if (NavSettings != null)
+        {
+            NavSettings.ClearValue(System.Windows.Controls.Button.BackgroundProperty);
+            if(NavSettings.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
             {
                 if(sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
                 if(sp.Children[1] is System.Windows.Controls.TextBlock tb2) { tb2.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty); tb2.ClearValue(System.Windows.Controls.TextBlock.FontWeightProperty); }

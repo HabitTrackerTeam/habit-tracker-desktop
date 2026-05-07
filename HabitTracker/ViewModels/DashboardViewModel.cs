@@ -67,6 +67,13 @@ namespace HabitTracker.ViewModels{
             set { _isMeasurementsVisible = value; OnPropertyChanged(); }
         }
 
+        private bool _isSettingsVisible = false;
+        public bool IsSettingsVisible
+        {
+            get => _isSettingsVisible;
+            set { _isSettingsVisible = value; OnPropertyChanged(); }
+        }
+
         private bool _isDashboardContent = true;
         public bool IsDashboardContent
         {
