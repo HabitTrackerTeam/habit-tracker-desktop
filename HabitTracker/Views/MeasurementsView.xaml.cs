@@ -16,6 +16,7 @@ namespace HabitTracker.Views
             if (DataContext is DashboardViewModel vm)
             {
                 await vm.SaveMeasurementAsync();
+                vm.IsModalOpen = false; // Close modal on save
             }
         }
     }

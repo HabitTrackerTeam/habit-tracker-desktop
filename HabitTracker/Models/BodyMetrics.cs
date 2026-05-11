@@ -19,6 +19,9 @@ namespace HabitTracker.Models
         [Column("weight")]
         public double Weight { get; set; }
 
+        [Column("height")]
+        public double Height { get; set; }
+
         [Column("additional_notes")]
         public string AdditionalNotes { get; set; }
 
