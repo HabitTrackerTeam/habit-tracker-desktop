@@ -9,6 +9,12 @@ using HabitTracker.Services;
 using System.Windows.Input;
 using System.Windows.Threading;
 using HabitTracker.Commands;
+using System.Collections.Generic;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.Defaults;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 
 namespace HabitTracker.ViewModels{
     public class DashboardViewModel:ViewModelBase{
@@ -107,6 +113,53 @@ namespace HabitTracker.ViewModels{
         public ObservableCollection<BodyParts> AvailableBodyParts { get; set; } = new();
         public ObservableCollection<MeasurementItemViewModel> CurrentSessionMeasurements { get; set; } = new();
 
+        public ObservableCollection<BodyMetricItem> BodyMetrics { get; set; } = new();
+        private BodyMetricItem _selectedBodyMetric;
+        public BodyMetricItem SelectedBodyMetric
+        {
+            get => _selectedBodyMetric;
+            set 
+            { 
+                _selectedBodyMetric = value; 
+                OnPropertyChanged();
+
+                if (_selectedBodyMetric != null)
+                {
+                    UpdateChartDataAsync(_selectedBodyMetric.BodyPartId);
+                }
+            }
+        }
+
+        private double _currentWeight;
+        public double CurrentWeight { get => _currentWeight; set { _currentWeight = value; OnPropertyChanged(); } }
+        private double _weightDelta;
+        public double WeightDelta { get => _weightDelta; set { _weightDelta = value; OnPropertyChanged(); } }
+        private double _currentHeight;
+        public double CurrentHeight { get => _currentHeight; set { _currentHeight = value; OnPropertyChanged(); } }
+        private double _bmiValue;
+        public double BmiValue { get => _bmiValue; set { _bmiValue = value; OnPropertyChanged(); } }
+        private string _bmiStatus = "";
+        public string BmiStatus { get => _bmiStatus; set { _bmiStatus = value; OnPropertyChanged(); } }
+
+        private double? _newWeightValue;
+        public double? NewWeightValue { get => _newWeightValue; set { _newWeightValue = value; OnPropertyChanged(); } }
+
+        private double? _newHeightValue;
+        public double? NewHeightValue { get => _newHeightValue; set { _newHeightValue = value; OnPropertyChanged(); } }
+
+        private bool _isModalOpen;
+        public bool IsModalOpen
+        {
+            get => _isModalOpen;
+            set { _isModalOpen = value; OnPropertyChanged(); }
+        }
+        public ICommand OpenLogModalCommand { get; }
+        public ICommand CloseLogModalCommand { get; }
+
+        public ISeries[] ChartSeries { get; set; } = new ISeries[0];
+        public Axis[] XAxes { get; set; } = new Axis[0];
+        public Axis[] YAxes { get; set; } = new Axis[0];
+
         private BodyParts _selectedBodyPartToAdd;
         public BodyParts SelectedBodyPartToAdd
         {
@@ -132,6 +185,8 @@ namespace HabitTracker.ViewModels{
         {
             AddMeasurementCommand = new RelayCommand(ExecuteAddMeasurement, CanExecuteAddMeasurement);
             RemoveMeasurementCommand = new RelayCommand(ExecuteRemoveMeasurement);
+            OpenLogModalCommand = new RelayCommand(_ => IsModalOpen = true);
+            CloseLogModalCommand = new RelayCommand(_ => IsModalOpen = false);
             // Initialize today's date and start timer to update it every minute
             UpdateTodayDate();
             var timer = new DispatcherTimer();
@@ -202,6 +257,52 @@ namespace HabitTracker.ViewModels{
                 var logs = await SupabaseService.Client.From<CircumferenceLogs>().Get();
                 MeasurementLogs = new ObservableCollection<CircumferenceLogs>(logs.Models);
                 OnPropertyChanged(nameof(MeasurementLogs));
+
+                // Process logs to populate BodyMetrics
+                BodyMetrics.Clear();
+                foreach (var part in BodyParts)
+                {
+                    var partLogs = MeasurementLogs.Where(l => l.BodyPartId == part.Id)
+                                                  .OrderByDescending(l => l.Session?.MeasurementDate).ToList();
+
+                    if (partLogs.Any())
+                    {
+                        var latest = partLogs.First().Value;
+                        double previous = partLogs.Count > 1 ? partLogs[1].Value : latest;
+                        double delta = latest - previous;
+
+                        BodyMetrics.Add(new BodyMetricItem
+                        {
+                            BodyPartId = part.Id,
+                            PartName = part.DisplayName,
+                            LatestValue = latest,
+                            Delta = delta,
+                            IsPositiveTrend = delta > 0
+                        });
+                    }
+                }
+
+                if (BodyMetrics.Any() && SelectedBodyMetric == null)
+                {
+                    SelectedBodyMetric = BodyMetrics.First();
+                }
+
+                // Temporary weight and height logic
+                var bodyMetricsDb = await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>().Get();
+                var latestBodyMetric = bodyMetricsDb.Models.OrderByDescending(m => m.MeasurementDate).FirstOrDefault();
+                if (latestBodyMetric != null)
+                {
+                    CurrentWeight = latestBodyMetric.Weight;
+                    CurrentHeight = latestBodyMetric.Height;
+
+                    var metricsRecords = bodyMetricsDb.Models.OrderByDescending(m => m.MeasurementDate).ToList();
+                    if(metricsRecords.Count > 1) 
+                    {
+                        WeightDelta = CurrentWeight - metricsRecords[1].Weight;
+                    }
+
+                    CalculateBmi();
+                }
             }
             catch (Exception ex)
             {
@@ -213,60 +314,195 @@ namespace HabitTracker.ViewModels{
             }
         }
 
+        private void CalculateBmi()
+        {
+            if (CurrentHeight > 0)
+            {
+                var heightInMeters = CurrentHeight / 100.0;
+                BmiValue = Math.Round(CurrentWeight / (heightInMeters * heightInMeters), 1);
+
+                if (BmiValue < 18.5) BmiStatus = "Underweight";
+                else if (BmiValue < 25) BmiStatus = "Normal";
+                else if (BmiValue < 30) BmiStatus = "Overweight";
+                else BmiStatus = "Obese";
+            }
+        }
+
+        private async void UpdateChartDataAsync(string bodyPartId)
+        {
+            try
+            {
+                var logs = await SupabaseService.Client.From<CircumferenceLogs>()
+                    .Where(l => l.BodyPartId == bodyPartId)
+                    .Get();
+
+                var sortedLogs = logs.Models
+                    .Where(l => l.Session != null)
+                    .OrderBy(l => l.Session.MeasurementDate)
+                    .ToList();
+
+                var values = new List<double>();
+                var labels = new List<string>();
+
+                // Add tooltip logic by formatting the X axis string more precisely, 
+                // but setting labels allows tooltips to inherit that text in default LV2 configurations
+                foreach (var log in sortedLogs)
+                {
+                    values.Add(log.Value);
+                    // Use exact date for the label so the tooltip shows exactly when it happened
+                    labels.Add(log.Session.MeasurementDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture));
+                }
+
+                ChartSeries = new ISeries[]
+                {
+                    new LineSeries<double>
+                    {
+                        Values = values,
+                        Name = "Measurement",
+                        Fill = new SolidColorPaint(new SKColor(50, 138, 93).WithAlpha(50)), // Green-ish transparent fill
+                        Stroke = new SolidColorPaint(new SKColor(50, 138, 93)) { StrokeThickness = 3 },
+                        GeometryFill = new SolidColorPaint(new SKColor(255, 255, 255)),
+                        GeometryStroke = new SolidColorPaint(new SKColor(50, 138, 93)) { StrokeThickness = 2 }
+                    }
+                };
+                OnPropertyChanged(nameof(ChartSeries));
+
+                XAxes = new Axis[]
+                {
+                    new Axis
+                    {
+                        Labels = labels,
+                        LabelsPaint = new SolidColorPaint(SKColors.Gray),
+                        TextSize = 12
+                    }
+                };
+                OnPropertyChanged(nameof(XAxes));
+
+                YAxes = new Axis[]
+                {
+                    new Axis
+                    {
+                        LabelsPaint = new SolidColorPaint(SKColors.Transparent), // Hide Y Axis labels if we want it clean like the UI
+                        SeparatorsPaint = new SolidColorPaint(SKColors.LightGray) { StrokeThickness = 1, PathEffect = new LiveChartsCore.SkiaSharpView.Painting.Effects.DashEffect(new float[] { 3, 3 }) }
+                    }
+                };
+                OnPropertyChanged(nameof(YAxes));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating chart: {ex.Message}");
+            }
+        }
+
         public async Task SaveMeasurementAsync()
         {
-            if (!CurrentSessionMeasurements.Any())
+            if (!CurrentSessionMeasurements.Any() && !NewWeightValue.HasValue && !NewHeightValue.HasValue)
             {
-                System.Windows.MessageBox.Show("Please add at least one measurement to the session.");
+                System.Windows.MessageBox.Show("Please add at least one measurement, weight, or height to the session.");
                 return;
             }
 
             var validItems = CurrentSessionMeasurements.Where(i => i.Value.HasValue && i.Value.Value > 0).ToList();
             if (validItems.Count != CurrentSessionMeasurements.Count)
             {
-                System.Windows.MessageBox.Show("All added measurements must have a valid value greater than 0 before saving.");
+                System.Windows.MessageBox.Show("All added body part measurements must have a valid value greater than 0 before saving.");
                 return;
             }
 
             try
             {
                 IsLoading = true;
-                var session = new MeasurementSessions
+
+                // Save Body Metrics (Weight/Height) directly to BodyMetrics table if provided
+                if (NewWeightValue.HasValue || NewHeightValue.HasValue)
                 {
-                    UserId = SupabaseService.Client.Auth.CurrentUser.Id,
-                    MeasurementDate = MeasurementDate,
-                    AdditionalNotes = ""
-                };
-                var sessionResponse = await SupabaseService.Client.From<MeasurementSessions>().Insert(session);
-                var createdSession = sessionResponse.Models.FirstOrDefault();
+                    double w = NewWeightValue ?? CurrentWeight; // default to existing if omitted
+                    double h = NewHeightValue ?? CurrentHeight;
 
-                if (createdSession != null)
-                {
-                    foreach (var item in validItems)
+                    var bmEntry = new HabitTracker.Models.BodyMetrics
                     {
-                        var log = new CircumferenceLogs
-                        {
-                            SessionId = createdSession.Id,
-                            BodyPartId = item.BodyPartId,
-                            Value = item.Value.Value
-                        };
-                        await SupabaseService.Client.From<CircumferenceLogs>().Insert(log);
-                    }
+                        Id = Guid.NewGuid().ToString(),
+                        UserId = SupabaseService.Client.Auth.CurrentUser.Id,
+                        MeasurementDate = MeasurementDate,
+                        Weight = w,
+                        Height = h,
+                        AdditionalNotes = ""
+                    };
+                    await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>().Insert(bmEntry);
 
-                    CurrentSessionMeasurements.Clear();
-
-                    AvailableBodyParts.Clear();
-                    foreach (var part in BodyParts)
-                    {
-                        AvailableBodyParts.Add(part);
-                    }
-                    SelectedBodyPartToAdd = AvailableBodyParts.FirstOrDefault();
-
-                    MeasurementDate = DateTime.Now;
-
-                    await LoadMeasurementsAsync();
-                    System.Windows.MessageBox.Show("Measurements saved successfully!");
+                    // Clear inputs after success
+                    NewWeightValue = null;
+                    NewHeightValue = null;
                 }
+
+                // Proceed with existing circumferences setup only if there are items
+                if (validItems.Any())
+                {
+                    var userId = SupabaseService.Client.Auth.CurrentUser.Id;
+                    var today = MeasurementDate.Date;
+
+                    // 1. Fetch or Create Session
+                    var existingSessions = await SupabaseService.Client.From<MeasurementSessions>()
+                        .Where(s => s.UserId == userId && s.MeasurementDate == today)
+                        .Get();
+
+                    string sessionId;
+                    if (existingSessions.Models.Any())
+                    {
+                        // Session exists
+                        sessionId = existingSessions.Models.First().Id;
+                    }
+                    else
+                    {
+                        // Create new session
+                        var session = new MeasurementSessions
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            UserId = userId,
+                            MeasurementDate = today,
+                            AdditionalNotes = ""
+                        };
+                        var sessionResponse = await SupabaseService.Client.From<MeasurementSessions>().Insert(session);
+                        sessionId = sessionResponse.Models.FirstOrDefault()?.Id;
+                    }
+
+                    if (!string.IsNullOrEmpty(sessionId))
+                    {
+                        // 2. Upsert circumference logs
+                        foreach (var item in validItems)
+                        {
+                            var log = new CircumferenceLogs
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                SessionId = sessionId,
+                                BodyPartId = item.BodyPartId,
+                                Value = item.Value.Value
+                            };
+
+                            var options = new Supabase.Postgrest.QueryOptions 
+                            { 
+                                DuplicateResolution = Supabase.Postgrest.QueryOptions.DuplicateResolutionType.MergeDuplicates,
+                                OnConflict = "session_id, body_part_id"
+                            };
+
+                            await SupabaseService.Client.From<CircumferenceLogs>().Upsert(log, options);
+                        }
+
+                        CurrentSessionMeasurements.Clear();
+
+                        AvailableBodyParts.Clear();
+                        foreach (var part in BodyParts)
+                        {
+                            AvailableBodyParts.Add(part);
+                        }
+                        SelectedBodyPartToAdd = AvailableBodyParts.FirstOrDefault();
+
+                        MeasurementDate = DateTime.Now;
+                    }
+                } // This closes: if (validItems.Any())
+
+                await LoadMeasurementsAsync();
+                System.Windows.MessageBox.Show("Measurements saved successfully!");
             }
             catch (Exception ex)
             {
