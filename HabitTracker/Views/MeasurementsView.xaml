@@ -207,7 +207,7 @@
         </Grid>
 
         <!-- Modal Overlay -->
-        <Grid Background="#80000000" Visibility="{Binding IsModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="999">
+        <Grid Visibility="{Binding IsModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="999">
             <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="0" Padding="30" Width="600" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="20" ShadowDepth="5" />
@@ -223,6 +223,30 @@
                         <TextBlock Text="Date: " VerticalAlignment="Center" Margin="0,0,5,0" Foreground="{DynamicResource TextMutedBrush}"/>
                         <TextBlock Text="{Binding MeasurementDate, StringFormat=dd/MM/yyyy}" VerticalAlignment="Center" Foreground="{DynamicResource TextMainBrush}" FontWeight="SemiBold"/>
                     </StackPanel>
+
+                    <Grid Margin="0,0,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="15" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Weight (kg)" Foreground="{DynamicResource TextMutedBrush}" FontSize="12" Margin="0,0,0,5" />
+                            <Border Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1" CornerRadius="8" Height="42">
+                                <TextBox Text="{Binding NewWeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{x:Null}" Padding="10,0" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" />
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Height (cm)" Foreground="{DynamicResource TextMutedBrush}" FontSize="12" Margin="0,0,0,5" />
+                            <Border Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1" CornerRadius="8" Height="42">
+                                <TextBox Text="{Binding NewHeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{x:Null}" Padding="10,0" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" />
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Body Circumferences" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" Margin="0,5,0,10" />
 
                     <Grid Margin="0,0,0,15">
                         <Grid.ColumnDefinitions>

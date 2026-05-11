@@ -141,6 +141,12 @@ namespace HabitTracker.ViewModels{
         private string _bmiStatus = "";
         public string BmiStatus { get => _bmiStatus; set { _bmiStatus = value; OnPropertyChanged(); } }
 
+        private double? _newWeightValue;
+        public double? NewWeightValue { get => _newWeightValue; set { _newWeightValue = value; OnPropertyChanged(); } }
+
+        private double? _newHeightValue;
+        public double? NewHeightValue { get => _newHeightValue; set { _newHeightValue = value; OnPropertyChanged(); } }
+
         private bool _isModalOpen;
         public bool IsModalOpen
         {
@@ -390,58 +396,113 @@ namespace HabitTracker.ViewModels{
 
         public async Task SaveMeasurementAsync()
         {
-            if (!CurrentSessionMeasurements.Any())
+            if (!CurrentSessionMeasurements.Any() && !NewWeightValue.HasValue && !NewHeightValue.HasValue)
             {
-                System.Windows.MessageBox.Show("Please add at least one measurement to the session.");
+                System.Windows.MessageBox.Show("Please add at least one measurement, weight, or height to the session.");
                 return;
             }
 
             var validItems = CurrentSessionMeasurements.Where(i => i.Value.HasValue && i.Value.Value > 0).ToList();
             if (validItems.Count != CurrentSessionMeasurements.Count)
             {
-                System.Windows.MessageBox.Show("All added measurements must have a valid value greater than 0 before saving.");
+                System.Windows.MessageBox.Show("All added body part measurements must have a valid value greater than 0 before saving.");
                 return;
             }
 
             try
             {
                 IsLoading = true;
-                var session = new MeasurementSessions
+
+                // Save Body Metrics (Weight/Height) directly to BodyMetrics table if provided
+                if (NewWeightValue.HasValue || NewHeightValue.HasValue)
                 {
-                    UserId = SupabaseService.Client.Auth.CurrentUser.Id,
-                    MeasurementDate = MeasurementDate,
-                    AdditionalNotes = ""
-                };
-                var sessionResponse = await SupabaseService.Client.From<MeasurementSessions>().Insert(session);
-                var createdSession = sessionResponse.Models.FirstOrDefault();
+                    double w = NewWeightValue ?? CurrentWeight; // default to existing if omitted
+                    double h = NewHeightValue ?? CurrentHeight;
 
-                if (createdSession != null)
-                {
-                    foreach (var item in validItems)
+                    var bmEntry = new HabitTracker.Models.BodyMetrics
                     {
-                        var log = new CircumferenceLogs
-                        {
-                            SessionId = createdSession.Id,
-                            BodyPartId = item.BodyPartId,
-                            Value = item.Value.Value
-                        };
-                        await SupabaseService.Client.From<CircumferenceLogs>().Insert(log);
-                    }
+                        Id = Guid.NewGuid().ToString(),
+                        UserId = SupabaseService.Client.Auth.CurrentUser.Id,
+                        MeasurementDate = MeasurementDate,
+                        Weight = w,
+                        Height = h,
+                        AdditionalNotes = ""
+                    };
+                    await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>().Insert(bmEntry);
 
-                    CurrentSessionMeasurements.Clear();
-
-                    AvailableBodyParts.Clear();
-                    foreach (var part in BodyParts)
-                    {
-                        AvailableBodyParts.Add(part);
-                    }
-                    SelectedBodyPartToAdd = AvailableBodyParts.FirstOrDefault();
-
-                    MeasurementDate = DateTime.Now;
-
-                    await LoadMeasurementsAsync();
-                    System.Windows.MessageBox.Show("Measurements saved successfully!");
+                    // Clear inputs after success
+                    NewWeightValue = null;
+                    NewHeightValue = null;
                 }
+
+                // Proceed with existing circumferences setup only if there are items
+                if (validItems.Any())
+                {
+                    var userId = SupabaseService.Client.Auth.CurrentUser.Id;
+                    var today = MeasurementDate.Date;
+
+                    // 1. Fetch or Create Session
+                    var existingSessions = await SupabaseService.Client.From<MeasurementSessions>()
+                        .Where(s => s.UserId == userId && s.MeasurementDate == today)
+                        .Get();
+
+                    string sessionId;
+                    if (existingSessions.Models.Any())
+                    {
+                        // Session exists
+                        sessionId = existingSessions.Models.First().Id;
+                    }
+                    else
+                    {
+                        // Create new session
+                        var session = new MeasurementSessions
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            UserId = userId,
+                            MeasurementDate = today,
+                            AdditionalNotes = ""
+                        };
+                        var sessionResponse = await SupabaseService.Client.From<MeasurementSessions>().Insert(session);
+                        sessionId = sessionResponse.Models.FirstOrDefault()?.Id;
+                    }
+
+                    if (!string.IsNullOrEmpty(sessionId))
+                    {
+                        // 2. Upsert circumference logs
+                        foreach (var item in validItems)
+                        {
+                            var log = new CircumferenceLogs
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                SessionId = sessionId,
+                                BodyPartId = item.BodyPartId,
+                                Value = item.Value.Value
+                            };
+
+                            var options = new Supabase.Postgrest.QueryOptions 
+                            { 
+                                DuplicateResolution = Supabase.Postgrest.QueryOptions.DuplicateResolutionType.MergeDuplicates,
+                                OnConflict = "session_id, body_part_id"
+                            };
+
+                            await SupabaseService.Client.From<CircumferenceLogs>().Upsert(log, options);
+                        }
+
+                        CurrentSessionMeasurements.Clear();
+
+                        AvailableBodyParts.Clear();
+                        foreach (var part in BodyParts)
+                        {
+                            AvailableBodyParts.Add(part);
+                        }
+                        SelectedBodyPartToAdd = AvailableBodyParts.FirstOrDefault();
+
+                        MeasurementDate = DateTime.Now;
+                    }
+                } // This closes: if (validItems.Any())
+
+                await LoadMeasurementsAsync();
+                System.Windows.MessageBox.Show("Measurements saved successfully!");
             }
             catch (Exception ex)
             {
