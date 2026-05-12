@@ -121,22 +121,7 @@
                                                         VerticalAlignment="Center" />
                                         </StackPanel>
 
-                                        <StackPanel Orientation="Horizontal" Margin="15,10,0,10"
-                                                VerticalAlignment="Center" Cursor="Hand">
-                                                <TextBlock x:Name="DashboardThemeIcon" Text="☀️"
-                                                        FontSize="16"
-                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                        Margin="0,0,15,0" />
-                                                <TextBlock x:Name="DashboardThemeLabel"
-                                                        Text="Light Mode" FontSize="13"
-                                                        FontWeight="SemiBold"
-                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                        VerticalAlignment="Center" />
 
-                                                <ToggleButton x:Name="DashboardThemeToggle"
-                                                        Style="{StaticResource ToggleSwitchStyle}"
-                                                        Click="ThemeToggle_Click" Margin="25,0,0,0" />
-                                        </StackPanel>
 
                                         <Button Style="{StaticResource SidebarMenuItemStyle}"
                                                 Click="LogoutButton_Click" Padding="15,10"
@@ -481,90 +466,142 @@
                                         <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Text="Settings" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,20" />
+                                <StackPanel Margin="0,0,0,24">
+                                        <TextBlock Text="Settings" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4" />
+                                        <TextBlock Text="Manage your account, preferences, and integrations." FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
+                                </StackPanel>
 
-                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,14,20">
                                         <StackPanel Orientation="Vertical">
 
-                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
+                                                <!-- Card 1: User Profile -->
+                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                                                        <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                
+                                                                <Border Width="60" Height="60" CornerRadius="30" Background="#E6F4EA" VerticalAlignment="Center" Margin="0,0,16,0">
+                                                                        <TextBlock Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="#328A5D" FontWeight="Bold" />
+                                                                </Border>
+                                                                
+                                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                                                                <TextBlock Text="{Binding UserName}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                                        </StackPanel>
+                                                                        <TextBlock Text="{Binding UserEmail}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,6" />
+                                                                </StackPanel>
+                                                                
+                                                                <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Vertical">
+                                                                        <Button Content="Edit Profile" Width="100" Height="32" Margin="0,0,0,10" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMainBrush}" FontWeight="Bold" FontSize="12" BorderThickness="0" Cursor="Hand" Click="EditProfile_Click">
+                                                                                <Button.Resources>
+                                                                                        <Style TargetType="Border">
+                                                                                                <Setter Property="CornerRadius" Value="16"/>
+                                                                                        </Style>
+                                                                                </Button.Resources>
+                                                                        </Button>
+                                                                        <TextBlock Text="Change Password" Foreground="#328A5D" FontSize="12" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="ChangePassword_Click" />
+                                                                </StackPanel>
+                                                        </Grid>
+                                                </Border>
+
+                                                <!-- Card 2: General -->
+                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
                                                         <StackPanel>
-                                                                <TextBlock Text="User Profile" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
+                                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                                                        <TextBlock Text="⚙️" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                                        <TextBlock Text="General" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
+                                                                </StackPanel>
+                                                                
                                                                 <Grid>
                                                                         <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" />
+                                                                                <ColumnDefinition Width="*" />
                                                                                 <ColumnDefinition Width="*" />
                                                                         </Grid.ColumnDefinitions>
-
-
-                                                                        <Border Width="100" Height="100" CornerRadius="50" Background="{DynamicResource InputBgBrush}" VerticalAlignment="Top" Margin="0,0,20,0">
-                                                                                <TextBlock Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36" Foreground="{DynamicResource TextMutedBrush}" FontWeight="Bold" />
-                                                                        </Border>
-
-
-                                                                        <StackPanel Grid.Column="1">
-                                                                                <TextBlock Text="Nickname" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" FontSize="12" Margin="0,0,0,4" />
-                                                                                <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" Height="40" Padding="10,8" FontSize="14" Margin="0,0,0,12" Tag="Enter nickname..." />
-                                                                                <TextBlock Text="Email Address" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" FontSize="12" Margin="0,0,0,4" />
-                                                                                <TextBlock Text="{Binding UserEmail}" Foreground="{DynamicResource TextMainBrush}" FontSize="14" Margin="0,0,0,12" />
-
-                                                                                <StackPanel Orientation="Horizontal">
-                                                                                        <Button Content="Change Password" Width="120" Padding="10,8" Margin="0,0,10,0" Style="{StaticResource AccentLinkButtonStyle}" />
-                                                                                        <Button Content="Change Avatar" Width="120" Padding="10,8" Style="{StaticResource AccentLinkButtonStyle}" />
-                                                                                </StackPanel>
+                                                                        
+                                                                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                                                                <TextBlock Text="Language" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
+                                                                                <ComboBox ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding SelectedLanguage}" Height="36" />
+                                                                        </StackPanel>
+                                                                        
+                                                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                                                                <TextBlock Text="Start of Week" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
+                                                                                <ComboBox ItemsSource="{Binding AvailableWeekStarts}" SelectedItem="{Binding SelectedWeekStart}" Height="36" />
                                                                         </StackPanel>
                                                                 </Grid>
                                                         </StackPanel>
                                                 </Border>
 
-
-                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
+                                                <!-- Card 3: Appearance -->
+                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
                                                         <StackPanel>
-                                                                <TextBlock Text="General" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
-
-                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
-                                                                        <TextBlock Text="Language" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
-                                                                        <ComboBox Width="240" ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding SelectedLanguage}" />
+                                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                                                        <TextBlock Text="🎨" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                                        <TextBlock Text="Appearance" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
                                                                 </StackPanel>
-
-                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
-                                                                        <TextBlock Text="Week Start" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
-                                                                        <ComboBox Width="240" ItemsSource="{Binding AvailableWeekStarts}" SelectedItem="{Binding SelectedWeekStart}" />
-                                                                </StackPanel>
-
-                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                        <TextBlock Text="Units" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
-                                                                        <ComboBox Width="240" ItemsSource="{Binding AvailableUnits}" SelectedItem="{Binding SelectedUnits}" />
-                                                                </StackPanel>
-                                                        </StackPanel>
-                                                </Border>
-
-
-                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
-                                                        <StackPanel>
-                                                                <TextBlock Text="Notifications" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16" />
-
-                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
-                                                                        <TextBlock Text="Daily Reminder" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
-                                                                        <ToggleButton Style="{StaticResource ToggleSwitchStyle}" Width="44" Height="24" IsChecked="{Binding IsDailyReminder}" />
-                                                                </StackPanel>
-
-                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
-                                                                        <TextBlock Text="Reminder Time" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
-                                                                        <ComboBox Width="240" ItemsSource="{Binding AvailableReminderTimes}" SelectedItem="{Binding SelectedReminderTime}" />
-                                                                </StackPanel>
-
-                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                        <TextBlock Text="Sounds / Vibrations" Width="180" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
-                                                                        <StackPanel Orientation="Horizontal">
-                                                                                <ToggleButton Style="{StaticResource ToggleSwitchStyle}" Width="44" Height="24" IsChecked="{Binding IsSoundEnabled}" Margin="0,0,8,0" />
-                                                                                <ToggleButton Style="{StaticResource ToggleSwitchStyle}" Width="44" Height="24" IsChecked="{Binding IsVibrationEnabled}" />
+                                                                
+                                                                <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                        <StackPanel Grid.Column="0">
+                                                                                <TextBlock Text="Dark Mode" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                                                                <TextBlock Text="Switch between light and dark UI themes." FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
                                                                         </StackPanel>
-                                                                </StackPanel>
+                                                                        <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" Click="DarkModeToggle_Click" x:Name="DarkModeToggle" />
+                                                                </Grid>
                                                         </StackPanel>
                                                 </Border>
 
+                                                <!-- Card 4: Notifications -->
+                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                                                        <StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                                                        <TextBlock Text="🔔" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                                        <TextBlock Text="Notifications" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
+                                                                </StackPanel>
+                                                                
+                                                                <Grid Margin="0,0,0,16">
+                                                                        <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <StackPanel Grid.Column="0">
+                                                                                <TextBlock Text="Daily Reminders" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                                                                <TextBlock Text="Push notifications to keep your streak alive." FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                        </StackPanel>
+                                                                        
+                                                                        <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Padding="10,4" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                                                <StackPanel Orientation="Horizontal">
+                                                                                        <TextBlock Text="⏱" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                                        <ComboBox ItemsSource="{Binding AvailableReminderTimes}" SelectedItem="{Binding SelectedReminderTime}" Height="24" Width="60" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource TextMainBrush}"/>
+                                                                                </StackPanel>
+                                                                        </Border>
+                                                                        
+                                                                        <ToggleButton Grid.Column="2" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsDailyReminder}" VerticalAlignment="Center"/>
+                                                                </Grid>
 
-                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Right">
+
+
+                                                                <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <StackPanel Grid.Column="0">
+                                                                                <TextBlock Text="Achievement Badges" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                                                                <TextBlock Text="When you hit milestones or break records." FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                        </StackPanel>
+                                                                        <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsAchievementBadgesEnabled}" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                        </StackPanel>
+                                                </Border>
+
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,40">
                                                         <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,15,0" FontSize="13">
                                                                 <TextBlock.Foreground>
                                                                         <SolidColorBrush Color="{Binding StatusColor}" />
@@ -576,19 +613,11 @@
                                                                 BorderThickness="0" Cursor="Hand"
                                                                 FontSize="14" />
                                                 </StackPanel>
-
-
-                                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20">
-                                                        <StackPanel>
-                                                                <TextBlock Text="About the App" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,12" />
-                                                                <TextBlock Text="HabitTracker" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                                                                <TextBlock Text="Version: 1.0.0" Margin="0,6,0,0" Foreground="{DynamicResource TextMutedBrush}" />
-                                                                <TextBlock Text="© 2026 Habit Tracker" Margin="0,6,0,0" Foreground="{DynamicResource TextMutedBrush}" />
-                                                        </StackPanel>
-                                                </Border>
                                         </StackPanel>
                                 </ScrollViewer>
-                        </Grid>
                 </Grid>
+        </Grid>
+        
+        <Border x:Name="DialogOverlay" Grid.ColumnSpan="2" Background="#99000000" Visibility="Collapsed" Panel.ZIndex="999" />
         </Grid>
 </UserControl>

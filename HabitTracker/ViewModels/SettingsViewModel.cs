@@ -98,6 +98,34 @@ namespace HabitTracker.ViewModels
             set { _userName = value; OnPropertyChanged(); }
         }
 
+        private bool _isWeeklyReportsEnabled;
+        public bool IsWeeklyReportsEnabled
+        {
+            get => _isWeeklyReportsEnabled;
+            set { _isWeeklyReportsEnabled = value; OnPropertyChanged(); }
+        }
+
+        private bool _isAchievementBadgesEnabled;
+        public bool IsAchievementBadgesEnabled
+        {
+            get => _isAchievementBadgesEnabled;
+            set { _isAchievementBadgesEnabled = value; OnPropertyChanged(); }
+        }
+
+        private bool _isPublicProfileEnabled;
+        public bool IsPublicProfileEnabled
+        {
+            get => _isPublicProfileEnabled;
+            set { _isPublicProfileEnabled = value; OnPropertyChanged(); }
+        }
+
+        private bool _isShareProgressEnabled = true;
+        public bool IsShareProgressEnabled
+        {
+            get => _isShareProgressEnabled;
+            set { _isShareProgressEnabled = value; OnPropertyChanged(); }
+        }
+
         private string _userEmail = string.Empty;
         public string UserEmail
         {

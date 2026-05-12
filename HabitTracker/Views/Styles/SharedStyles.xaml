@@ -189,7 +189,7 @@
                                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                                 BorderThickness="{TemplateBinding BorderThickness}"/>
                                                         <ScrollViewer x:Name="PART_ContentHost"
-                                                                      Margin="12,20,12,6"/>
+                                                                      Margin="12,14,12,2"/>
                                                         <TextBlock x:Name="FloatingLabel"
                                                                    Text="{TemplateBinding Tag}"
                                                                    Foreground="{DynamicResource TextMutedBrush}"
@@ -317,7 +317,7 @@
                                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                                 BorderThickness="{TemplateBinding BorderThickness}"/>
                                                         <ScrollViewer x:Name="PART_ContentHost"
-                                                                      Margin="12,20,12,6"/>
+                                                                      Margin="12,14,12,2"/>
                                                         <TextBlock x:Name="PasswordFloatingLabel"
                                                                    Text="{TemplateBinding Tag}"
                                                                    Foreground="{DynamicResource TextMutedBrush}"

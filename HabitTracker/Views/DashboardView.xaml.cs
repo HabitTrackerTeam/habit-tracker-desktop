@@ -29,33 +29,16 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         ViewModel.ShowAccountSelection();
     }
 
-    internal void ThemeToggle_Click(object sender, RoutedEventArgs e)
-    {
-        var mainWindow = Window.GetWindow(this) as MainWindow;
-        mainWindow?.HandleThemeToggle(sender, e);
-    }
-
     public void UpdateThemeToggleVisuals(bool isDark)
     {
-        string icon = isDark ? "🌙" : "☀️";
-        string label = isDark ? "Dark Mode" : "Light Mode";
-
-        if (DashboardThemeIcon != null)
-        {
-            DashboardThemeIcon.Text = icon;
-        }
-
-        if (DashboardThemeLabel != null)
-        {
-            DashboardThemeLabel.Text = label;
-        }
+        // No longer needed as we removed the sidebar toggle icons/labels
     }
 
     public void SyncThemeToggle(bool isDark)
     {
-        if (DashboardThemeToggle != null && DashboardThemeToggle.IsChecked != isDark)
+        if (DarkModeToggle != null && DarkModeToggle.IsChecked != isDark)
         {
-            DashboardThemeToggle.IsChecked = isDark;
+            DarkModeToggle.IsChecked = isDark;
         }
     }
 
@@ -117,6 +100,62 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         if (_settingsVM != null)
         {
             await _settingsVM.SaveSettingsAsync();
+        }
+    }
+
+    private async void ChangePassword_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        DialogOverlay.Visibility = Visibility.Visible;
+        var passwordWindow = new ChangePasswordWindow();
+        passwordWindow.Owner = Window.GetWindow(this);
+        if (passwordWindow.ShowDialog() == true)
+        {
+            try
+            {
+                var email = HabitTracker.Services.SupabaseService.Client.Auth.CurrentUser?.Email;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    // Weryfikacja starego hasła przez logowanie
+                    await HabitTracker.Services.SupabaseService.Client.Auth.SignIn(email, passwordWindow.OldPassword);
+
+                    // Aktualizacja hasła na nowe
+                    var attrs = new Supabase.Gotrue.UserAttributes { Password = passwordWindow.NewPassword };
+                    await HabitTracker.Services.SupabaseService.Client.Auth.Update(attrs);
+                    MessageBox.Show("Password changed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("User email not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Failed to change password. Make sure the old password is correct.\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        DialogOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void EditProfile_Click(object sender, RoutedEventArgs e)
+    {
+        DialogOverlay.Visibility = Visibility.Visible;
+        var editProfileWindow = new EditProfileWindow(_settingsVM?.UserName ?? "");
+        editProfileWindow.Owner = Window.GetWindow(this);
+        if (editProfileWindow.ShowDialog() == true)
+        {
+            if (_settingsVM != null)
+            {
+                _settingsVM.UserName = editProfileWindow.NewFullName;
+            }
+        }
+        DialogOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void DarkModeToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (Window.GetWindow(this) is MainWindow mainWindow)
+        {
+            mainWindow.HandleThemeToggle(sender, e);
         }
     }
     private void SwitchToCalendar_Click(object sender, RoutedEventArgs e)
