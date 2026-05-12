@@ -288,14 +288,17 @@ namespace HabitTracker.ViewModels{
                 }
 
                 // Temporary weight and height logic
-                var bodyMetricsDb = await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>().Get();
-                var latestBodyMetric = bodyMetricsDb.Models.OrderByDescending(m => m.MeasurementDate).FirstOrDefault();
+                string currentUserId = SupabaseService.Client.Auth.CurrentUser?.Id;
+                var bodyMetricsDb = await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>()
+                    .Where(m => m.UserId == currentUserId)
+                    .Get();
+                var metricsRecords = bodyMetricsDb.Models.OrderByDescending(m => m.MeasurementDate).ThenByDescending(m => m.Id).ToList();
+                var latestBodyMetric = metricsRecords.FirstOrDefault();
                 if (latestBodyMetric != null)
                 {
                     CurrentWeight = latestBodyMetric.Weight;
                     CurrentHeight = latestBodyMetric.Height;
 
-                    var metricsRecords = bodyMetricsDb.Models.OrderByDescending(m => m.MeasurementDate).ToList();
                     if(metricsRecords.Count > 1) 
                     {
                         WeightDelta = CurrentWeight - metricsRecords[1].Weight;
@@ -413,24 +416,33 @@ namespace HabitTracker.ViewModels{
             {
                 IsLoading = true;
 
-                // Save Body Metrics (Weight/Height) directly to BodyMetrics table if provided
+                var userId = SupabaseService.Client.Auth.CurrentUser.Id;
+
+                // 1. BEZPIECZNA DATA: Wymuszamy czas UTC, żeby baza PostgreSQL (typ date) nie przesunęła nam dnia
+                var todayUtc = DateTime.SpecifyKind(MeasurementDate.Date, DateTimeKind.Utc);
+                var todayDateString = MeasurementDate.ToString("yyyy-MM-dd");
+
+                // 2. ZAPIS WAGI I WZROSTU (Prawdziwy UPSERT)
                 if (NewWeightValue.HasValue || NewHeightValue.HasValue)
                 {
-                    double w = NewWeightValue ?? CurrentWeight; // default to existing if omitted
+                    double w = NewWeightValue ?? CurrentWeight; 
                     double h = NewHeightValue ?? CurrentHeight;
 
                     var bmEntry = new HabitTracker.Models.BodyMetrics
                     {
-                        Id = Guid.NewGuid().ToString(),
-                        UserId = SupabaseService.Client.Auth.CurrentUser.Id,
-                        MeasurementDate = MeasurementDate,
+                        Id = Guid.NewGuid().ToString(), // Generate ID in case of insert, Postgres will ignore on conflict if we specify upsert logic correctly
+                        UserId = userId,
+                        MeasurementDate = todayUtc,
                         Weight = w,
                         Height = h,
                         AdditionalNotes = ""
                     };
-                    await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>().Insert(bmEntry);
 
-                    // Clear inputs after success
+                    // Mówimy bazie: "Spróbuj wstawić. Jak znajdziesz konflikt dla tego użytkownika i tej daty, po prostu zaktualizuj wagę/wzrost"
+                    var options = new Supabase.Postgrest.QueryOptions { OnConflict = "user_id, measurement_date" };
+                    await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>().Upsert(bmEntry, options);
+
+                    // Wyczyszczenie inputów po udanym zapisie
                     NewWeightValue = null;
                     NewHeightValue = null;
                 }
@@ -438,19 +450,18 @@ namespace HabitTracker.ViewModels{
                 // Proceed with existing circumferences setup only if there are items
                 if (validItems.Any())
                 {
-                    var userId = SupabaseService.Client.Auth.CurrentUser.Id;
-                    var today = MeasurementDate.Date;
-
-                    // 1. Fetch or Create Session
-                    var existingSessions = await SupabaseService.Client.From<MeasurementSessions>()
-                        .Where(s => s.UserId == userId && s.MeasurementDate == today)
+                    // 1. Fetch or Create Session using exact date filtering
+                    var userSessions = await SupabaseService.Client.From<MeasurementSessions>()
+                        .Where(s => s.UserId == userId)
                         .Get();
 
+                    var existingSession = userSessions.Models.FirstOrDefault(s => s.MeasurementDate.ToString("yyyy-MM-dd") == todayDateString);
+
                     string sessionId;
-                    if (existingSessions.Models.Any())
+                    if (existingSession != null)
                     {
                         // Session exists
-                        sessionId = existingSessions.Models.First().Id;
+                        sessionId = existingSession.Id;
                     }
                     else
                     {
@@ -459,7 +470,7 @@ namespace HabitTracker.ViewModels{
                         {
                             Id = Guid.NewGuid().ToString(),
                             UserId = userId,
-                            MeasurementDate = today,
+                            MeasurementDate = todayUtc,
                             AdditionalNotes = ""
                         };
                         var sessionResponse = await SupabaseService.Client.From<MeasurementSessions>().Insert(session);
@@ -471,21 +482,29 @@ namespace HabitTracker.ViewModels{
                         // 2. Upsert circumference logs
                         foreach (var item in validItems)
                         {
-                            var log = new CircumferenceLogs
+                            // Fetch existing to see if we update or insert (to avoid generating new Id on update which violates unique constraints)
+                            var existingLogResponse = await SupabaseService.Client.From<CircumferenceLogs>()
+                                .Where(l => l.SessionId == sessionId && l.BodyPartId == item.BodyPartId)
+                                .Get();
+
+                            var existingLog = existingLogResponse.Models.FirstOrDefault();
+
+                            if (existingLog != null)
                             {
-                                Id = Guid.NewGuid().ToString(),
-                                SessionId = sessionId,
-                                BodyPartId = item.BodyPartId,
-                                Value = item.Value.Value
-                            };
-
-                            var options = new Supabase.Postgrest.QueryOptions 
-                            { 
-                                DuplicateResolution = Supabase.Postgrest.QueryOptions.DuplicateResolutionType.MergeDuplicates,
-                                OnConflict = "session_id, body_part_id"
-                            };
-
-                            await SupabaseService.Client.From<CircumferenceLogs>().Upsert(log, options);
+                                existingLog.Value = item.Value.Value;
+                                await SupabaseService.Client.From<CircumferenceLogs>().Update(existingLog);
+                            }
+                            else
+                            {
+                                var log = new CircumferenceLogs
+                                {
+                                    Id = Guid.NewGuid().ToString(),
+                                    SessionId = sessionId,
+                                    BodyPartId = item.BodyPartId,
+                                    Value = item.Value.Value
+                                };
+                                await SupabaseService.Client.From<CircumferenceLogs>().Insert(log);
+                            }
                         }
 
                         CurrentSessionMeasurements.Clear();
