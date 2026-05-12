@@ -8,13 +8,16 @@ public partial class DashboardView : System.Windows.Controls.UserControl
     private LoginViewModel ViewModel => (LoginViewModel)DataContext;
 
     private DashboardViewModel _dashboardVM;
+    private SettingsViewModel _settingsVM;
     public DashboardView()
     {
         InitializeComponent();
 
         _dashboardVM=new DashboardViewModel();
+        _settingsVM = new SettingsViewModel();
 
         MainContentArea.DataContext = _dashboardVM;
+        SettingsPanel.DataContext = _settingsVM;
 
         this.Loaded+=DashboardView_Loaded;
     }
@@ -99,12 +102,21 @@ public partial class DashboardView : System.Windows.Controls.UserControl
             _dashboardVM.IsAddFormVisible = !_dashboardVM.IsAddFormVisible;
         }
     }
-    private void SwitchToSettings_Click(object sender, RoutedEventArgs e)
+    private async void SwitchToSettings_Click(object sender, RoutedEventArgs e)
     {
         if (_dashboardVM != null)
         {
             _dashboardVM.SwitchToSettings();
             UpdateSidebar(NavSettings);
+            await _settingsVM.LoadSettingsAsync();
+        }
+    }
+
+    private async void SaveSettings_Click(object sender, RoutedEventArgs e)
+    {
+        if (_settingsVM != null)
+        {
+            await _settingsVM.SaveSettingsAsync();
         }
     }
     private void SwitchToCalendar_Click(object sender, RoutedEventArgs e)
