@@ -200,7 +200,7 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <lvc:CartesianChart Grid.Row="1" Series="{Binding ChartSeries}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" />
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding ChartSeries}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" Background="{DynamicResource CardBgBrush}" />
                     </Grid>
                 </Border>
             </Grid>
