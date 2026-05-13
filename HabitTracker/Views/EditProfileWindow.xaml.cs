@@ -1,17 +1,40 @@
 using System.Windows;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
-using Supabase.Gotrue;
 
 namespace HabitTracker.Views
 {
     public partial class EditProfileWindow : Window
     {
         public string NewFullName { get; private set; } = string.Empty;
+        public string? SelectedPhotoPath { get; private set; }
 
-        public EditProfileWindow(string currentName)
+        public EditProfileWindow(string currentName, string? currentAvatarUrl = null)
         {
             InitializeComponent();
             FullNameInput.Text = currentName;
+
+            // Set initial
+            if (!string.IsNullOrEmpty(currentName))
+            {
+                AvatarInitial.Text = currentName[0].ToString().ToUpper();
+            }
+
+            // If there's an existing avatar URL, show it
+            if (!string.IsNullOrEmpty(currentAvatarUrl))
+            {
+                try
+                {
+                    var bitmap = new BitmapImage(new System.Uri(currentAvatarUrl));
+                    AvatarImage.ImageSource = bitmap;
+                    AvatarImageEllipse.Visibility = Visibility.Visible;
+                    AvatarInitial.Visibility = Visibility.Collapsed;
+                }
+                catch
+                {
+                    // If loading fails, keep showing the initial
+                }
+            }
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
@@ -20,7 +43,7 @@ namespace HabitTracker.Views
             Close();
         }
 
-        private async void Save_Click(object sender, RoutedEventArgs e)
+        private void Save_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(FullNameInput.Text))
             {
@@ -34,7 +57,7 @@ namespace HabitTracker.Views
             Close();
         }
 
-        private async void ChangePhoto_Click(object sender, RoutedEventArgs e)
+        private void ChangePhoto_Click(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new OpenFileDialog
             {
@@ -44,8 +67,27 @@ namespace HabitTracker.Views
 
             if (openFileDialog.ShowDialog() == true)
             {
-                // To be implemented: upload image to storage and update UI
-                MessageBox.Show("Photo selection handled. Implementation pending.", "Change Photo", MessageBoxButton.OK, MessageBoxImage.Information);
+                SelectedPhotoPath = openFileDialog.FileName;
+
+                // Show preview of the selected image
+                try
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new System.Uri(SelectedPhotoPath);
+                    bitmap.DecodePixelWidth = 200;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+
+                    AvatarImage.ImageSource = bitmap;
+                    AvatarImageEllipse.Visibility = Visibility.Visible;
+                    AvatarInitial.Visibility = Visibility.Collapsed;
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show($"Could not load image: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    SelectedPhotoPath = null;
+                }
             }
         }
     }

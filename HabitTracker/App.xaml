@@ -2,12 +2,14 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HabitTracker"
+             xmlns:services="clr-namespace:HabitTracker.Services"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Views/Styles/SharedStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <x:Static x:Key="Loc" Member="services:LocalizationService.Instance"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using HabitTracker.Commands;
 using HabitTracker.Models;
 using HabitTracker.Services;
@@ -17,7 +18,7 @@ namespace HabitTracker.ViewModels
 
         public ObservableCollection<string> AvailableLanguages { get; } = new()
         {
-            "Polski", "English", "Deutsch"
+            "Polski", "English"
         };
 
         public ObservableCollection<string> AvailableWeekStarts { get; } = new()
@@ -39,7 +40,18 @@ namespace HabitTracker.ViewModels
         public string SelectedLanguage
         {
             get => _selectedLanguage;
-            set { _selectedLanguage = value; OnPropertyChanged(); }
+            set 
+            { 
+                _selectedLanguage = value; 
+                OnPropertyChanged();
+                // Immediately apply language change to the UI
+                var langCode = value switch
+                {
+                    "English" => "en",
+                    _ => "pl"
+                };
+                LocalizationService.Instance.CurrentLanguage = langCode;
+            }
         }
 
         private string _selectedWeekStart;
@@ -84,18 +96,37 @@ namespace HabitTracker.ViewModels
             set { _isVibrationEnabled = value; OnPropertyChanged(); }
         }
 
-        private string _selectedTheme;
-        public string SelectedTheme
+        private bool _isDarkMode;
+        public bool IsDarkMode
         {
-            get => _selectedTheme;
-            set { _selectedTheme = value; OnPropertyChanged(); }
+            get => _isDarkMode;
+            set 
+            { 
+                if (_isDarkMode == value) return;
+                _isDarkMode = value; 
+                OnPropertyChanged(); 
+                
+                // Programmatically apply theme safely on UI thread
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+                    {
+                        mainWindow.ApplyTheme(value);
+                    }
+                });
+            }
         }
 
         private string _userName = string.Empty;
         public string UserName
         {
             get => _userName;
-            set { _userName = value; OnPropertyChanged(); }
+            set 
+            { 
+                _userName = value; 
+                OnPropertyChanged();
+                UserInitial = !string.IsNullOrEmpty(value) ? value[0].ToString().ToUpper() : "?";
+            }
         }
 
         private bool _isWeeklyReportsEnabled;
@@ -137,7 +168,55 @@ namespace HabitTracker.ViewModels
         public string UserAvatarUrl
         {
             get => _userAvatarUrl;
-            set { _userAvatarUrl = value; OnPropertyChanged(); }
+            set 
+            { 
+                _userAvatarUrl = value; 
+                OnPropertyChanged();
+                LoadAvatarImage(value);
+            }
+        }
+
+        private BitmapImage? _avatarImageSource;
+        public BitmapImage? AvatarImageSource
+        {
+            get => _avatarImageSource;
+            set { _avatarImageSource = value; OnPropertyChanged(); }
+        }
+
+        public bool HasAvatarImage => AvatarImageSource != null;
+
+        private void LoadAvatarImage(string? url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                AvatarImageSource = null;
+                OnPropertyChanged(nameof(HasAvatarImage));
+                return;
+            }
+
+            try
+            {
+                // Add cache-busting if not already present
+                var imageUrl = url;
+                if (!imageUrl.Contains("?t="))
+                {
+                    imageUrl = $"{imageUrl}?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+                }
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(imageUrl);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                bitmap.DecodePixelWidth = 120;
+                bitmap.EndInit();
+                AvatarImageSource = bitmap;
+            }
+            catch
+            {
+                AvatarImageSource = null;
+            }
+            OnPropertyChanged(nameof(HasAvatarImage));
         }
 
         private string _userInitial = "?";
@@ -236,7 +315,6 @@ namespace HabitTracker.ViewModels
             {
                 "pl" => "Polski",
                 "en" => "English",
-                "de" => "Deutsch",
                 _ => "Polski"
             };
 
@@ -259,7 +337,7 @@ namespace HabitTracker.ViewModels
             SelectedReminderTime = settings.ReminderTime;
             IsSoundEnabled = settings.SoundEnabled;
             IsVibrationEnabled = settings.VibrationEnabled;
-            SelectedTheme = settings.Theme;
+            IsDarkMode = settings.Theme == "dark";
         }
 
         private void ApplyUIToSettings(UserSettings settings)
@@ -268,7 +346,6 @@ namespace HabitTracker.ViewModels
             {
                 "Polski" => "pl",
                 "English" => "en",
-                "Deutsch" => "de",
                 _ => "pl"
             };
 
@@ -291,7 +368,7 @@ namespace HabitTracker.ViewModels
             settings.ReminderTime = SelectedReminderTime;
             settings.SoundEnabled = IsSoundEnabled;
             settings.VibrationEnabled = IsVibrationEnabled;
-            settings.Theme = SelectedTheme;
+            settings.Theme = IsDarkMode ? "dark" : "light";
         }
     }
 }

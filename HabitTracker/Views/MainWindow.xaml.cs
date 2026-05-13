@@ -42,7 +42,11 @@ public partial class MainWindow : Window
     {
         var toggle = sender as System.Windows.Controls.Primitives.ToggleButton;
         bool isDark = toggle?.IsChecked == true;
+        ApplyTheme(isDark);
+    }
 
+    public void ApplyTheme(bool isDark)
+    {
         // Synchronizuj oba widoki
         AuthViewControl.SyncThemeToggle(isDark);
         DashboardViewControl.SyncThemeToggle(isDark);
