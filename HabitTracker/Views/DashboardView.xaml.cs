@@ -44,6 +44,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
 
     private async void DashboardView_Loaded(object sender, RoutedEventArgs e)
     {
+        await _settingsVM.LoadSettingsAsync(); // This applies language and theme
         await _dashboardVM.LoadFormDataAsync();
         await _dashboardVM.LoadHabitsAsync();
         UpdateSidebar(NavDashboard);
@@ -136,28 +137,81 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         DialogOverlay.Visibility = Visibility.Collapsed;
     }
 
-    private void EditProfile_Click(object sender, RoutedEventArgs e)
+    private async void EditProfile_Click(object sender, RoutedEventArgs e)
     {
         DialogOverlay.Visibility = Visibility.Visible;
-        var editProfileWindow = new EditProfileWindow(_settingsVM?.UserName ?? "");
+        var editProfileWindow = new EditProfileWindow(
+            _settingsVM?.UserName ?? "",
+            _settingsVM?.UserAvatarUrl);
         editProfileWindow.Owner = Window.GetWindow(this);
         if (editProfileWindow.ShowDialog() == true)
         {
             if (_settingsVM != null)
             {
                 _settingsVM.UserName = editProfileWindow.NewFullName;
+                _settingsVM.UserInitial = !string.IsNullOrEmpty(editProfileWindow.NewFullName) 
+                    ? editProfileWindow.NewFullName[0].ToString().ToUpper() : "?";
+            }
+
+            // Handle photo upload if a new photo was selected
+            if (!string.IsNullOrEmpty(editProfileWindow.SelectedPhotoPath))
+            {
+                try
+                {
+                    var currentUser = HabitTracker.Services.SupabaseService.Client.Auth.CurrentUser;
+                    if (currentUser != null)
+                    {
+                        var fileBytes = System.IO.File.ReadAllBytes(editProfileWindow.SelectedPhotoPath);
+                        var extension = System.IO.Path.GetExtension(editProfileWindow.SelectedPhotoPath).ToLowerInvariant();
+                        var fileName = $"{currentUser.Id}/avatar{extension}";
+                        var contentType = extension switch
+                        {
+                            ".png" => "image/png",
+                            ".gif" => "image/gif",
+                            ".bmp" => "image/bmp",
+                            _ => "image/jpeg"
+                        };
+
+                        // Upload to Supabase Storage (avatars bucket) with upsert
+                        await HabitTracker.Services.SupabaseService.Client.Storage
+                            .From("avatars")
+                            .Upload(fileBytes, fileName, new Supabase.Storage.FileOptions
+                            {
+                                ContentType = contentType,
+                                Upsert = true
+                            });
+
+                        // Get the public URL with cache-busting timestamp
+                        var baseUrl = HabitTracker.Services.SupabaseService.Client.Storage
+                            .From("avatars")
+                            .GetPublicUrl(fileName);
+                        var publicUrl = $"{baseUrl}?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                        // Update user metadata with the avatar URL
+                        var attrs = new Supabase.Gotrue.UserAttributes();
+                        attrs.Data = new System.Collections.Generic.Dictionary<string, object>
+                        {
+                            { "avatar_url", baseUrl }
+                        };
+                        await HabitTracker.Services.SupabaseService.Client.Auth.Update(attrs);
+
+                        // Immediately update the UI
+                        if (_settingsVM != null)
+                        {
+                            _settingsVM.UserAvatarUrl = publicUrl;
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"Failed to upload photo:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
         }
         DialogOverlay.Visibility = Visibility.Collapsed;
     }
 
-    private void DarkModeToggle_Click(object sender, RoutedEventArgs e)
-    {
-        if (Window.GetWindow(this) is MainWindow mainWindow)
-        {
-            mainWindow.HandleThemeToggle(sender, e);
-        }
-    }
+
     private void SwitchToCalendar_Click(object sender, RoutedEventArgs e)
     {
         if (_dashboardVM != null)

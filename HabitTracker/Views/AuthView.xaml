@@ -41,12 +41,12 @@
                                            LineHeight="42"
                                            Margin="0,0,0,16"
                                            TextWrapping="Wrap">
-                                        Plant habits. 
-                                        <Run Text="Harvest success."
+                                        <Run Text="{Binding AuthSlogan1, Source={StaticResource Loc}, Mode=OneWay}" />
+                                        <Run Text="{Binding AuthSlogan2, Source={StaticResource Loc}, Mode=OneWay}"
                                              Foreground="#FF1F7D33"/>
                                 </TextBlock>
 
-                                <TextBlock Text="Your dedicated tracker for productivity and health. Stay consistent, analyze your performance, and turn small steps into lasting lifestyle changes in just a few clicks a day."
+                                <TextBlock Text="{Binding AuthSubtitle, Source={StaticResource Loc}}"
                                            FontSize="16"
                                            Foreground="{DynamicResource TextMutedBrush}"
                                            Margin="0,0,0,20"
@@ -108,11 +108,11 @@
                                                                                 </Style.Triggers>
                                                                         </Style>
                                                                 </StackPanel.Style>
-                                                                <TextBlock Text="Welcome back"
+                                                                <TextBlock Text="{Binding WelcomeBack, Source={StaticResource Loc}}"
                                                                            FontSize="28"
                                                                            FontWeight="Bold"
                                                                            Foreground="{DynamicResource TextMainBrush}"/>
-                                                                <TextBlock Text="Select an account or sign in manually."
+                                                                <TextBlock Text="{Binding SelectAccount, Source={StaticResource Loc}}"
                                                                            FontSize="14"
                                                                            Foreground="{DynamicResource TextMutedBrush}"
                                                                            Margin="0,8,0,0"/>
@@ -137,7 +137,7 @@
                                                                                 </Style.Triggers>
                                                                         </Style>
                                                                 </StackPanel.Style>
-                                                                <TextBlock Text="RECENTLY ACTIVE"
+                                                                <TextBlock Text="{Binding RecentlyActive, Source={StaticResource Loc}}"
                                                                            FontSize="11"
                                                                            FontWeight="Bold"
                                                                            Foreground="{DynamicResource TextMutedBrush}"
@@ -189,7 +189,7 @@
                                                         <StackPanel x:Name="LoginFormPanel"
                                                                     Margin="0,0,0,8"
                                                                     Visibility="{Binding IsLoginVisible, Converter={StaticResource BoolToVis}}">
-                                                                <TextBlock Text="EMAIL ADDRESS"
+                                                                <TextBlock Text="{Binding EmailAddress, Source={StaticResource Loc}}"
                                                                            FontSize="11"
                                                                            FontWeight="Bold"
                                                                            Foreground="{DynamicResource TextMutedBrush}"
@@ -200,7 +200,7 @@
                                                                          Tag="E-mail"
                                                                          Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                                <TextBlock Text="PASSWORD"
+                                                                <TextBlock Text="{Binding Password, Source={StaticResource Loc}}"
                                                                            FontSize="11"
                                                                            FontWeight="Bold"
                                                                            Foreground="{DynamicResource TextMutedBrush}"
@@ -243,11 +243,11 @@
                                                                         </Grid.ColumnDefinitions>
                                                                         <StackPanel Orientation="Horizontal"
                                                                                     VerticalAlignment="Center">
-                                                                                <TextBlock Text="Don't have an account?"
+                                                                                <TextBlock Text="{Binding DontHaveAccount, Source={StaticResource Loc}}"
                                                                                            VerticalAlignment="Center"
                                                                                            Foreground="{DynamicResource TextMainBrush}"
                                                                                            FontSize="16"/>
-                                                                                <Button Content="Register"
+                                                                                <Button Content="{Binding RegisterBtn, Source={StaticResource Loc}}"
                                                                                         Click="NavToRegister_Click"
                                                                                         Cursor="Hand"
                                                                                         FontSize="16"
@@ -258,7 +258,7 @@
                                                                         </StackPanel>
                                                                         <Button Grid.Column="1"
                                                                                 HorizontalAlignment="Right"
-                                                                                Content="Forgot password?"
+                                                                                Content="{Binding ForgotPassword, Source={StaticResource Loc}}"
                                                                                 Click="NavToForgot_Click"
                                                                                 FontSize="14"
                                                                                 Style="{StaticResource AccentLinkButtonStyle}"/>
@@ -270,7 +270,7 @@
                                                                         Background="#FF1F7D33"
                                                                         Click="LoginButton_Click"
                                                                         Style="{StaticResource LoginLoadingButtonStyle}"
-                                                                        Content="Sign In"
+                                                                        Content="{Binding SignIn, Source={StaticResource Loc}}"
                                                                         Foreground="White"
                                                                         FontWeight="SemiBold"/>
 
@@ -291,11 +291,11 @@
                                                                            FontSize="32"
                                                                            FontWeight="Bold"
                                                                            Foreground="#FF328A5D"
-                                                                           Text="Create profile"/>
+                                                                           Text="{Binding CreateProfile, Source={StaticResource Loc}}"/>
                                                                 <TextBlock Margin="0,0,0,20"
                                                                            FontSize="15"
                                                                            Foreground="{DynamicResource TextMutedBrush}"
-                                                                           Text="Set up your account in a few quick steps."/>
+                                                                           Text="{Binding SetupAccount, Source={StaticResource Loc}}"/>
 
                                                                 <Grid HorizontalAlignment="Center"
                                                                       Margin="0,0,0,25">
@@ -410,7 +410,7 @@
                                                                                     </Style.Triggers>
                                                                                 </Style>
                                                                             </TextBlock.Style>
-                                                                            At least 6 characters
+                                                                            <TextBlock Text="{Binding PasswordChecklistMinLength, Source={StaticResource Loc}}" />
                                                                         </TextBlock>
                                                                     </StackPanel>
                                                                     <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -439,7 +439,7 @@
                                                                                     </Style.Triggers>
                                                                                 </Style>
                                                                             </TextBlock.Style>
-                                                                            At least 1 uppercase letter
+                                                                            <TextBlock Text="{Binding PasswordChecklistUppercase, Source={StaticResource Loc}}" />
                                                                         </TextBlock>
                                                                     </StackPanel>
                                                                     <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -468,7 +468,7 @@
                                                                                     </Style.Triggers>
                                                                                 </Style>
                                                                             </TextBlock.Style>
-                                                                            At least 1 lowercase letter
+                                                                            <TextBlock Text="{Binding PasswordChecklistLowercase, Source={StaticResource Loc}}" />
                                                                         </TextBlock>
                                                                     </StackPanel>
                                                                     <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -497,7 +497,7 @@
                                                                                     </Style.Triggers>
                                                                                 </Style>
                                                                             </TextBlock.Style>
-                                                                            At least 1 digit
+                                                                            <TextBlock Text="{Binding PasswordChecklistDigit, Source={StaticResource Loc}}" />
                                                                         </TextBlock>
                                                                     </StackPanel>
                                                                     <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -526,7 +526,7 @@
                                                                                     </Style.Triggers>
                                                                                 </Style>
                                                                             </TextBlock.Style>
-                                                                            At least 1 special character
+                                                                            <TextBlock Text="{Binding PasswordChecklistSpecial, Source={StaticResource Loc}}" />
                                                                         </TextBlock>
                                                                     </StackPanel>
                                                                 </StackPanel>
@@ -561,7 +561,7 @@
                                                                         Margin="0,0,0,15"
                                                                         Background="#FF328A5D"
                                                                         Click="RegisterButton_Click"
-                                                                        Content="Sign up"
+                                                                        Content="{Binding SignUp, Source={StaticResource Loc}}"
                                                                         Foreground="White"
                                                                         FontWeight="SemiBold"/>
                                                                 <TextBlock Margin="0,0,0,14"
@@ -574,7 +574,7 @@
                                                                 <Button HorizontalAlignment="Center"
                                                                         Background="Transparent"
                                                                         Click="NavToLogin_Click"
-                                                                        Content="Back to Login"
+                                                                        Content="{Binding BackToLogin, Source={StaticResource Loc}}"
                                                                         Cursor="Hand"
                                                                         FontSize="13"
                                                                         Style="{StaticResource AccentLinkButtonStyle}"/>
@@ -587,13 +587,13 @@
                                                                            FontSize="32"
                                                                            FontWeight="Bold"
                                                                            Foreground="#FF328A5D"
-                                                                           Text="Reset Password"/>
+                                                                           Text="{Binding ResetPasswordTitle, Source={StaticResource Loc}}"/>
 
                                                                 <StackPanel Visibility="{Binding IsForgotEmailStep, Converter={StaticResource BoolToVis}}">
                                                                         <TextBlock Margin="0,0,0,30"
                                                                                    FontSize="14"
                                                                                    Foreground="{DynamicResource TextMutedBrush}"
-                                                                                   Text="Enter your email to receive a reset code"
+                                                                                   Text="{Binding EnterEmailForReset, Source={StaticResource Loc}}"
                                                                                    TextWrapping="Wrap"/>
                                                                         <TextBox Height="50"
                                                                                  Margin="0,0,0,25"
@@ -603,7 +603,7 @@
                                                                                 Margin="0,0,0,15"
                                                                                 Background="#FF328A5D"
                                                                                 Click="SendResetLink_Click"
-                                                                                Content="Send reset code"
+                                                                                Content="{Binding SendResetCode, Source={StaticResource Loc}}"
                                                                                 Foreground="White"
                                                                                 FontWeight="SemiBold"/>
                                                                 </StackPanel>
@@ -612,7 +612,7 @@
                                                                         <TextBlock Margin="0,0,0,20"
                                                                                    FontSize="14"
                                                                                    Foreground="{DynamicResource TextMutedBrush}"
-                                                                                   Text="Enter the verification code from your email"
+                                                                                   Text="{Binding EnterVerificationCode, Source={StaticResource Loc}}"
                                                                                    TextWrapping="Wrap"/>
                                                                         <TextBox Height="50"
                                                                                  Margin="0,0,0,25"
@@ -622,7 +622,7 @@
                                                                                 Margin="0,0,0,15"
                                                                                 Background="#FF328A5D"
                                                                                 Click="VerifyOnlyCode_Click"
-                                                                                Content="Verify code"
+                                                                                Content="{Binding VerifyCode, Source={StaticResource Loc}}"
                                                                                 Foreground="White"
                                                                                 FontWeight="SemiBold"/>
                                                                 </StackPanel>
@@ -631,7 +631,7 @@
                                                                         <TextBlock Margin="0,0,0,20"
                                                                                    FontSize="14"
                                                                                    Foreground="{DynamicResource TextMutedBrush}"
-                                                                                   Text="Create your new password"
+                                                                                   Text="{Binding CreateNewPassword, Source={StaticResource Loc}}"
                                                                                    TextWrapping="Wrap"/>
                                                                         <Grid Margin="0,0,0,6">
                                                                             <TextBox x:Name="ForgotNewPasswordVisible"

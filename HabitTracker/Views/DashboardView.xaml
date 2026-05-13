@@ -40,7 +40,7 @@
                                                         <TextBlock Text="🏠" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="Dashboard"
+                                                        <TextBlock Text="{Binding Dashboard, Source={StaticResource Loc}}"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -50,7 +50,7 @@
                                                         <TextBlock Text="🔄" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="Habits Manager"
+                                                        <TextBlock Text="{Binding HabitsManager, Source={StaticResource Loc}}"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -59,7 +59,7 @@
                                                         <TextBlock Text="📅" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="Calendar"
+                                                        <TextBlock Text="{Binding Calendar, Source={StaticResource Loc}}"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -68,7 +68,7 @@
                                                         <TextBlock Text="📊" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="Statistics"
+                                                        <TextBlock Text="{Binding Statistics, Source={StaticResource Loc}}"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -77,7 +77,7 @@
                                                         <TextBlock Text="📏" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="Measurements"
+                                                        <TextBlock Text="{Binding Measurements, Source={StaticResource Loc}}"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -86,7 +86,7 @@
                                                         <TextBlock Text="📑" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="PDF Report"
+                                                        <TextBlock Text="{Binding PdfReport, Source={StaticResource Loc}}"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -95,7 +95,7 @@
                                                         <TextBlock Text="⚙️" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="Settings"
+                                                        <TextBlock Text="{Binding Settings, Source={StaticResource Loc}}"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -130,7 +130,7 @@
                                                         <TextBlock Text="🚪" FontSize="16"
                                                                 Margin="0,0,15,0"
                                                                 VerticalAlignment="Center" />
-                                                        <TextBlock Text="Logout" FontSize="13"
+                                                        <TextBlock Text="{Binding Logout, Source={StaticResource Loc}}" FontSize="13"
                                                                 VerticalAlignment="Center" />
                                                 </StackPanel>
                                         </Button>
@@ -146,9 +146,9 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                                <TextBlock Text="Habits Manager" FontSize="28" FontWeight="Bold"
+                                <TextBlock Text="{Binding HabitsManager, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold"
                                         Foreground="{DynamicResource TextMainBrush}" />
-                                <TextBlock Text="What are you planning to achieve?"
+                                <TextBlock Text="{Binding WhatPlanToAchieve, Source={StaticResource Loc}}"
                                         FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
                                 <ProgressBar IsIndeterminate="True" Height="4" Margin="0,10,0,0"
                                         Foreground="#FF328A5D"
@@ -159,15 +159,15 @@
                                 CornerRadius="15" Margin="0,0,0,25" Padding="20"
                                 Visibility="{Binding IsAddFormVisible, Converter={StaticResource BoolToVis}}">
                                 <StackPanel>
-                                        <TextBlock Text="Add New Habit" FontSize="16"
+                                        <TextBlock Text="{Binding AddNewHabit, Source={StaticResource Loc}}" FontSize="16"
                                                 FontWeight="Bold"
                                                 Foreground="{DynamicResource TextMainBrush}"
                                                 Margin="0,0,0,15" />
 
                                         <!-- Mode selection: Built-in list vs Custom -->
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                                <Button Content="From List" Width="110" Margin="0,0,10,0" Click="ChooseBuiltIn_Click" />
-                                                <Button Content="Custom" Width="110" Click="ChooseCustom_Click" />
+                                                <Button Content="{Binding FromList, Source={StaticResource Loc}}" Width="110" Margin="0,0,10,0" Click="ChooseBuiltIn_Click" />
+                                                <Button Content="{Binding Custom, Source={StaticResource Loc}}" Width="110" Click="ChooseCustom_Click" />
                                         </StackPanel>
 
                                         <!-- Built-in mode -->
@@ -362,7 +362,7 @@
                                                 <ColumnDefinition />
                                                 <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Dashboard" FontSize="28" FontWeight="Bold"
+                                        <TextBlock Text="{Binding Dashboard, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold"
                                                    Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" />
                                         <TextBlock Grid.Column="1" Text="{Binding TodayDate}" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" />
                                 </Grid>
@@ -370,7 +370,7 @@
                                 <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}"
                                         CornerRadius="12" Padding="16" Margin="0,8,0,0">
                                         <StackPanel>
-                                                <TextBlock Text="My Habits" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,8" />
+                                                <TextBlock Text="{Binding MyHabits, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,8" />
                                                 <TextBlock Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap">
                                                         Personal habits will appear here.
                                                         <LineBreak/>
@@ -394,7 +394,7 @@
                                 <!-- Notes area: 1/3 height under habits -->
                                 <Border Grid.Row="2" Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="12" Margin="0,12,0,0">
                                         <StackPanel>
-                                                <TextBlock Text="My Notes" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,8" />
+                                                <TextBlock Text="{Binding MyNotes, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,8" />
                                                 <TextBox AcceptsReturn="True" TextWrapping="Wrap" Height="120" VerticalScrollBarVisibility="Auto" />
                                         </StackPanel>
                                 </Border>
@@ -410,8 +410,8 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                                        <TextBlock Text="Calendar" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                                        <TextBlock Text="Track your habits over time" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+                                        <TextBlock Text="{Binding Calendar, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                        <TextBlock Text="{Binding TrackHabitsOverTime, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
                                 </StackPanel>
 
                                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
@@ -429,8 +429,8 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                                        <TextBlock Text="Statistics" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                                        <TextBlock Text="View your progress and achievements" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+                                        <TextBlock Text="{Binding Statistics, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                        <TextBlock Text="{Binding ViewProgressAchievements, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
                                 </StackPanel>
 
                                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
@@ -448,8 +448,8 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                                        <TextBlock Text="PDF Report" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                                        <TextBlock Text="Generate and download your reports" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+                                        <TextBlock Text="{Binding PdfReport, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                        <TextBlock Text="{Binding GenerateDownloadReports, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
                                 </StackPanel>
 
                                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
@@ -467,8 +467,8 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Margin="0,0,0,24">
-                                        <TextBlock Text="Settings" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4" />
-                                        <TextBlock Text="Manage your account, preferences, and integrations." FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
+                                        <TextBlock Text="{Binding Settings, Source={StaticResource Loc}}" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4" />
+                                        <TextBlock Text="{Binding ManageAccount, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
                                 </StackPanel>
 
                                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,14,20">
@@ -483,9 +483,28 @@
                                                                         <ColumnDefinition Width="Auto" />
                                                                 </Grid.ColumnDefinitions>
                                                                 
-                                                                <Border Width="60" Height="60" CornerRadius="30" Background="#E6F4EA" VerticalAlignment="Center" Margin="0,0,16,0">
-                                                                        <TextBlock Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="#328A5D" FontWeight="Bold" />
-                                                                </Border>
+                                                                <Grid Width="60" Height="60" VerticalAlignment="Center" Margin="0,0,16,0">
+                                                                        <!-- Background circle with initial (always present as fallback) -->
+                                                                        <Border CornerRadius="30" Background="#E6F4EA">
+                                                                                <TextBlock Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="#328A5D" FontWeight="Bold" />
+                                                                        </Border>
+                                                                        <!-- Avatar image overlay (shown when avatar is available) -->
+                                                                        <Ellipse Width="60" Height="60">
+                                                                                <Ellipse.Style>
+                                                                                        <Style TargetType="Ellipse">
+                                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                                <Style.Triggers>
+                                                                                                        <DataTrigger Binding="{Binding HasAvatarImage}" Value="True">
+                                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                                        </DataTrigger>
+                                                                                                </Style.Triggers>
+                                                                                        </Style>
+                                                                                </Ellipse.Style>
+                                                                                <Ellipse.Fill>
+                                                                                        <ImageBrush ImageSource="{Binding AvatarImageSource}" Stretch="UniformToFill"/>
+                                                                                </Ellipse.Fill>
+                                                                        </Ellipse>
+                                                                </Grid>
                                                                 
                                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
@@ -495,14 +514,14 @@
                                                                 </StackPanel>
                                                                 
                                                                 <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Vertical">
-                                                                        <Button Content="Edit Profile" Width="100" Height="32" Margin="0,0,0,10" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMainBrush}" FontWeight="Bold" FontSize="12" BorderThickness="0" Cursor="Hand" Click="EditProfile_Click">
+                                                                        <Button Content="{Binding EditProfile, Source={StaticResource Loc}}" Width="100" Height="32" Margin="0,0,0,10" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMainBrush}" FontWeight="Bold" FontSize="12" BorderThickness="0" Cursor="Hand" Click="EditProfile_Click">
                                                                                 <Button.Resources>
                                                                                         <Style TargetType="Border">
                                                                                                 <Setter Property="CornerRadius" Value="16"/>
                                                                                         </Style>
                                                                                 </Button.Resources>
                                                                         </Button>
-                                                                        <TextBlock Text="Change Password" Foreground="#328A5D" FontSize="12" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="ChangePassword_Click" />
+                                                                        <TextBlock Text="{Binding ChangePassword, Source={StaticResource Loc}}" Foreground="#328A5D" FontSize="12" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="ChangePassword_Click" />
                                                                 </StackPanel>
                                                         </Grid>
                                                 </Border>
@@ -512,7 +531,7 @@
                                                         <StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                                                                         <TextBlock Text="⚙️" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                                                        <TextBlock Text="General" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="{Binding General, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
                                                                 </StackPanel>
                                                                 
                                                                 <Grid>
@@ -522,12 +541,12 @@
                                                                         </Grid.ColumnDefinitions>
                                                                         
                                                                         <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                                                                <TextBlock Text="Language" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
+                                                                                <TextBlock Text="{Binding Language, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
                                                                                 <ComboBox ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding SelectedLanguage}" Height="36" />
                                                                         </StackPanel>
                                                                         
                                                                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                                                                <TextBlock Text="Start of Week" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
+                                                                                <TextBlock Text="{Binding StartOfWeek, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
                                                                                 <ComboBox ItemsSource="{Binding AvailableWeekStarts}" SelectedItem="{Binding SelectedWeekStart}" Height="36" />
                                                                         </StackPanel>
                                                                 </Grid>
@@ -539,7 +558,7 @@
                                                         <StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                                                                         <TextBlock Text="🎨" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                                                        <TextBlock Text="Appearance" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="{Binding Appearance, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
                                                                 </StackPanel>
                                                                 
                                                                 <Grid>
@@ -548,10 +567,10 @@
                                                                                 <ColumnDefinition Width="Auto" />
                                                                 </Grid.ColumnDefinitions>
                                                                         <StackPanel Grid.Column="0">
-                                                                                <TextBlock Text="Dark Mode" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
-                                                                                <TextBlock Text="Switch between light and dark UI themes." FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                                <TextBlock Text="{Binding DarkMode, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                                                                <TextBlock Text="{Binding DarkModeDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
                                                                         </StackPanel>
-                                                                        <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" Click="DarkModeToggle_Click" x:Name="DarkModeToggle" />
+                                                                        <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" x:Name="DarkModeToggle" IsChecked="{Binding IsDarkMode, Mode=TwoWay}" />
                                                                 </Grid>
                                                         </StackPanel>
                                                 </Border>
@@ -561,7 +580,7 @@
                                                         <StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                                                                         <TextBlock Text="🔔" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                                                        <TextBlock Text="Notifications" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="{Binding Notifications, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
                                                                 </StackPanel>
                                                                 
                                                                 <Grid Margin="0,0,0,16">
@@ -571,14 +590,14 @@
                                                                                 <ColumnDefinition Width="Auto" />
                                                                         </Grid.ColumnDefinitions>
                                                                         <StackPanel Grid.Column="0">
-                                                                                <TextBlock Text="Daily Reminders" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
-                                                                                <TextBlock Text="Push notifications to keep your streak alive." FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                                <TextBlock Text="{Binding DailyReminders, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                                                                <TextBlock Text="{Binding DailyRemindersDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
                                                                         </StackPanel>
                                                                         
                                                                         <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Padding="10,4" Margin="0,0,12,0" VerticalAlignment="Center">
                                                                                 <StackPanel Orientation="Horizontal">
                                                                                         <TextBlock Text="⏱" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}"/>
-                                                                                        <ComboBox ItemsSource="{Binding AvailableReminderTimes}" SelectedItem="{Binding SelectedReminderTime}" Height="24" Width="60" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource TextMainBrush}"/>
+                                                                                        <ComboBox ItemsSource="{Binding AvailableReminderTimes}" SelectedItem="{Binding SelectedReminderTime}" Height="36" Width="130" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource TextMainBrush}" FontSize="13" VerticalContentAlignment="Center"/>
                                                                                 </StackPanel>
                                                                         </Border>
                                                                         
@@ -593,8 +612,8 @@
                                                                                 <ColumnDefinition Width="Auto" />
                                                                         </Grid.ColumnDefinitions>
                                                                         <StackPanel Grid.Column="0">
-                                                                                <TextBlock Text="Achievement Badges" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
-                                                                                <TextBlock Text="When you hit milestones or break records." FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                                <TextBlock Text="{Binding AchievementBadges, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                                                                <TextBlock Text="{Binding AchievementBadgesDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
                                                                         </StackPanel>
                                                                         <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsAchievementBadgesEnabled}" VerticalAlignment="Center"/>
                                                                 </Grid>
@@ -607,7 +626,7 @@
                                                                         <SolidColorBrush Color="{Binding StatusColor}" />
                                                                 </TextBlock.Foreground>
                                                         </TextBlock>
-                                                        <Button Content="Save Settings" Click="SaveSettings_Click"
+                                                        <Button Content="{Binding SaveSettings, Source={StaticResource Loc}}" Click="SaveSettings_Click"
                                                                 Background="#FF328A5D" Foreground="White"
                                                                 FontWeight="Bold" Padding="24,10"
                                                                 BorderThickness="0" Cursor="Hand"

@@ -25,7 +25,7 @@
             
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,24">
-                <TextBlock Text="Edit Profile" FontWeight="Bold" FontSize="16" Foreground="#1C1C1C" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding EditProfile, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="16" Foreground="#1C1C1C" VerticalAlignment="Center"/>
                 <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="#1C1C1C" FontSize="16" Cursor="Hand" Click="Close_Click"/>
             </Grid>
             
@@ -33,8 +33,14 @@
             <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,24">
                 <Grid Width="100" Height="100">
                     <Ellipse Fill="#F0F4F2" Width="100" Height="100"/>
-                    <TextBlock Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36" Foreground="#328A5D" FontWeight="Bold" />
-                    <!-- Placeholder for image -->
+                    <TextBlock x:Name="AvatarInitial" Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36" Foreground="#328A5D" FontWeight="Bold" />
+                    
+                    <!-- Avatar image (shown when a photo is selected) -->
+                    <Ellipse x:Name="AvatarImageEllipse" Width="100" Height="100" Visibility="Collapsed">
+                        <Ellipse.Fill>
+                            <ImageBrush x:Name="AvatarImage" Stretch="UniformToFill"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
                     
                     <Button Width="28" Height="28" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4" Background="#328A5D" Foreground="White" BorderThickness="2" BorderBrush="White" Cursor="Hand" Click="ChangePhoto_Click">
                         <Button.Template>
@@ -47,12 +53,12 @@
                         </Button.Template>
                     </Button>
                 </Grid>
-                <TextBlock Text="CHANGE PHOTO" Foreground="#328A5D" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" Margin="0,12,0,0" Cursor="Hand" MouseLeftButtonUp="ChangePhoto_Click"/>
+                <TextBlock Text="{Binding ChangePhoto, Source={StaticResource Loc}}" Foreground="#328A5D" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" Margin="0,12,0,0" Cursor="Hand" MouseLeftButtonUp="ChangePhoto_Click"/>
             </StackPanel>
             
             <!-- Full Name -->
             <StackPanel Grid.Row="2" Margin="0,0,0,24">
-                <TextBlock Text="FULL NAME" FontWeight="Bold" FontSize="11" Foreground="#8C9B9F" Margin="0,0,0,6"/>
+                <TextBlock Text="{Binding FullName, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="11" Foreground="#8C9B9F" Margin="0,0,0,6"/>
                 <TextBox x:Name="FullNameInput" Height="48" Padding="12,0" Background="#F2F3F5" BorderBrush="Transparent" BorderThickness="0" Foreground="#1C1C1C" FontSize="14" VerticalContentAlignment="Center">
                     <TextBox.Resources>
                         <Style TargetType="Border">
@@ -67,8 +73,8 @@
             
             <!-- Actions -->
             <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Cancel" Width="90" Height="38" Margin="0,0,12,0" Click="Close_Click" Background="Transparent" Foreground="#8C9B9F" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
-                <Button Content="Save Changes" Width="120" Height="38" Click="Save_Click" Background="#328A5D" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                <Button Content="{Binding Cancel, Source={StaticResource Loc}}" Width="90" Height="38" Margin="0,0,12,0" Click="Close_Click" Background="Transparent" Foreground="#8C9B9F" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+                <Button Content="{Binding SaveChanges, Source={StaticResource Loc}}" Width="120" Height="38" Click="Save_Click" Background="#328A5D" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="8"/>
