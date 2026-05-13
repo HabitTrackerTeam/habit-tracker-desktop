@@ -409,16 +409,220 @@
                                         <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
-                                <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                                        <TextBlock Text="{Binding Calendar, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                                        <TextBlock Text="{Binding TrackHabitsOverTime, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
-                                </StackPanel>
+                                <Grid Grid.Row="0" Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                            <!-- Navigation arrows -->
+                                            <Button Content="&lt;" Command="{Binding PreviousMonthCommand}" Background="Transparent" BorderThickness="0" FontSize="20" FontWeight="Bold" Margin="0,0,15,0" Cursor="Hand" Foreground="#111827" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding CurrentMonthYear}" FontSize="28" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Center" />
+                                            <Button Content="&gt;" Command="{Binding NextMonthCommand}" Background="Transparent" BorderThickness="0" FontSize="20" FontWeight="Bold" Margin="15,0,0,0" Cursor="Hand" Foreground="#111827" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding CurrentProtocolText}" FontSize="14" Foreground="#6B7280" />
+                                    </StackPanel>
 
-                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
-                                        <TextBlock Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="20">
-                                                Calendar content will be added here.
-                                        </TextBlock>
-                                </ScrollViewer>
+                                    <!-- Monthly / Weekly toggle -->
+                                    <Border Grid.Column="1" Background="#F8FAFC" CornerRadius="10" Padding="4" VerticalAlignment="Top">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Command="{Binding SetMonthlyViewCommand}" BorderThickness="0" Cursor="Hand" Background="Transparent" Padding="0">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border CornerRadius="8" Padding="15,8" Background="{TemplateBinding Background}">
+                                                            <Border.Style>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="Background" Value="Transparent" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsMonthlyView}" Value="True">
+                                                                            <Setter Property="Background" Value="White" />
+                                                                            <Setter Property="Effect">
+                                                                                <Setter.Value>
+                                                                                    <DropShadowEffect BlurRadius="4" ShadowDepth="1" Opacity="0.05" />
+                                                                                </Setter.Value>
+                                                                            </Setter>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Border.Style>
+                                                            <TextBlock Text="Monthly" FontSize="12">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Foreground" Value="#6B7280" />
+                                                                        <Setter Property="FontWeight" Value="Normal" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsMonthlyView}" Value="True">
+                                                                                <Setter Property="Foreground" Value="#328A5D" />
+                                                                                <Setter Property="FontWeight" Value="Bold" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                            
+                                            <Button Command="{Binding SetWeeklyViewCommand}" BorderThickness="0" Cursor="Hand" Background="Transparent" Padding="0">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border CornerRadius="8" Padding="15,8" Background="{TemplateBinding Background}">
+                                                            <Border.Style>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="Background" Value="Transparent" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsMonthlyView}" Value="False">
+                                                                            <Setter Property="Background" Value="White" />
+                                                                            <Setter Property="Effect">
+                                                                                <Setter.Value>
+                                                                                    <DropShadowEffect BlurRadius="4" ShadowDepth="1" Opacity="0.05" />
+                                                                                </Setter.Value>
+                                                                            </Setter>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Border.Style>
+                                                            <TextBlock Text="Weekly" FontSize="12">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Foreground" Value="#6B7280" />
+                                                                        <Setter Property="FontWeight" Value="Normal" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsMonthlyView}" Value="False">
+                                                                                <Setter Property="Foreground" Value="#328A5D" />
+                                                                                <Setter Property="FontWeight" Value="Bold" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Days of week -->
+                                    <Grid Grid.Row="0" Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Column="0" Text="MON" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#9CA3AF" FontSize="11" />
+                                        <TextBlock Grid.Column="1" Text="TUE" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#9CA3AF" FontSize="11" />
+                                        <TextBlock Grid.Column="2" Text="WED" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#9CA3AF" FontSize="11" />
+                                        <TextBlock Grid.Column="3" Text="THU" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#9CA3AF" FontSize="11" />
+                                        <TextBlock Grid.Column="4" Text="FRI" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#9CA3AF" FontSize="11" />
+                                        <TextBlock Grid.Column="5" Text="SAT" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#9CA3AF" FontSize="11" />
+                                        <TextBlock Grid.Column="6" Text="SUN" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#9CA3AF" FontSize="11" />
+                                    </Grid>
+
+                                    <!-- Calendar Grid -->
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{Binding CalendarDays}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Columns="7" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Margin="4" CornerRadius="10" Height="85" Cursor="Hand" Padding="8,8,8,4">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="Transparent" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCurrentMonth}" Value="True">
+                                                                        <Setter Property="Background" Value="White" />
+                                                                        <Setter Property="Effect">
+                                                                            <Setter.Value>
+                                                                                <DropShadowEffect BlurRadius="10" Opacity="0.08" ShadowDepth="2" Direction="270" Color="Black" />
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                        <Setter Property="Background" Value="#328A5D" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="*" />
+                                                                <RowDefinition Height="Auto" />
+                                                            </Grid.RowDefinitions>
+
+                                                            <TextBlock Grid.Row="0" Text="{Binding DayNumber}" FontWeight="Bold" FontSize="11">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Foreground" Value="#111827" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
+                                                                                <Setter Property="Foreground" Value="#D1D5DB" />
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                                <Setter Property="Foreground" Value="White" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+
+                                                            <Border Grid.Row="1" Background="{Binding BadgeColor}" CornerRadius="12" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="8,4" Margin="0,2,0,0">
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding PercentageText}" Value="">
+                                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                                <TextBlock Text="{Binding PercentageText}" FontSize="9" FontWeight="Bold">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="Foreground" Value="#328A5D" />
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding BadgeColor}" Value="#FFF0F0">
+                                                                                    <Setter Property="Foreground" Value="#D32F2F" />
+                                                                                </DataTrigger>
+                                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                                    <Setter Property="Foreground" Value="White" />
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+                                                            </Border>
+
+                                                            <Ellipse Grid.Row="2" Width="4" Height="4" Fill="{Binding DotColor}" HorizontalAlignment="Center" Margin="0,5,0,0" />
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
                         </Grid>
 
                         <!-- Statistics Section -->
