@@ -181,12 +181,53 @@ namespace HabitTracker.ViewModels{
             set { _measurementDate = value; OnPropertyChanged(); }
         }
 
+        private string _currentMonthYear;
+        public string CurrentMonthYear
+        {
+            get => _currentMonthYear;
+            set { _currentMonthYear = value; OnPropertyChanged(); }
+        }
+
+        private string _currentProtocolText = "Focusing on \"Mindful Mornings\" protocol";
+        public string CurrentProtocolText
+        {
+            get => _currentProtocolText;
+            set { _currentProtocolText = value; OnPropertyChanged(); }
+        }
+
+        private ObservableCollection<CalendarDayViewModel> _calendarDays = new ObservableCollection<CalendarDayViewModel>();
+        public ObservableCollection<CalendarDayViewModel> CalendarDays
+        {
+            get => _calendarDays;
+            set { _calendarDays = value; OnPropertyChanged(); }
+        }
+
+        public ICommand PreviousMonthCommand { get; }
+        public ICommand NextMonthCommand { get; }
+
+        private bool _isMonthlyView = true;
+        public bool IsMonthlyView
+        {
+            get => _isMonthlyView;
+            set { _isMonthlyView = value; OnPropertyChanged(); }
+        }
+
+        public ICommand SetMonthlyViewCommand { get; }
+        public ICommand SetWeeklyViewCommand { get; }
+
+        private DateTime _currentCalendarDate = DateTime.Now;
+
         public DashboardViewModel()
         {
             AddMeasurementCommand = new RelayCommand(ExecuteAddMeasurement, CanExecuteAddMeasurement);
             RemoveMeasurementCommand = new RelayCommand(ExecuteRemoveMeasurement);
             OpenLogModalCommand = new RelayCommand(_ => IsModalOpen = true);
             CloseLogModalCommand = new RelayCommand(_ => IsModalOpen = false);
+            PreviousMonthCommand = new RelayCommand(_ => ChangeMonth(-1));
+            NextMonthCommand = new RelayCommand(_ => ChangeMonth(1));
+            SetMonthlyViewCommand = new RelayCommand(_ => IsMonthlyView = true);
+            SetWeeklyViewCommand = new RelayCommand(_ => IsMonthlyView = false);
+            GenerateCalendar();
             // Initialize today's date and start timer to update it every minute
             UpdateTodayDate();
             var timer = new DispatcherTimer();
@@ -744,6 +785,78 @@ namespace HabitTracker.ViewModels{
         private void UpdateTodayDate()
         {
             TodayDate = DateTime.Now.ToString("yyyy-MM-dd, dddd", CultureInfo.GetCultureInfo("en-US"));
+        }
+
+        private void ChangeMonth(int monthsToAdd)
+        {
+            _currentCalendarDate = _currentCalendarDate.AddMonths(monthsToAdd);
+            GenerateCalendar();
+        }
+
+        private void GenerateCalendar()
+        {
+            CurrentMonthYear = _currentCalendarDate.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("en-US"));
+            var days = new ObservableCollection<CalendarDayViewModel>();
+            
+            var firstDayOfMonth = new DateTime(_currentCalendarDate.Year, _currentCalendarDate.Month, 1);
+            var daysInMonth = DateTime.DaysInMonth(_currentCalendarDate.Year, _currentCalendarDate.Month);
+            
+            // Assuming week starts on Monday
+            int startDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+            if (startDayOfWeek == 0) startDayOfWeek = 7; // Sunday is 7
+            
+            var startDate = firstDayOfMonth.AddDays(-(startDayOfWeek - 1));
+            var rnd = new Random();
+            
+            // We usually need 35 or 42 days to fill a calendar grid
+            int totalDays = 42; 
+            if (startDayOfWeek == 1 && daysInMonth == 28) totalDays = 28;
+            else if (startDayOfWeek + daysInMonth - 1 <= 35) totalDays = 35;
+            
+            for (int i = 0; i < totalDays; i++)
+            {
+                var date = startDate.AddDays(i);
+                bool isCurrentMonth = date.Month == _currentCalendarDate.Month;
+                bool isToday = date.Date == DateTime.Today;
+                
+                int percentage = rnd.Next(40, 100); 
+                if (rnd.Next(0, 10) > 8) percentage = 0;
+                if (isToday) percentage = 100;
+
+                string badgeColor = "#E6F4EA"; // Light green
+                string dotColor = "#328A5D"; // Green dot
+                
+                if (percentage < 50) 
+                {
+                    badgeColor = "#FFF0F0"; // Light red
+                    dotColor = "#D32F2F"; // Red dot
+                }
+                if (percentage == 0)
+                {
+                    badgeColor = "#F0F2F5"; // Gray
+                    dotColor = "Transparent"; 
+                }
+
+                if(isToday)
+                {
+                    badgeColor = "#4CA475"; // Darker green for today
+                    dotColor = "#FFFFFF"; // White dot
+                }
+
+                days.Add(new CalendarDayViewModel
+                {
+                    Date = date,
+                    DayNumber = date.ToString("dd"),
+                    PercentageText = isCurrentMonth ? $"{percentage}%" : "",
+                    IsCurrentMonth = isCurrentMonth,
+                    IsToday = isToday,
+                    IsSelected = isToday,
+                    BadgeColor = badgeColor,
+                    DotColor = dotColor
+                });
+            }
+            
+            CalendarDays = days;
         }
     }
 }
