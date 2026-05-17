@@ -1,5 +1,7 @@
 using System.Windows;
 using HabitTracker.ViewModels;
+using System.Linq;
+using HabitTracker.Models;
 
 namespace HabitTracker.Views;
 
@@ -252,6 +254,32 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         if (_dashboardVM != null)
         {
             await _dashboardVM.CreateHabitAsync();
+        }
+    }
+
+    private void EditHabit_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null && sender is System.Windows.Controls.Button btn && btn.DataContext is Habits habit)
+        {
+            _dashboardVM.NewHabitName = habit.Name ?? string.Empty;
+            var cat = _dashboardVM.Categories?.FirstOrDefault(c => c.Id == habit.CategoryId);
+            if (cat != null) _dashboardVM.SelectedCategory = cat;
+            var type = _dashboardVM.HabitTypes?.FirstOrDefault(t => t.Id == habit.HabitTypeId);
+            if (type != null) _dashboardVM.SelectedType = type;
+            _dashboardVM.IsAddFormVisible = true;
+        }
+    }
+
+    private void DeleteHabit_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dashboardVM != null && sender is System.Windows.Controls.Button btn && btn.DataContext is Habits habit)
+        {
+            var res = System.Windows.MessageBox.Show($"Are you sure you want to deactivate '{habit.Name}'?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (res == MessageBoxResult.Yes)
+            {
+                _dashboardVM.Habits.Remove(habit);
+                // TODO: call backend to mark habit as inactive/persist change
+            }
         }
     }
 
