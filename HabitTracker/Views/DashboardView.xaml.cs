@@ -2,6 +2,7 @@ using System.Windows;
 using HabitTracker.ViewModels;
 using System.Linq;
 using HabitTracker.Models;
+using HabitTracker.Views;
 
 namespace HabitTracker.Views;
 
@@ -54,7 +55,13 @@ public partial class DashboardView : System.Windows.Controls.UserControl
 
     private async void AddHabit_Click(object sender, RoutedEventArgs e)
     {
-        await _dashboardVM.CreateHabitAsync();
+        var addHabitWindow = new AddHabitWindow(_dashboardVM);
+        addHabitWindow.Owner = Window.GetWindow(this);
+        if (addHabitWindow.ShowDialog() == true)
+        {
+            // Dialog closed successfully, refresh list
+            await _dashboardVM.LoadHabitsAsync();
+        }
     }
 
     private void ChooseBuiltIn_Click(object sender, RoutedEventArgs e)
