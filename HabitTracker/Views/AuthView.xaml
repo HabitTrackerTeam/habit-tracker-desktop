@@ -210,12 +210,14 @@
                                                                                  Height="56"
                                                                                  Tag="Password"
                                                                                  Padding="0,0,44,0"
+                                                                                 KeyDown="PasswordBox_KeyDown"
                                                                                  Visibility="Collapsed"/>
 
                                                                         <PasswordBox x:Name="LoginPassword"
                                                                                      Height="56"
                                                                                      Tag="Password"
-                                                                                     Padding="0,0,44,0"/>
+                                                                                     Padding="0,0,44,0"
+                                                                                     KeyDown="PasswordBox_KeyDown"/>
 
                                                                         <Button Width="34"
                                                                                 Height="34"
