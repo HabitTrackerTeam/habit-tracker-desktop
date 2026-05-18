@@ -142,211 +142,156 @@
                                 <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
                                         <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
-                                <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                                <TextBlock Text="{Binding HabitsManager, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold"
-                                        Foreground="{DynamicResource TextMainBrush}" />
-                                <TextBlock Text="{Binding WhatPlanToAchieve, Source={StaticResource Loc}}"
-                                        FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
-                                <ProgressBar IsIndeterminate="True" Height="4" Margin="0,10,0,0"
-                                        Foreground="#FF328A5D"
-                                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}" />
-                        </StackPanel>
-
-                        <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}"
-                                CornerRadius="15" Margin="0,0,0,25" Padding="20"
-                                Visibility="{Binding IsAddFormVisible, Converter={StaticResource BoolToVis}}">
-                                <StackPanel>
-                                        <TextBlock Text="{Binding AddNewHabit, Source={StaticResource Loc}}" FontSize="16"
-                                                FontWeight="Bold"
-                                                Foreground="{DynamicResource TextMainBrush}"
-                                                Margin="0,0,0,15" />
-
-                                        <!-- Mode selection: Built-in list vs Custom -->
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                                <Button Content="{Binding FromList, Source={StaticResource Loc}}" Width="110" Margin="0,0,10,0" Click="ChooseBuiltIn_Click" />
-                                                <Button Content="{Binding Custom, Source={StaticResource Loc}}" Width="110" Click="ChooseCustom_Click" />
+                                <!-- Header Section -->
+                                <Grid Grid.Row="0" Margin="0,0,0,24">
+                                        <StackPanel VerticalAlignment="Top">
+                                                <TextBlock Text="{Binding HabitsManager, Source={StaticResource Loc}}" FontSize="32" FontWeight="Bold"
+                                                        Foreground="{DynamicResource TextMainBrush}" />
+                                                <TextBlock Text="{Binding WhatPlanToAchieve, Source={StaticResource Loc}}"
+                                                        FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
                                         </StackPanel>
 
-                                        <!-- Built-in mode -->
-                                        <StackPanel Visibility="{Binding IsBuiltInMode, Converter={StaticResource BoolToVis}}">
-                                                        <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="*" />
-                                                                        <ColumnDefinition Width="Auto" />
-                                                                </Grid.ColumnDefinitions>
+                                        <!-- Add Habit Button -->
+                                        <Button HorizontalAlignment="Right" VerticalAlignment="Top" 
+                                                Click="AddHabit_Click" 
+                                                Background="{DynamicResource AccentGreenBrush}" 
+                                                Foreground="White" 
+                                                FontWeight="Bold" 
+                                                FontSize="16"
+                                                Padding="24,14" 
+                                                BorderThickness="0" 
+                                                Cursor="Hand">
+                                                <StackPanel Orientation="Horizontal" Margin="0">
+                                                        <TextBlock Text="+" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                                        <TextBlock Text="Add Habit" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                        </Button>
+                                </Grid>
 
-                                                                <Grid>
-                                                                        <ComboBox x:Name="BuiltInCombo" ItemsSource="{Binding BuiltInHabits}"
-                                                                                  SelectedItem="{Binding SelectedBuiltInHabit}"
-                                                                                  Margin="0,0,10,0" Height="50" Padding="10,8" VerticalContentAlignment="Center" FontSize="14" />
+                                <!-- Search Box -->
+                                <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,16">
+                                        <TextBox x:Name="SearchBox" Tag="Search habits..." Height="44" Margin="0" />
+                                </Border>
 
-                                                                        <TextBlock Text="Choose a habit from the list"
-                                                                                   IsHitTestVisible="False"
-                                                                                   Margin="14,0,10,0"
-                                                                                   VerticalAlignment="Center"
-                                                                                   Foreground="{DynamicResource TextMutedBrush}"
-                                                                                   FontSize="14">
-                                                                                <TextBlock.Style>
-                                                                                        <Style TargetType="TextBlock">
-                                                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                                                                <Style.Triggers>
-                                                                                                        <DataTrigger Binding="{Binding SelectedItem, ElementName=BuiltInCombo}" Value="{x:Null}">
-                                                                                                                <Setter Property="Visibility" Value="Visible" />
-                                                                                                        </DataTrigger>
-                                                                                                </Style.Triggers>
-                                                                                        </Style>
-                                                                                </TextBlock.Style>
-                                                                        </TextBlock>
-                                                                </Grid>
+                                <!-- Filter Boxes -->
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20">
+                                        <!-- Priority Filter -->
+                                        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="12" MinWidth="180" Margin="0,0,12,0">
+                                                <StackPanel>
+                                                        <TextBlock Text="PRIORITY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8" />
+                                                        <ComboBox x:Name="PriorityFilter" ItemsSource="{Binding Priorities}" SelectedItem="{Binding SelectedPriority}" DisplayMemberPath="Name" Height="36" Padding="10,6" />
+                                                </StackPanel>
+                                        </Border>
 
-                                                                <Button Grid.Column="1" Content="Add Selected"
-                                                                        Click="AddBuiltIn_Click"
-                                                                        Background="#FF328A5D" Foreground="White"
-                                                                        FontWeight="Bold" Padding="18,0" Height="50"
-                                                                        BorderThickness="0" Cursor="Hand" />
-                                                        </Grid>
-                                        </StackPanel>
+                                        <!-- Category Filter -->
+                                        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="12" MinWidth="180" Margin="0,0,12,0">
+                                                <StackPanel>
+                                                        <TextBlock Text="CATEGORY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8" />
+                                                        <ComboBox x:Name="CategoryFilter" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategoryFilter}" DisplayMemberPath="Name" Height="36" Padding="10,6" />
+                                                </StackPanel>
+                                        </Border>
 
-                                        <!-- Custom mode -->
-                                        <StackPanel Visibility="{Binding IsCustomMode, Converter={StaticResource BoolToVis}}">
-                                                <Grid>
+                                        <!-- Status Filter -->
+                                        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="12" MinWidth="180" Margin="0,0,12,0">
+                                                <StackPanel>
+                                                        <TextBlock Text="STATUS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8" />
+                                                        <ComboBox x:Name="StatusFilter" ItemsSource="{Binding Statuses}" SelectedItem="{Binding SelectedStatus}" DisplayMemberPath="Name" Height="36" Padding="10,6" />
+                                                </StackPanel>
+                                        </Border>
+
+                                        <!-- Frequency Filter -->
+                                        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="12" MinWidth="180">
+                                                <StackPanel>
+                                                        <TextBlock Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8" />
+                                                        <ComboBox x:Name="FrequencyFilter" ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedFrequency}" DisplayMemberPath="Name" Height="36" Padding="10,6" />
+                                                </StackPanel>
+                                        </Border>
+                                </StackPanel>
+
+                                <!-- Habits List Container -->
+                                <Border Grid.Row="3" Background="{DynamicResource CardBgBrush}" CornerRadius="15" Padding="20">
+                                        <Grid>
+                                                <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="*" />
+                                                </Grid.RowDefinitions>
+
+                                                <!-- List Header -->
+                                                <Grid Grid.Row="0" Margin="0,0,0,12">
                                                         <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="180" />
+                                                                <ColumnDefinition Width="140" />
+                                                                <ColumnDefinition Width="100" />
                                                         </Grid.ColumnDefinitions>
 
-                                                        <TextBox
-                                                                Text="{Binding NewHabitName, UpdateSourceTrigger=PropertyChanged}"
-                                                                Margin="0,0,10,0"
-                                                                VerticalContentAlignment="Center"
-                                                                Height="50" Padding="10,8"
-                                                                FontSize="14"
-                                                                Tag="Habit name (e.g. Morning Run)..." />
-
-                                                        <ComboBox Grid.Column="1"
-                                                                ItemsSource="{Binding Categories}"
-                                                                SelectedItem="{Binding SelectedCategory}"
-                                                                DisplayMemberPath="Name" Width="140"
-                                                                Margin="0,0,10,0" Height="50" Padding="10,8"
-                                                                VerticalContentAlignment="Center" FontSize="14" />
-
-                                                        <ComboBox Grid.Column="2"
-                                                                ItemsSource="{Binding HabitTypes}"
-                                                                SelectedItem="{Binding SelectedType}"
-                                                                DisplayMemberPath="Type" Width="120"
-                                                                Margin="0,0,10,0" Height="50" Padding="10,8"
-                                                                VerticalContentAlignment="Center" FontSize="14" />
-
-                                                        <Button Grid.Column="3" Content="Save Habit"
-                                                                Click="SaveHabit_Click"
-                                                                Background="#FF328A5D" Foreground="White"
-                                                                FontWeight="Bold" Padding="20,0" Height="50"
-                                                                BorderThickness="0" Cursor="Hand" />
-                                                </Grid>
-                                        </StackPanel>
-                                </StackPanel>
-                        </Border>
-
-                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
-                                Padding="0,0,10,0">
-                                <ItemsControl ItemsSource="{Binding Habits}">
-                                        <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                        <Border
-                                                                Background="{DynamicResource CardBgBrush}"
-                                                                CornerRadius="15" Margin="0,0,0,15"
-                                                                Padding="20">
-                                                                <Border.Effect>
-                                                                        <DropShadowEffect
-                                                                                BlurRadius="10"
-                                                                                Opacity="0.05"
-                                                                                ShadowDepth="2" />
-                                                                </Border.Effect>
+                                                        <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource InputBorderBrush}" Padding="0,0,0,12">
                                                                 <Grid>
                                                                         <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition
-                                                                                        Width="*" />
-                                                                                <ColumnDefinition
-                                                                                        Width="Auto" />
-                                                                                <ColumnDefinition
-                                                                                        Width="Auto" />
-                                                                                <ColumnDefinition
-                                                                                        Width="Auto" />
+                                                                                <ColumnDefinition Width="*" />
                                                                         </Grid.ColumnDefinitions>
-
-                                                                        <StackPanel Grid.Column="0"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Bottom">
-                                                                                <TextBlock
-                                                                                        Text="Habit Name"
-                                                                                        FontSize="12"
-                                                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                                                        Margin="0,0,0,5"
-                                                                                        FontWeight="SemiBold" />
-                                                                                <TextBox
-                                                                                        Text="{Binding NewHabitName, UpdateSourceTrigger=PropertyChanged}"
-                                                                                        Padding="10,8"
-                                                                                        Height="50"
-                                                                                        VerticalAlignment="Center"
-                                                                                        Tag="e.g. Morning Run..." />
-                                                                        </StackPanel>
-
-                                                                        <StackPanel Grid.Column="1"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Bottom">
-                                                                                <TextBlock
-                                                                                        Text="Category"
-                                                                                        FontSize="12"
-                                                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                                                        Margin="0,0,0,5"
-                                                                                        FontWeight="SemiBold" />
-                                                                                <ComboBox
-                                                                                        ItemsSource="{Binding Categories}"
-                                                                                        SelectedItem="{Binding SelectedCategory}"
-                                                                                        DisplayMemberPath="Name"
-                                                                                        Width="140"
-                                                                                        Padding="10,8" />
-                                                                        </StackPanel>
-
-                                                                        <StackPanel Grid.Column="2"
-                                                                                Margin="0,0,15,0"
-                                                                                VerticalAlignment="Bottom">
-                                                                                <TextBlock
-                                                                                        Text="Type"
-                                                                                        FontSize="12"
-                                                                                        Foreground="{DynamicResource TextMutedBrush}"
-                                                                                        Margin="0,0,0,5"
-                                                                                        FontWeight="SemiBold" />
-                                                                                <ComboBox
-                                                                                        ItemsSource="{Binding HabitTypes}"
-                                                                                        SelectedItem="{Binding SelectedType}"
-                                                                                        DisplayMemberPath="Type"
-                                                                                        Width="120"
-                                                                                        Padding="10,8" />
-                                                                        </StackPanel>
-
-                                                                        <Button Grid.Column="3"
-                                                                                Content="Save Habit"
-                                                                                Click="SaveHabit_Click"
-                                                                                Background="#FF328A5D"
-                                                                                Foreground="White"
-                                                                                FontWeight="Bold"
-                                                                                Padding="20,0"
-                                                                                Height="36"
-                                                                                BorderThickness="0"
-                                                                                Cursor="Hand"
-                                                                                VerticalAlignment="Bottom" />
+                                                                        <TextBlock Text="HABIT DETAILS" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="12" />
                                                                 </Grid>
                                                         </Border>
-                                                </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                        </ScrollViewer>
+                                                        
+                                                        <TextBlock Grid.Column="1" Text="CATEGORY" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,12" />
+                                                        <TextBlock Grid.Column="2" Text="FREQUENCY" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,12" />
+                                                        <TextBlock Grid.Column="3" Text="ACTIONS" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                                                </Grid>
+
+                                                <!-- Habits Items List -->
+                                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                                                        <ItemsControl ItemsSource="{Binding Habits}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                                <Border Background="Transparent" CornerRadius="12" Padding="0,12,0,12" Margin="0,0,0,0" BorderThickness="0,0,0,1" BorderBrush="#FFF0F3F1">
+                                                                                        <Grid>
+                                                                                                <Grid.ColumnDefinitions>
+                                                                                                        <ColumnDefinition Width="*" />
+                                                                                                        <ColumnDefinition Width="180" />
+                                                                                                        <ColumnDefinition Width="140" />
+                                                                                                        <ColumnDefinition Width="100" />
+                                                                                                </Grid.ColumnDefinitions>
+
+                                                                                                <!-- Habit Details (Icon + Name) -->
+                                                                                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                                                        <Border Width="40" Height="40" Background="#E9FFF3" CornerRadius="10" VerticalAlignment="Center">
+                                                                                                                <TextBlock Text="💧" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
+                                                                                                        </Border>
+                                                                                                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                                                                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" />
+                                                                                                        </StackPanel>
+                                                                                                </StackPanel>
+
+                                                                                                <!-- Category -->
+                                                                                                <TextBlock Grid.Column="1" Text="{Binding Category.Name}" VerticalAlignment="Center" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
+
+                                                                                                <!-- Frequency Badge -->
+                                                                                                <Border Grid.Column="2" Background="#E6F8F0" CornerRadius="8" Padding="10,6" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                                                                        <TextBlock Text="{Binding Period}" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" FontSize="11" />
+                                                                                                </Border>
+
+                                                                                                <!-- Actions -->
+                                                                                                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                                                        <Button Click="EditHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" Margin="0,0,8,0" ToolTip="Edit">
+                                                                                                                <TextBlock Text="✏️" FontSize="14" />
+                                                                                                        </Button>
+                                                                                                        <Button Click="DeleteHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" ToolTip="Delete">
+                                                                                                                <TextBlock Text="🗑️" FontSize="14" />
+                                                                                                        </Button>
+                                                                                                </StackPanel>
+                                                                                        </Grid>
+                                                                                </Border>
+                                                                        </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                </ScrollViewer>
+                                        </Grid>
+                                </Border>
                         </Grid>
 
                         <!-- Dashboard personal habits visualization -->

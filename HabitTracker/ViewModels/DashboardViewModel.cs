@@ -17,11 +17,38 @@ using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 
 namespace HabitTracker.ViewModels{
+
+    // Helper class for filter items
+    public class FilterItem
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
     public class DashboardViewModel:ViewModelBase{
         //Lista automatycznie odswiezajaca XAML, gdy pojawia sie w niej nowe dane
         private ObservableCollection<Habits> _habits = new ObservableCollection<Habits>();
         public ObservableCollection<HabitCategory> Categories {get;set;} = new();
         public ObservableCollection<HabitTypes> HabitTypes {get;set;} = new();
+        
+        // Filter collections
+        public ObservableCollection<FilterItem> Priorities { get; set; } = new();
+        public ObservableCollection<FilterItem> Statuses { get; set; } = new();
+        public ObservableCollection<FilterItem> Frequencies { get; set; } = new();
+
+        // Selected filters
+        private FilterItem _selectedPriority;
+        public FilterItem SelectedPriority { get => _selectedPriority; set { _selectedPriority = value; OnPropertyChanged(); } }
+
+        private FilterItem _selectedStatus;
+        public FilterItem SelectedStatus { get => _selectedStatus; set { _selectedStatus = value; OnPropertyChanged(); } }
+
+        private FilterItem _selectedFrequency;
+        public FilterItem SelectedFrequency { get => _selectedFrequency; set { _selectedFrequency = value; OnPropertyChanged(); } }
+
+        private HabitCategory _selectedCategoryFilter;
+        public HabitCategory SelectedCategoryFilter { get => _selectedCategoryFilter; set { _selectedCategoryFilter = value; OnPropertyChanged(); } }
+
         //Pola zbierajace dane z formularza
         private string _newHabitName;
         public string NewHabitName{get=>_newHabitName; set{_newHabitName=value; OnPropertyChanged();}}
@@ -228,12 +255,39 @@ namespace HabitTracker.ViewModels{
             SetMonthlyViewCommand = new RelayCommand(_ => IsMonthlyView = true);
             SetWeeklyViewCommand = new RelayCommand(_ => IsMonthlyView = false);
             GenerateCalendar();
+            
+            // Initialize filter options
+            InitializeFilters();
+            
             // Initialize today's date and start timer to update it every minute
             UpdateTodayDate();
             var timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMinutes(1);
             timer.Tick += (s, e) => UpdateTodayDate();
             timer.Start();
+        }
+
+        private void InitializeFilters()
+        {
+            // Priorities
+            Priorities.Add(new FilterItem { Id = "all", Name = "All Priorities" });
+            Priorities.Add(new FilterItem { Id = "1", Name = "High" });
+            Priorities.Add(new FilterItem { Id = "2", Name = "Medium" });
+            Priorities.Add(new FilterItem { Id = "3", Name = "Low" });
+            SelectedPriority = Priorities.First();
+
+            // Statuses
+            Statuses.Add(new FilterItem { Id = "all", Name = "Active Habits" });
+            Statuses.Add(new FilterItem { Id = "active", Name = "Active Only" });
+            Statuses.Add(new FilterItem { Id = "archived", Name = "Archived" });
+            SelectedStatus = Statuses.First();
+
+            // Frequencies
+            Frequencies.Add(new FilterItem { Id = "all", Name = "Every Day" });
+            Frequencies.Add(new FilterItem { Id = "daily", Name = "Daily" });
+            Frequencies.Add(new FilterItem { Id = "weekly", Name = "Weekly" });
+            Frequencies.Add(new FilterItem { Id = "monthly", Name = "Monthly" });
+            SelectedFrequency = Frequencies.First();
         }
 
         private bool CanExecuteAddMeasurement(object obj)

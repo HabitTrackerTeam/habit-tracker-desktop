@@ -62,6 +62,15 @@ public partial class AuthView : System.Windows.Controls.UserControl
         }
     }
 
+    private void PasswordBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Return)
+        {
+            LoginButton_Click(this, new RoutedEventArgs());
+            e.Handled = true;
+        }
+    }
+
     private async void RegisterButton_Click(object sender, RoutedEventArgs e)
     {
         string password = RegisterPassword.Visibility == Visibility.Visible ? RegisterPassword.Password : RegisterPasswordVisible.Text;
