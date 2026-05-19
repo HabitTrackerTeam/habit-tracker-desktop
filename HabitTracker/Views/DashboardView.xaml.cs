@@ -384,6 +384,8 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         {
             if (b == null) continue;
             b.ClearValue(System.Windows.Controls.Button.BackgroundProperty);
+            b.ClearValue(System.Windows.Controls.Button.BorderThicknessProperty);
+            b.ClearValue(System.Windows.Controls.Button.BorderBrushProperty);
             if (b.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
             {
                 if (sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
@@ -397,10 +399,13 @@ public partial class DashboardView : System.Windows.Controls.UserControl
 
         if (activeBtn != null)
         {
-            activeBtn.SetResourceReference(System.Windows.Controls.Button.BackgroundProperty, "InputBgBrush");
+            activeBtn.Background = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#ECFDF5"));
+            activeBtn.BorderThickness = new System.Windows.Thickness(0, 0, 4, 0);
+            activeBtn.BorderBrush = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#059669"));
+            
             if (activeBtn.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
             {
-                var greenBrush = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#328A5D"));
+                var greenBrush = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#047857"));
                 if (sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.Foreground = greenBrush;
                 if (sp.Children[1] is System.Windows.Controls.TextBlock tb2)
                 {
