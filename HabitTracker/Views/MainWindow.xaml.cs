@@ -60,12 +60,12 @@ public partial class MainWindow : Window
             bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF121212"), 0.0));
             bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF1E1E1E"), 1.0));
 
-            this.Resources["AppBgBrush"] = bgBrush;
-            this.Resources["CardBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF2D2D30");
-            this.Resources["TextMainBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFE0E0E0");
-            this.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFA0A0A0");
-            this.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF1E1E1E");
-            this.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF434346");
+            Application.Current.Resources["AppBgBrush"] = bgBrush;
+            Application.Current.Resources["CardBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF2D2D30");
+            Application.Current.Resources["TextMainBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFE0E0E0");
+            Application.Current.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFA0A0A0");
+            Application.Current.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF1E1E1E");
+            Application.Current.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF434346");
         }
         else
         {
@@ -76,12 +76,12 @@ public partial class MainWindow : Window
             bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFF4F4E9"), 0.0));
             bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFE4E8E5"), 1.0));
 
-            this.Resources["AppBgBrush"] = bgBrush;
-            this.Resources["CardBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("White");
-            this.Resources["TextMainBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF4E606C");
-            this.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF8B9AA2");
-            this.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFF8F9FA");
-            this.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFDDE2E5");
+            Application.Current.Resources["AppBgBrush"] = bgBrush;
+            Application.Current.Resources["CardBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("White");
+            Application.Current.Resources["TextMainBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF4E606C");
+            Application.Current.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF8B9AA2");
+            Application.Current.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFF8F9FA");
+            Application.Current.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFDDE2E5");
         }
 
         AuthViewControl.UpdateThemeToggleVisuals(isDark);
