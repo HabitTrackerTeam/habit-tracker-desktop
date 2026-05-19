@@ -91,27 +91,20 @@ namespace HabitTracker.Views.Tabs
             if (sender is Button btn)
             {
                 var bgBrush = btn.Background as System.Windows.Media.SolidColorBrush;
-                bool isSelected = bgBrush == null || bgBrush.Color.R == 255;
-
-                System.Windows.Media.Color green = System.Windows.Media.Color.FromArgb(255, 50, 138, 93);
-                System.Windows.Media.Color gray = System.Windows.Media.Color.FromArgb(255, 221, 226, 229);
-                System.Windows.Media.Color darkGray = System.Windows.Media.Color.FromArgb(255, 78, 96, 108);
+                // If it's transparent/gray, we make it green
+                bool isSelected = bgBrush != null && bgBrush.Color == System.Windows.Media.Color.FromArgb(255, 226, 232, 240); 
 
                 if (isSelected)
                 {
-                    btn.Background = new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromArgb(255, 230, 248, 240)
-                    );
-                    btn.BorderBrush = new System.Windows.Media.SolidColorBrush(green);
-                    btn.BorderThickness = new Thickness(2);
-                    btn.Foreground = new System.Windows.Media.SolidColorBrush(green);
+                    btn.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)); // #166534
+                    btn.Foreground = System.Windows.Media.Brushes.White;
+                    btn.FontWeight = FontWeights.Bold;
                 }
                 else
                 {
-                    btn.Background = System.Windows.Media.Brushes.White;
-                    btn.BorderBrush = new System.Windows.Media.SolidColorBrush(gray);
-                    btn.BorderThickness = new Thickness(1);
-                    btn.Foreground = new System.Windows.Media.SolidColorBrush(darkGray);
+                    btn.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 226, 232, 240)); // #E2E8F0
+                    btn.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 100, 116, 139)); // #64748B
+                    btn.FontWeight = FontWeights.Normal;
                 }
             }
         }
@@ -132,9 +125,6 @@ namespace HabitTracker.Views.Tabs
 
         private void ResetButtonGroup(Button?[] buttons, Button selectedBtn)
         {
-            System.Windows.Media.Color green = System.Windows.Media.Color.FromArgb(255, 50, 138, 93);
-            System.Windows.Media.Color gray = System.Windows.Media.Color.FromArgb(255, 221, 226, 229);
-            System.Windows.Media.Color darkGray = System.Windows.Media.Color.FromArgb(255, 78, 96, 108);
 
             foreach (var btn in buttons)
             {
@@ -142,19 +132,17 @@ namespace HabitTracker.Views.Tabs
                 
                 if (btn == selectedBtn)
                 {
-                    btn.Background = new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromArgb(255, 230, 248, 240)
-                    );
-                    btn.BorderBrush = new System.Windows.Media.SolidColorBrush(green);
-                    btn.BorderThickness = new Thickness(2);
-                    btn.Foreground = new System.Windows.Media.SolidColorBrush(green);
+                    btn.Background = System.Windows.Media.Brushes.White;
+                    btn.BorderThickness = new Thickness(0);
+                    btn.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)); // #166534
+                    btn.FontWeight = FontWeights.Bold;
                 }
                 else
                 {
-                    btn.Background = System.Windows.Media.Brushes.White;
-                    btn.BorderBrush = new System.Windows.Media.SolidColorBrush(gray);
-                    btn.BorderThickness = new Thickness(1);
-                    btn.Foreground = new System.Windows.Media.SolidColorBrush(darkGray);
+                    btn.Background = System.Windows.Media.Brushes.Transparent;
+                    btn.BorderThickness = new Thickness(0);
+                    btn.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 100, 116, 139)); // #64748B
+                    btn.FontWeight = FontWeights.Normal;
                 }
             }
         }
