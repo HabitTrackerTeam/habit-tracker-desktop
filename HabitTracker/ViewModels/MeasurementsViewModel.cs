@@ -220,11 +220,38 @@ namespace HabitTracker.ViewModels
                     }
 
                     CalculateBmi();
+
+                    double heightDelta = metricsRecords.Count > 1 ? CurrentHeight - metricsRecords[1].Height : 0;
+
+                    BodyMetrics.Insert(0, new BodyMetricItem
+                    {
+                        BodyPartId = "HEIGHT",
+                        PartName = LocalizationService.Instance.Height,
+                        LatestValue = CurrentHeight,
+                        Delta = heightDelta,
+                        IsPositiveTrend = heightDelta > 0,
+                        Unit = "cm"
+                    });
+
+                    BodyMetrics.Insert(0, new BodyMetricItem
+                    {
+                        BodyPartId = "WEIGHT",
+                        PartName = LocalizationService.Instance.Weight,
+                        LatestValue = CurrentWeight,
+                        Delta = WeightDelta,
+                        IsPositiveTrend = WeightDelta > 0,
+                        Unit = "kg"
+                    });
+                }
+                
+                if (SelectedBodyMetric == null && BodyMetrics.Any())
+                {
+                    SelectedBodyMetric = BodyMetrics.First();
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Failed to load measurements: {ex.Message}");
+                HabitTracker.Views.CustomMessageBox.Show($"Failed to load measurements: {ex.Message}");
             }
             finally
             {
@@ -250,22 +277,40 @@ namespace HabitTracker.ViewModels
         {
             try
             {
-                var logs = await SupabaseService.Client.From<CircumferenceLogs>()
-                    .Where(l => l.BodyPartId == bodyPartId)
-                    .Get();
-
-                var sortedLogs = logs.Models
-                    .Where(l => l.Session != null)
-                    .OrderBy(l => l.Session.MeasurementDate)
-                    .ToList();
-
                 var values = new List<double>();
                 var labels = new List<string>();
 
-                foreach (var log in sortedLogs)
+                if (bodyPartId == "WEIGHT" || bodyPartId == "HEIGHT")
                 {
-                    values.Add(log.Value);
-                    labels.Add(log.Session.MeasurementDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture));
+                    var currentUserId = SupabaseService.Client.Auth.CurrentUser?.Id;
+                    var logs = await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>()
+                        .Where(m => m.UserId == currentUserId)
+                        .Get();
+
+                    var sortedLogs = logs.Models.OrderBy(m => m.MeasurementDate).ToList();
+
+                    foreach (var log in sortedLogs)
+                    {
+                        values.Add(bodyPartId == "WEIGHT" ? log.Weight : log.Height);
+                        labels.Add(log.MeasurementDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture));
+                    }
+                }
+                else
+                {
+                    var logs = await SupabaseService.Client.From<CircumferenceLogs>()
+                        .Where(l => l.BodyPartId == bodyPartId)
+                        .Get();
+
+                    var sortedLogs = logs.Models
+                        .Where(l => l.Session != null)
+                        .OrderBy(l => l.Session.MeasurementDate)
+                        .ToList();
+
+                    foreach (var log in sortedLogs)
+                    {
+                        values.Add(log.Value);
+                        labels.Add(log.Session.MeasurementDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture));
+                    }
                 }
 
                 ChartSeries = new ISeries[]
@@ -313,14 +358,14 @@ namespace HabitTracker.ViewModels
         {
             if (!CurrentSessionMeasurements.Any() && !NewWeightValue.HasValue && !NewHeightValue.HasValue)
             {
-                System.Windows.MessageBox.Show("Please add at least one measurement, weight, or height to the session.");
+                HabitTracker.Views.CustomMessageBox.Show("Please add at least one measurement, weight, or height to the session.");
                 return;
             }
 
             var validItems = CurrentSessionMeasurements.Where(i => i.Value.HasValue && i.Value.Value > 0).ToList();
             if (validItems.Count != CurrentSessionMeasurements.Count)
             {
-                System.Windows.MessageBox.Show("All added body part measurements must have a valid value greater than 0 before saving.");
+                HabitTracker.Views.CustomMessageBox.Show("All added body part measurements must have a valid value greater than 0 before saving.");
                 return;
             }
 
@@ -433,11 +478,11 @@ namespace HabitTracker.ViewModels
                 } // This closes: if (validItems.Any())
 
                 await LoadMeasurementsAsync();
-                System.Windows.MessageBox.Show("Measurements saved successfully!");
+                HabitTracker.Views.CustomMessageBox.Show("Measurements saved successfully!");
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error saving measurement: {ex.Message}");
+                HabitTracker.Views.CustomMessageBox.Show($"Error saving measurement: {ex.Message}");
             }
             finally
             {
