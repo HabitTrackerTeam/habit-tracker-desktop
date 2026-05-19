@@ -345,7 +345,7 @@
                                 </Border>
                         </Grid>
 
-                        <views:MeasurementsView Visibility="{Binding IsMeasurementsVisible, Converter={StaticResource BoolToVis}}" />
+                        <views:MeasurementsView x:Name="MeasurementsViewControl" Visibility="{Binding DataContext.IsMeasurementsVisible, ElementName=MainContentArea, Converter={StaticResource BoolToVis}}" />
 
                         <!-- Calendar Section -->
                         <Grid Visibility="{Binding IsCalendarVisible, Converter={StaticResource BoolToVis}}">

@@ -12,15 +12,18 @@ public partial class DashboardView : System.Windows.Controls.UserControl
 
     private DashboardViewModel _dashboardVM;
     private SettingsViewModel _settingsVM;
+    private MeasurementsViewModel _measurementsVM;
     public DashboardView()
     {
         InitializeComponent();
 
         _dashboardVM=new DashboardViewModel();
         _settingsVM = new SettingsViewModel();
+        _measurementsVM = new MeasurementsViewModel();
 
         MainContentArea.DataContext = _dashboardVM;
         SettingsPanel.DataContext = _settingsVM;
+        MeasurementsViewControl.DataContext = _measurementsVM;
 
         this.Loaded+=DashboardView_Loaded;
     }
@@ -306,12 +309,13 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         }
     }
 
-    private void SwitchToMeasurements_Click(object sender, RoutedEventArgs e)
+    private async void SwitchToMeasurements_Click(object sender, RoutedEventArgs e)
     {
         if (_dashboardVM != null)
         {
             _dashboardVM.SwitchToMeasurements();
             UpdateSidebar(NavMeasurements);
+            await _measurementsVM.LoadMeasurementsAsync();
         }
     }
     
