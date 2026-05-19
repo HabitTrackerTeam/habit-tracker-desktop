@@ -13,7 +13,7 @@ namespace HabitTracker.Views
 
         private async void SaveMeasurement_Click(object sender, RoutedEventArgs e)
         {
-            if (DataContext is DashboardViewModel vm)
+            if (DataContext is MeasurementsViewModel vm)
             {
                 await vm.SaveMeasurementAsync();
                 vm.IsModalOpen = false; // Close modal on save
