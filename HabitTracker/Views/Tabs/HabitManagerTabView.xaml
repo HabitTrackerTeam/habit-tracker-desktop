@@ -36,114 +36,150 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-        <!-- Header Section (Habits Manager) -->
-        <Grid Grid.Row="0" Margin="0,0,0,24">
-            <StackPanel VerticalAlignment="Top">
-                <TextBlock Text="{Binding HabitsManager, Source={StaticResource Loc}}" FontSize="32" FontWeight="Bold"
-                           Foreground="{DynamicResource TextMainBrush}" />
-                <TextBlock Text="{Binding WhatPlanToAchieve, Source={StaticResource Loc}}"
-                           FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,32">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{Binding HabitsManager, Source={StaticResource Loc}}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                <TextBlock Text="{Binding WhatPlanToAchieve, Source={StaticResource Loc}}" 
+                           Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,8,0,0"/>
             </StackPanel>
-
-            <Button HorizontalAlignment="Right" VerticalAlignment="Top" 
+            
+            <Button Grid.Column="1" VerticalAlignment="Top"
                     Click="AddHabit_Click" 
-                    Background="{DynamicResource AccentGreenBrush}" 
+                    Background="#166534" 
                     Foreground="White" 
                     FontWeight="Bold" 
                     FontSize="16"
                     Padding="24,14" 
                     BorderThickness="0" 
                     Cursor="Hand">
-                <StackPanel Orientation="Horizontal" Margin="0">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+                <StackPanel Orientation="Horizontal">
                     <TextBlock Text="+" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center" />
                     <TextBlock Text="Add Habit" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
         </Grid>
 
-        <!-- Search Box -->
-        <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,16">
-            <TextBox x:Name="SearchBox" Tag="Search habits..." Height="44" Margin="0" />
+        <!-- Search Bar -->
+        <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}" CornerRadius="12" Margin="0,0,0,24">
+            <TextBox x:Name="SearchBox" Tag="Search habits..." Height="44" Background="Transparent" BorderThickness="0" Padding="16,0" VerticalContentAlignment="Center" Foreground="{DynamicResource TextMainBrush}" />
         </Border>
 
-        <!-- Filters and List (Grid.Row=2 & 3) -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20">
-            <!-- priority/category/status/frequency filters copied from original -->
-            <!-- ... (kept intentionally concise in the new UserControl) ... -->
-        </StackPanel>
+        <!-- Filters -->
+        <Grid Grid.Row="2" Margin="0,0,0,32">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                <TextBlock Text="PRIORITY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
+                    <TextBlock Text="All Priorities" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                </Border>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="8,0,8,0">
+                <TextBlock Text="CATEGORY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
+                    <TextBlock Text="All Categories" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                </Border>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Margin="8,0,8,0">
+                <TextBlock Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
+                    <TextBlock Text="Active Habits" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                </Border>
+            </StackPanel>
+            <StackPanel Grid.Column="3" Margin="8,0,0,0">
+                <TextBlock Text="FREQUENCY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
+                    <TextBlock Text="Every Day" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                </Border>
+            </StackPanel>
+        </Grid>
 
-        <Border Grid.Row="3" Background="{DynamicResource CardBgBrush}" CornerRadius="15" Padding="20">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!-- List Header -->
-                <Grid Grid.Row="0" Margin="0,0,0,12">
+        <!-- Habits List (Scrollable) -->
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <!-- Table Headers -->
+            <Border Grid.Row="0" Margin="0,0,0,8" Padding="16,0">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="180" />
-                        <ColumnDefinition Width="140" />
-                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="120" />
                     </Grid.ColumnDefinitions>
-
-                    <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource InputBorderBrush}" Padding="0,0,0,12">
-                        <Grid>
-                            <TextBlock Text="HABIT DETAILS" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="12" />
-                        </Grid>
-                    </Border>
-
-                    <TextBlock Grid.Column="1" Text="CATEGORY" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,12" />
-                    <TextBlock Grid.Column="2" Text="FREQUENCY" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,12" />
-                    <TextBlock Grid.Column="3" Text="ACTIONS" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                    <TextBlock Grid.Column="0" Text="HABIT DETAILS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <TextBlock Grid.Column="1" Text="CATEGORY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right"/>
                 </Grid>
+            </Border>
 
-                <!-- Habits Items List -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
-                    <ItemsControl ItemsSource="{Binding Habits}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="Transparent" CornerRadius="12" Padding="0,12,0,12" Margin="0,0,0,0" BorderThickness="0,0,0,1" BorderBrush="#FFF0F3F1">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="180" />
-                                            <ColumnDefinition Width="140" />
-                                            <ColumnDefinition Width="100" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <Border Width="40" Height="40" Background="#E9FFF3" CornerRadius="10" VerticalAlignment="Center">
-                                                <TextBlock Text="đź’§" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
-                                            </Border>
-                                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" />
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <TextBlock Grid.Column="1" Text="{Binding Category.Name}" VerticalAlignment="Center" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
-
-                                        <Border Grid.Column="2" Background="#E6F8F0" CornerRadius="8" Padding="10,6" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Period}" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" FontSize="11" />
+            <!-- Scrollable Items -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                <ItemsControl ItemsSource="{Binding Habits}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" Opacity="0.03" BlurRadius="4" ShadowDepth="2" Direction="270" />
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="120" />
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                        <Border Background="#ECFDF5" Width="40" Height="40" CornerRadius="8">
+                                            <TextBlock Text="{Binding Category.Icon, FallbackValue=đź’§}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
                                         </Border>
-
-                                        <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                            <Button Click="EditHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" Margin="0,0,8,0" ToolTip="Edit">
-                                                <TextBlock Text="âśŹď¸Ź" FontSize="14" />
-                                            </Button>
-                                            <Button Click="DeleteHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" ToolTip="Delete">
-                                                <TextBlock Text="đź—‘ď¸Ź" FontSize="14" />
-                                            </Button>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Grid>
-        </Border>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="16,0,0,0" />
+                                    </StackPanel>
+                                    
+                                    <TextBlock Grid.Column="1" Text="{Binding Category.Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                    
+                                    <Border Grid.Column="2" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
+                                        <TextBlock Text="{Binding Period}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                    </Border>
+                                    
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Button Click="EditHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" Margin="0,0,4,0" ToolTip="Edit">
+                                            <TextBlock Text="âśŹď¸Ź" FontSize="14" />
+                                        </Button>
+                                        <Button Click="DeleteHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" ToolTip="Delete">
+                                            <TextBlock Text="đź—‘ď¸Ź" FontSize="14" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
         </Grid>
 
         <!-- ========== ADD HABIT MODAL ========== -->
