@@ -171,7 +171,7 @@
                                     <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                             <TextBlock Text="{Binding LatestValue}" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                                            <TextBlock Text=" cm" Foreground="{DynamicResource TextMainBrush}" />
+                                            <TextBlock Text="{Binding Unit, StringFormat=' {0}'}" Foreground="{DynamicResource TextMainBrush}" />
                                         </StackPanel>
                                         <!-- Trend logic (green/red) would normally require a converter, simplifying here to just display the delta -->
                                         <TextBlock Text="{Binding Delta, StringFormat={}{0:+0.0;-0.0;0}}" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
@@ -196,6 +196,7 @@
                                 <TextBlock Text="{Binding SelectedBodyMetric.PartName}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                 <TextBlock Text=":" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,5,0" />
                                 <TextBlock Text="{Binding SelectedBodyMetric.LatestValue}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                <TextBlock Text="{Binding SelectedBodyMetric.Unit, StringFormat=' {0}'}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
                                 <TextBlock Text="{Binding SelectedBodyMetric.Delta, StringFormat={} {0:+0.0;-0.0;0} this month}" FontSize="14" Foreground="#FF328A5D" FontWeight="Bold" VerticalAlignment="Center" Margin="15,0,0,0" />
                             </StackPanel>
                         </StackPanel>

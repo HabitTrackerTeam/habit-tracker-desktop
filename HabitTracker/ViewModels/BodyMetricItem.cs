@@ -43,5 +43,12 @@ namespace HabitTracker.ViewModels
             get => _isPositiveTrend;
             set { _isPositiveTrend = value; OnPropertyChanged(); }
         }
+
+        private string _unit = "cm";
+        public string Unit
+        {
+            get => _unit;
+            set { _unit = value; OnPropertyChanged(); }
+        }
     }
 }
