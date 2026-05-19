@@ -1,0 +1,21 @@
+<UserControl x:Class="HabitTracker.Views.Tabs.StatisticsTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:HabitTracker"
+             xmlns:views="clr-namespace:HabitTracker.Views">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="{Binding Statistics, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+            <TextBlock Text="{Binding ViewProgressAchievements, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+            <TextBlock Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="20">Statistics content will be added here.</TextBlock>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

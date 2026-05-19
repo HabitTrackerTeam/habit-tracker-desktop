@@ -1,0 +1,160 @@
+<UserControl x:Class="HabitTracker.Views.Tabs.SettingsTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:HabitTracker"
+             xmlns:views="clr-namespace:HabitTracker.Views">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="{Binding Settings, Source={StaticResource Loc}}" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4" />
+            <TextBlock Text="{Binding ManageAccount, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,14,20">
+            <StackPanel Orientation="Vertical">
+
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Width="60" Height="60" VerticalAlignment="Center" Margin="0,0,16,0">
+                            <Border CornerRadius="30" Background="#E6F4EA">
+                                <TextBlock Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="#328A5D" FontWeight="Bold" />
+                            </Border>
+                            <Ellipse Width="60" Height="60">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasAvatarImage}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="{Binding AvatarImageSource}" Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding UserName}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding UserEmail}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,6" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Vertical">
+                            <Button Content="{Binding EditProfile, Source={StaticResource Loc}}" Width="100" Height="32" Margin="0,0,0,10" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMainBrush}" FontWeight="Bold" FontSize="12" BorderThickness="0" Cursor="Hand" Click="EditProfile_Click" />
+                            <TextBlock Text="{Binding ChangePassword, Source={StaticResource Loc}}" Foreground="#328A5D" FontSize="12" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="ChangePassword_Click" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <TextBlock Text="⚙️" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding General, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="{Binding Language, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
+                                <ComboBox ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding SelectedLanguage}" Height="36" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                <TextBlock Text="{Binding StartOfWeek, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
+                                <ComboBox ItemsSource="{Binding AvailableWeekStarts}" SelectedItem="{Binding SelectedWeekStart}" Height="36" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <TextBlock Text="🎨" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Appearance, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DarkMode, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding DarkModeDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                            </StackPanel>
+                            <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" x:Name="DarkModeToggle" IsChecked="{Binding IsDarkMode, Mode=TwoWay}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <TextBlock Text="🔔" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Notifications, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DailyReminders, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding DailyRemindersDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                            </StackPanel>
+
+                            <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Padding="10,4" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="⏱" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    <ComboBox ItemsSource="{Binding AvailableReminderTimes}" SelectedItem="{Binding SelectedReminderTime}" Height="36" Width="130" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource TextMainBrush}" FontSize="13" VerticalContentAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <ToggleButton Grid.Column="2" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsDailyReminder}" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding AchievementBadges, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding AchievementBadgesDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                            </StackPanel>
+                            <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsAchievementBadgesEnabled}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,40">
+                    <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,15,0" FontSize="13">
+                        <TextBlock.Foreground>
+                            <SolidColorBrush Color="{Binding StatusColor}" />
+                        </TextBlock.Foreground>
+                    </TextBlock>
+                    <Button Content="{Binding SaveSettings, Source={StaticResource Loc}}" Click="SaveSettings_Click" Background="#FF328A5D" Foreground="White" FontWeight="Bold" Padding="24,10" BorderThickness="0" Cursor="Hand" FontSize="14" />
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border x:Name="DialogOverlay" Grid.RowSpan="2" Background="#99000000" Visibility="Collapsed" Panel.ZIndex="999" />
+    </Grid>
+</UserControl>

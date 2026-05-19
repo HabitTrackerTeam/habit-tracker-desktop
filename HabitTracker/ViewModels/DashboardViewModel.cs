@@ -115,18 +115,25 @@ namespace HabitTracker.ViewModels{
             set { _isStatisticsVisible = value; OnPropertyChanged(); }
         }
 
-        private bool _isPdfReportVisible = false;
-        public bool IsPdfReportVisible
-        {
-            get => _isPdfReportVisible;
-            set { _isPdfReportVisible = value; OnPropertyChanged(); }
-        }
-
         private bool _isDashboardContent = true;
         public bool IsDashboardContent
         {
             get => _isDashboardContent;
             set { _isDashboardContent = value; OnPropertyChanged(); }
+        }
+
+        private bool _isAddHabitModalOpen = false;
+        public bool IsAddHabitModalOpen
+        {
+            get => _isAddHabitModalOpen;
+            set { _isAddHabitModalOpen = value; OnPropertyChanged(); }
+        }
+
+        private bool _isCreateCategoryModalOpen = false;
+        public bool IsCreateCategoryModalOpen
+        {
+            get => _isCreateCategoryModalOpen;
+            set { _isCreateCategoryModalOpen = value; OnPropertyChanged(); }
         }
 
 
@@ -218,7 +225,6 @@ namespace HabitTracker.ViewModels{
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = false;
-            IsPdfReportVisible = false;
         }
 
         public void SwitchToHabits()
@@ -230,7 +236,6 @@ namespace HabitTracker.ViewModels{
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = false;
-            IsPdfReportVisible = false;
         }
 
         public void SwitchToDashboard()
@@ -242,7 +247,6 @@ namespace HabitTracker.ViewModels{
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = false;
-            IsPdfReportVisible = false;
         }
 
         public void SwitchToSettings()
@@ -254,7 +258,6 @@ namespace HabitTracker.ViewModels{
             IsSettingsVisible = true;
             IsCalendarVisible = false;
             IsStatisticsVisible = false;
-            IsPdfReportVisible = false;
         }
 
         public void SwitchToCalendar()
@@ -266,7 +269,6 @@ namespace HabitTracker.ViewModels{
             IsSettingsVisible = false;
             IsCalendarVisible = true;
             IsStatisticsVisible = false;
-            IsPdfReportVisible = false;
         }
 
         public void SwitchToStatistics()
@@ -278,19 +280,6 @@ namespace HabitTracker.ViewModels{
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = true;
-            IsPdfReportVisible = false;
-        }
-
-        public void SwitchToPdfReport()
-        {
-            IsMeasurementsVisible = false;
-            IsHabitsVisible = false;
-            IsAddFormVisible = false;
-            IsDashboardContent = false;
-            IsSettingsVisible = false;
-            IsCalendarVisible = false;
-            IsStatisticsVisible = false;
-            IsPdfReportVisible = true;
         }
 
         private void SetStatus(string message, string color = "#FFFFFF")
