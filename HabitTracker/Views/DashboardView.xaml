@@ -33,10 +33,10 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="1">
-                    <Button x:Name="NavDashboard" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToDashboard_Click">
+                    <Button x:Name="NavHome" Style="{StaticResource SidebarMenuItemStyle}" Click="SwitchToHome_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🏠" FontSize="16" Margin="0,0,15,0" VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding Dashboard, Source={StaticResource Loc}}" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Home, Source={StaticResource Loc}}" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
 
@@ -97,10 +97,10 @@
         </Border>
 
         <!-- Main content area -->
-        <Grid Grid.Column="1" x:Name="MainContentArea" Margin="40,20,20,20">
-            <tabs:HomeTabView Visibility="{Binding IsDashboardContent, Converter={StaticResource BoolToVis}}" />
+        <Grid Grid.Column="1" x:Name="MainContentArea" Margin="0">
+            <tabs:HomeTabView Visibility="{Binding IsHomeVisible, Converter={StaticResource BoolToVis}}" />
             <tabs:HabitManagerTabView Visibility="{Binding IsHabitsVisible, Converter={StaticResource BoolToVis}}" />
-            <tabs:MeasurementsView x:Name="MeasurementsViewControl" Visibility="{Binding DataContext.IsMeasurementsVisible, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource BoolToVis}}" />
+            <tabs:MeasurementsTabView x:Name="MeasurementsViewControl" Visibility="{Binding DataContext.IsMeasurementsVisible, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource BoolToVis}}" />
             <tabs:CalendarTabView Visibility="{Binding IsCalendarVisible, Converter={StaticResource BoolToVis}}" />
             <tabs:StatisticsTabView Visibility="{Binding IsStatisticsVisible, Converter={StaticResource BoolToVis}}" />
             <tabs:SettingsTabView Visibility="{Binding DataContext.IsSettingsVisible, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource BoolToVis}}" />

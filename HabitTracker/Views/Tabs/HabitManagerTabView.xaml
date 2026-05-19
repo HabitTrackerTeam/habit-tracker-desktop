@@ -7,12 +7,34 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        <!-- Main Content -->
+        <Grid Margin="40,20,20,20">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsAddHabitModalOpen}" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="15" KernelType="Gaussian" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsCreateCategoryModalOpen}" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="15" KernelType="Gaussian" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
         <!-- Header Section (Habits Manager) -->
         <Grid Grid.Row="0" Margin="0,0,0,24">
@@ -122,11 +144,18 @@
                 </ScrollViewer>
             </Grid>
         </Border>
+        </Grid>
 
         <!-- ========== ADD HABIT MODAL ========== -->
         <Grid Visibility="{Binding IsAddHabitModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="999">
-            <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="0" Padding="30" Width="600" MaxHeight="750"
-                    HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border Background="#4D000000" />
+            <Border Background="{DynamicResource CardBgBrush}" 
+                    CornerRadius="15" 
+                    Margin="0" 
+                    Padding="30" 
+                    Width="600" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="20" ShadowDepth="5" />
                 </Border.Effect>
@@ -232,14 +261,22 @@
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
+                    <!-- Dimming overlay for when Create Category is open -->
+                    <Border Grid.RowSpan="2" Background="#4D000000" CornerRadius="15" Margin="-30" Visibility="{Binding IsCreateCategoryModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </Grid>
             </Border>
         </Grid>
 
         <!-- ========== CREATE CATEGORY MODAL ========== -->
         <Grid Visibility="{Binding IsCreateCategoryModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="999">
-            <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="0" Padding="30" Width="600"
-                    HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border Background="Transparent" />
+            <Border Background="{DynamicResource CardBgBrush}" 
+                    CornerRadius="15" 
+                    Margin="0" 
+                    Padding="30" 
+                    Width="600" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="20" ShadowDepth="5" />
                 </Border.Effect>

@@ -115,11 +115,11 @@ namespace HabitTracker.ViewModels{
             set { _isStatisticsVisible = value; OnPropertyChanged(); }
         }
 
-        private bool _isDashboardContent = true;
-        public bool IsDashboardContent
+        private bool _isHomeVisible = true;
+        public bool IsHomeVisible
         {
-            get => _isDashboardContent;
-            set { _isDashboardContent = value; OnPropertyChanged(); }
+            get => _isHomeVisible;
+            set { _isHomeVisible = value; OnPropertyChanged(); }
         }
 
         private bool _isAddHabitModalOpen = false;
@@ -221,7 +221,7 @@ namespace HabitTracker.ViewModels{
             IsHabitsVisible = false;
             IsMeasurementsVisible = true;
             IsAddFormVisible = false;
-            IsDashboardContent = false;
+            IsHomeVisible = false;
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = false;
@@ -232,18 +232,18 @@ namespace HabitTracker.ViewModels{
             IsMeasurementsVisible = false;
             IsHabitsVisible = true;
             IsAddFormVisible = true;
-            IsDashboardContent = false;
+            IsHomeVisible = false;
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = false;
         }
 
-        public void SwitchToDashboard()
+        public void SwitchToHome()
         {
             IsMeasurementsVisible = false;
             IsHabitsVisible = false;
             IsAddFormVisible = false;
-            IsDashboardContent = true;
+            IsHomeVisible = true;
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = false;
@@ -254,7 +254,7 @@ namespace HabitTracker.ViewModels{
             IsMeasurementsVisible = false;
             IsHabitsVisible = false;
             IsAddFormVisible = false;
-            IsDashboardContent = false;
+            IsHomeVisible = false;
             IsSettingsVisible = true;
             IsCalendarVisible = false;
             IsStatisticsVisible = false;
@@ -265,7 +265,7 @@ namespace HabitTracker.ViewModels{
             IsMeasurementsVisible = false;
             IsHabitsVisible = false;
             IsAddFormVisible = false;
-            IsDashboardContent = false;
+            IsHomeVisible = false;
             IsSettingsVisible = false;
             IsCalendarVisible = true;
             IsStatisticsVisible = false;
@@ -276,7 +276,7 @@ namespace HabitTracker.ViewModels{
             IsMeasurementsVisible = false;
             IsHabitsVisible = false;
             IsAddFormVisible = false;
-            IsDashboardContent = false;
+            IsHomeVisible = false;
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = true;

@@ -1,4 +1,4 @@
-<UserControl x:Class="HabitTracker.Views.Tabs.MeasurementsView"
+<UserControl x:Class="HabitTracker.Views.Tabs.MeasurementsTabView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -14,7 +14,20 @@
 
     <Grid>
         <!-- Main Layout -->
-        <Grid>
+        <Grid Margin="40,20,20,20">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsModalOpen}" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="15" KernelType="Gaussian" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -209,6 +222,7 @@
 
         <!-- Modal Overlay -->
         <Grid Visibility="{Binding IsModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="999">
+            <Border Background="#4D000000" />
             <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="0" Padding="30" Width="600" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="20" ShadowDepth="5" />

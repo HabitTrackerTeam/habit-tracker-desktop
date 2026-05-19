@@ -45,7 +45,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
     {
         await _dashboardVM.LoadFormDataAsync();
         await _dashboardVM.LoadHabitsAsync();
-        UpdateSidebar(NavDashboard);
+        UpdateSidebar(NavHome);
     }
 
     private void AddHabit_Click(object sender, RoutedEventArgs e)
@@ -321,10 +321,10 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         UpdateSidebar(NavStatistics);
     }
 
-    private void SwitchToDashboard_Click(object sender, RoutedEventArgs e)
+    private void SwitchToHome_Click(object sender, RoutedEventArgs e)
     {
-        _dashboardVM.SwitchToDashboard();
-        UpdateSidebar(NavDashboard);
+        _dashboardVM.SwitchToHome();
+        UpdateSidebar(NavHome);
     }
 
     private async void SaveHabit_Click(object sender, RoutedEventArgs e)
@@ -360,13 +360,13 @@ public partial class DashboardView : System.Windows.Controls.UserControl
     private void SwitchToHabits_Click(object sender, RoutedEventArgs e)
     {
         _dashboardVM.SwitchToHabits();
-        if (sender is System.Windows.Controls.Button btn && (btn == NavDashboard || btn == NavHabits))
+        if (sender is System.Windows.Controls.Button btn && (btn == NavHome || btn == NavHabits))
         {
             UpdateSidebar(btn);
         }
         else
         {
-            UpdateSidebar(NavDashboard);
+            UpdateSidebar(NavHome);
         }
     }
 
@@ -379,7 +379,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
 
     private void UpdateSidebar(System.Windows.Controls.Button activeBtn)
     {
-        var buttons = new[] { NavDashboard, NavHabits, NavCalendar, NavStatistics, NavMeasurements, NavSettings };
+        var buttons = new[] { NavHome, NavHabits, NavCalendar, NavStatistics, NavMeasurements, NavSettings };
         foreach (var b in buttons)
         {
             if (b == null) continue;

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HabitTracker"
              xmlns:views="clr-namespace:HabitTracker.Views">
-    <Grid>
+    <Grid Margin="40,20,20,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

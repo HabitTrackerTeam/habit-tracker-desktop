@@ -4,9 +4,9 @@ using HabitTracker.ViewModels;
 
 namespace HabitTracker.Views.Tabs
 {
-    public partial class MeasurementsView : UserControl
+    public partial class MeasurementsTabView : UserControl
     {
-        public MeasurementsView()
+        public MeasurementsTabView()
         {
             InitializeComponent();
         }
