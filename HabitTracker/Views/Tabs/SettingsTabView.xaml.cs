@@ -17,6 +17,18 @@ namespace HabitTracker.Views.Tabs
             _settingsVM = new SettingsViewModel();
             DataContext = _settingsVM;
             Loaded += SettingsTabView_Loaded;
+            IsVisibleChanged += SettingsTabView_IsVisibleChanged;
+        }
+
+        private async void SettingsTabView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue == true)
+            {
+                if (_settingsVM != null)
+                {
+                    await _settingsVM.LoadSettingsAsync();
+                }
+            }
         }
 
         private async void SettingsTabView_Loaded(object sender, RoutedEventArgs e)
@@ -81,55 +93,77 @@ namespace HabitTracker.Views.Tabs
 
                 if (!string.IsNullOrEmpty(editProfileWindow.SelectedPhotoPath))
                 {
-                    try
-                    {
-                        var currentUser = HabitTracker.Services.SupabaseService.Client.Auth.CurrentUser;
-                        if (currentUser != null)
-                        {
-                            var fileBytes = System.IO.File.ReadAllBytes(editProfileWindow.SelectedPhotoPath);
-                            var extension = System.IO.Path.GetExtension(editProfileWindow.SelectedPhotoPath).ToLowerInvariant();
-                            var fileName = $"{currentUser.Id}/avatar{extension}";
-                            var contentType = extension switch
-                            {
-                                ".png" => "image/png",
-                                ".gif" => "image/gif",
-                                ".bmp" => "image/bmp",
-                                _ => "image/jpeg"
-                            };
-
-                            await HabitTracker.Services.SupabaseService.Client.Storage
-                                .From("avatars")
-                                .Upload(fileBytes, fileName, new Supabase.Storage.FileOptions
-                                {
-                                    ContentType = contentType,
-                                    Upsert = true
-                                });
-
-                            var baseUrl = HabitTracker.Services.SupabaseService.Client.Storage
-                                .From("avatars")
-                                .GetPublicUrl(fileName);
-                            var publicUrl = $"{baseUrl}?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-
-                            var attrs = new UserAttributes();
-                            attrs.Data = new System.Collections.Generic.Dictionary<string, object>
-                            {
-                                { "avatar_url", baseUrl }
-                            };
-                            await HabitTracker.Services.SupabaseService.Client.Auth.Update(attrs);
-
-                            if (_settingsVM != null)
-                            {
-                                _settingsVM.UserAvatarUrl = publicUrl;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Failed to upload photo:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
+                    await UploadAvatarAsync(editProfileWindow.SelectedPhotoPath);
                 }
             }
             DialogOverlay.Visibility = Visibility.Collapsed;
+        }
+
+        private async void DirectChangePhoto_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp",
+                Title = "Select an Avatar Image"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string selectedPath = openFileDialog.FileName;
+                DialogOverlay.Visibility = Visibility.Visible;
+                await UploadAvatarAsync(selectedPath);
+                DialogOverlay.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async Task UploadAvatarAsync(string localPath)
+        {
+            try
+            {
+                var currentUser = HabitTracker.Services.SupabaseService.Client.Auth.CurrentUser;
+                if (currentUser != null)
+                {
+                    var fileBytes = System.IO.File.ReadAllBytes(localPath);
+                    var extension = System.IO.Path.GetExtension(localPath).ToLowerInvariant();
+                    var fileName = $"{currentUser.Id}/avatar{extension}";
+                    var contentType = extension switch
+                    {
+                        ".png" => "image/png",
+                        ".gif" => "image/gif",
+                        ".bmp" => "image/bmp",
+                        _ => "image/jpeg"
+                    };
+
+                    await HabitTracker.Services.SupabaseService.Client.Storage
+                        .From("avatars")
+                        .Upload(fileBytes, fileName, new Supabase.Storage.FileOptions
+                        {
+                            ContentType = contentType,
+                            Upsert = true
+                        });
+
+                    var baseUrl = HabitTracker.Services.SupabaseService.Client.Storage
+                        .From("avatars")
+                        .GetPublicUrl(fileName);
+                    var publicUrl = $"{baseUrl}?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                    var attrs = new UserAttributes();
+                    attrs.Data = new System.Collections.Generic.Dictionary<string, object>
+                    {
+                        { "avatar_url", baseUrl }
+                    };
+                    await HabitTracker.Services.SupabaseService.Client.Auth.Update(attrs);
+
+                    if (_settingsVM != null)
+                    {
+                        _settingsVM.UserAvatarUrl = publicUrl;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to upload photo:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
     }
 }
