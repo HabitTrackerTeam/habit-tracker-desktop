@@ -5,6 +5,24 @@
              xmlns:views="clr-namespace:HabitTracker.Views">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="EmojiButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Background" Value="#F1F5F9"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <!-- Main Content -->
@@ -125,7 +143,7 @@
                 <ItemsControl ItemsSource="{Binding Habits}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                            <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,12" AllowDrop="True" Drop="HabitRow_Drop" DragOver="HabitRow_DragOver">
                                 <Border.Effect>
                                     <DropShadowEffect Color="Black" Opacity="0.03" BlurRadius="4" ShadowDepth="2" Direction="270" />
                                 </Border.Effect>
@@ -148,6 +166,11 @@
                                     </Border>
                                     
                                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <!-- Ikonka kropek (Drag Handle) -->
+                                        <Border Background="Transparent" Cursor="SizeAll" Padding="4" Margin="0,0,8,0" 
+                                                PreviewMouseLeftButtonDown="DragHandle_PreviewMouseLeftButtonDown">
+                                            <Path Data="M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z" Fill="#94A3B8" Width="14" Height="20" Stretch="Uniform" VerticalAlignment="Center"/>
+                                        </Border>
                                         <Button Click="EditHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" Margin="0,0,4,0" ToolTip="Edit">
                                             <TextBlock Text="✏️" FontSize="14" />
                                         </Button>
@@ -181,9 +204,8 @@
                     <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/> <!-- Header -->
-                        <RowDefinition Height="Auto"/> <!-- Habit Name -->
+                        <RowDefinition Height="Auto"/> <!-- Habit Name & Icon -->
                         <RowDefinition Height="Auto"/> <!-- Type & Priority -->
-                        <RowDefinition Height="Auto"/> <!-- Frequency -->
                         <RowDefinition Height="Auto"/> <!-- Frequency -->
                         <RowDefinition Height="Auto"/> <!-- Goal & Units -->
                         <RowDefinition Height="*"/>    <!-- Spacer -->
@@ -193,7 +215,7 @@
                     <!-- Header -->
                     <Grid Grid.Row="0" Margin="0,0,0,24">
                         <StackPanel>
-                            <TextBlock Text="Add New Habit" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                            <TextBlock Text="{Binding ModalTitle}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
                             <TextBlock Text="Plant a new seed for your personal growth journey." FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
                         </StackPanel>
                         <Button HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="CloseAddHabitModal_Click">
@@ -201,13 +223,54 @@
                         </Button>
                     </Grid>
 
-                    <!-- Habit Name -->
-                    <StackPanel Grid.Row="1" Margin="0,0,0,20">
-                        <TextBlock Text="HABIT NAME" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                        <Border Background="#F8FAFC" CornerRadius="12" Padding="16,12">
-                            <TextBox x:Name="HabitNameBox" Text="e.g., Daily Meditation" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#94A3B8" Padding="0" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
+                    <!-- Habit Name & Icon -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/> <!-- Label -->
+                            <RowDefinition Height="Auto"/> <!-- Controls -->
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/> <!-- Icon Button -->
+                            <ColumnDefinition Width="*"/>    <!-- Textbox -->
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="HABIT NAME" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+
+                        <!-- Left-aligned Select Icon Button (styled like habit list cards) -->
+                        <Button Grid.Row="1" Grid.Column="0" x:Name="SelectIconButton" Click="SelectIconButton_Click" Cursor="Hand" Background="#F0FDF4" Width="48" Height="48" BorderThickness="0" Margin="0,0,16,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <TextBlock x:Name="SelectedIconPreview" Text="{Binding NewHabitIcon, FallbackValue=❓}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Button>
+
+                        <Popup Grid.Row="1" Grid.Column="0" x:Name="IconPickerPopup" PlacementTarget="{Binding ElementName=SelectIconButton}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
+                            <Border Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="12" Padding="12,12,4,12" Width="300" Height="220">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" Color="Black" Opacity="0.1" ShadowDepth="3"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Choose an Icon" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,8"/>
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <WrapPanel x:Name="EmojiWrapPanel" HorizontalAlignment="Center" Width="252"/>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+                        </Popup>
+
+                        <!-- Right-aligned Habit Name input box -->
+                        <Border Grid.Row="1" Grid.Column="1" Background="#F8FAFC" CornerRadius="12" Padding="16,12" Height="48">
+                            <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="HabitNameBox" Text="e.g., Daily Meditation" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#94A3B8" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
                         </Border>
-                    </StackPanel>
+                    </Grid>
 
                     <!-- Type & Priority -->
                     <Grid Grid.Row="2" Margin="0,0,0,20">
@@ -262,45 +325,8 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Icon Selection for Habit -->
-                    <StackPanel Grid.Row="3" Margin="0,0,0,20">
-                        <TextBlock Text="ICON" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                        <WrapPanel>
-                                <Button x:Name="IconBtn1" Content="❤️" Width="44" Height="44" Padding="0" Background="#166534" Foreground="White" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn2" Content="💪" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn3" Content="🧠" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn4" Content="📖" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn5" Content="🏃" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn6" Content="🧘" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn7" Content="💧" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn8" Content="🎯" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn9" Content="✏️" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn10" Content="🌱" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                        </WrapPanel>
-                    </StackPanel>
-
                     <!-- Frequency -->
-                    <StackPanel Grid.Row="4" Margin="0,0,0,20">
+                    <StackPanel Grid.Row="3" Margin="0,0,0,20">
                         <TextBlock Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
                         <Border Background="#F1F5F9" CornerRadius="12" Padding="4">
                             <Grid>
@@ -369,7 +395,7 @@
                     </StackPanel>
 
                     <!-- Goal & Units -->
-                    <Grid Grid.Row="5">
+                    <Grid Grid.Row="4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="24"/>
@@ -379,7 +405,7 @@
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="GOAL / TARGET" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
                             <Border Background="#F8FAFC" CornerRadius="12" Padding="16,12">
-                                <TextBox x:Name="GoalBox" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A" Padding="0" />
+                                <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="GoalBox" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A" />
                             </Border>
                         </StackPanel>
 
@@ -398,7 +424,7 @@
                     </Grid>
 
                     <!-- Footer Actions -->
-                    <Grid Grid.Row="7" Margin="0,32,0,0">
+                    <Grid Grid.Row="6" Margin="0,32,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="Cancel" FontSize="14" FontWeight="SemiBold" Foreground="#64748B" Background="Transparent" BorderThickness="0" Margin="0,0,24,0" Cursor="Hand" Click="CancelAddHabit_Click"/>
                             <Button Background="#166534" BorderThickness="0" Padding="24,14" Cursor="Hand" Click="PlantHabit_Click">
@@ -409,7 +435,7 @@
                                 </Button.Resources>
                                 <StackPanel Orientation="Horizontal">
                                     <Path Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" Fill="White" Width="14" Height="14" Margin="0,0,8,0" Stretch="Uniform"/>
-                                    <TextBlock Text="Plant Habit" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding ModalButtonText}" Foreground="White" FontSize="14" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
