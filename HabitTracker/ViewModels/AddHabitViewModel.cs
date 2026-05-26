@@ -33,12 +33,7 @@ public class AddHabitViewModel : ViewModelBase
         set { _priority = value; OnPropertyChanged(); } 
     }
 
-    private HabitCategory _selectedCategory;
-    public HabitCategory SelectedCategory 
-    { 
-        get => _selectedCategory; 
-        set { _selectedCategory = value; OnPropertyChanged(); } 
-    }
+
 
     private string _selectedIcon = "✓";
     public string SelectedIcon 
@@ -83,7 +78,7 @@ public class AddHabitViewModel : ViewModelBase
     }
 
     // Collections
-    public ObservableCollection<HabitCategory> Categories { get; set; } = new();
+
     public ObservableCollection<string> HabitTypes { get; set; } = new();
     public ObservableCollection<string> Units { get; set; } = new();
 
@@ -106,24 +101,10 @@ public class AddHabitViewModel : ViewModelBase
         {
             IsLoading = true;
 
-            // Load from parent VM if available
+            // Load from parent VM if available (future use)
             if (_parentVM != null)
             {
-                Categories = new ObservableCollection<HabitCategory>(_parentVM.Categories);
-                if (Categories.Any())
-                {
-                    SelectedCategory = Categories.First();
-                }
-            }
-            else
-            {
-                // Load from DB
-                var categories = await SupabaseService.Client.From<HabitCategory>().Get();
-                Categories = new ObservableCollection<HabitCategory>(categories.Models);
-                if (Categories.Any())
-                {
-                    SelectedCategory = Categories.First();
-                }
+                // Parent VM available
             }
 
             // Populate units
@@ -153,11 +134,7 @@ public class AddHabitViewModel : ViewModelBase
                 return false;
             }
 
-            if (SelectedCategory == null)
-            {
-                System.Windows.MessageBox.Show("Please select a category.");
-                return false;
-            }
+
 
             IsLoading = true;
 
@@ -179,7 +156,6 @@ public class AddHabitViewModel : ViewModelBase
             var habit = new Habits
             {
                 Name = HabitName,
-                CategoryId = SelectedCategory.Id,
                 HabitTypeId = _habitTypeId.ToString(), // Need to store as string for FK
                 UserId = SupabaseService.Client.Auth.CurrentUser?.Id,
                 Period = period,
