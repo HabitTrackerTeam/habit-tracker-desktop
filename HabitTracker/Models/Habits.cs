@@ -11,14 +11,16 @@ namespace HabitTracker.Models{
         [Column("user_id")]
         public string UserId {get;set;}
 
-        [Column("category_id")]
-        public string CategoryId {get;set;}
+
 
         [Column("habit_type_id")]
         public string HabitTypeId{get;set;}
 
         [Column("name")]
         public string Name{get;set;}
+
+        [Column("icon")]
+        public string Icon{get;set;}
 
         [Column("period")]
         public string Period{get;set;}
@@ -48,8 +50,6 @@ namespace HabitTracker.Models{
         [Reference(typeof(Users))]
         public Users User {get;set;}
 
-        [Reference(typeof(HabitCategory))]
-        public HabitCategory Category {get;set;}
 
         [Reference(typeof(HabitTypes))]
         public HabitTypes HabitType {get;set;}

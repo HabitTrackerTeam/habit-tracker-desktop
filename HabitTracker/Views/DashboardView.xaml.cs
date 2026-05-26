@@ -145,13 +145,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         }
     }
 
-    private void NewCategoryFromAddHabit_Click(object sender, RoutedEventArgs e)
-    {
-        if (FindName("CreateCategoryModal") is System.Windows.Controls.Grid modal)
-        {
-            modal.Visibility = Visibility.Visible;
-        }
-    }
+
 
     private void ResetButtonGroup(System.Windows.Controls.Button?[] buttons, System.Windows.Controls.Button selectedBtn)
     {
@@ -180,108 +174,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         }
     }
 
-    private void OpenCreateCategoryModal_Click(object sender, RoutedEventArgs e)
-    {
-        if (FindName("CreateCategoryModal") is System.Windows.Controls.Grid modal)
-        {
-            modal.Visibility = Visibility.Visible;
-        }
-    }
 
-    private void CloseCreateCategoryModal_Click(object sender, RoutedEventArgs e)
-    {
-        if (FindName("CreateCategoryModal") is System.Windows.Controls.Grid modal)
-        {
-            modal.Visibility = Visibility.Collapsed;
-        }
-    }
-
-    private void CancelCreateCategory_Click(object sender, RoutedEventArgs e)
-    {
-        if (FindName("CreateCategoryModal") is System.Windows.Controls.Grid modal)
-        {
-            modal.Visibility = Visibility.Collapsed;
-        }
-    }
-
-    private void CreateCategoryButton_Click(object sender, RoutedEventArgs e)
-    {
-        var categoryNameBox = FindName("CategoryNameBoxCreateCategory") as System.Windows.Controls.TextBox;
-        string categoryName = categoryNameBox?.Text?.Trim() ?? string.Empty;
-
-        if (string.IsNullOrEmpty(categoryName))
-        {
-            MessageBox.Show("Please enter a category name.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        MessageBox.Show(
-            $"Category '{categoryName}' will be created!",
-            "Success",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
-
-        if (FindName("CreateCategoryModal") is System.Windows.Controls.Grid modal)
-        {
-            modal.Visibility = Visibility.Collapsed;
-        }
-    }
-
-    private void CategoryIconButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is System.Windows.Controls.Button btn)
-        {
-            UpdateIconSelection(btn);
-        }
-    }
-
-    private void CategoryColorButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is System.Windows.Controls.Button btn)
-        {
-            UpdateColorSelection(btn);
-        }
-    }
-
-    private void UpdateIconSelection(System.Windows.Controls.Button selectedBtn)
-    {
-        var children = (selectedBtn.Parent as System.Windows.Controls.Panel)?.Children;
-        if (children == null) return;
-
-        var selectedBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 50, 138, 93));
-
-        foreach (var child in children)
-        {
-            if (child is System.Windows.Controls.Button btn)
-            {
-                btn.Background = btn == selectedBtn ? selectedBackground : System.Windows.Media.Brushes.White;
-                btn.Foreground = btn == selectedBtn ? System.Windows.Media.Brushes.White : System.Windows.Media.Brushes.Black;
-            }
-        }
-    }
-
-    private void UpdateColorSelection(System.Windows.Controls.Button selectedBtn)
-    {
-        var parentPanel = selectedBtn.Parent as System.Windows.Controls.StackPanel;
-        if (parentPanel == null) return;
-
-        foreach (var child in parentPanel.Children)
-        {
-            if (child is System.Windows.Controls.Button btn && btn.Width == 40)
-            {
-                if (btn == selectedBtn)
-                {
-                    btn.BorderThickness = new System.Windows.Thickness(3);
-                    btn.BorderBrush = System.Windows.Media.Brushes.Black;
-                }
-                else
-                {
-                    btn.BorderThickness = new System.Windows.Thickness(0);
-                    btn.BorderBrush = null;
-                }
-            }
-        }
-    }
 
     private void ChooseBuiltIn_Click(object sender, RoutedEventArgs e)
     {
@@ -337,8 +230,6 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         if (sender is System.Windows.Controls.Button btn && btn.DataContext is Habits habit)
         {
             _dashboardVM.NewHabitName = habit.Name ?? string.Empty;
-            var cat = _dashboardVM.Categories?.FirstOrDefault(c => c.Id == habit.CategoryId);
-            if (cat != null) _dashboardVM.SelectedCategory = cat;
             var type = _dashboardVM.HabitTypes?.FirstOrDefault(t => t.Id == habit.HabitTypeId);
             if (type != null) _dashboardVM.SelectedType = type;
             _dashboardVM.IsAddFormVisible = true;

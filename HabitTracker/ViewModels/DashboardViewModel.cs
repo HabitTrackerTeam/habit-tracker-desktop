@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using HabitTracker.Commands;
 using System.Collections.Generic;
+using Supabase.Postgrest;
 
 namespace HabitTracker.ViewModels{
 
@@ -23,8 +24,9 @@ namespace HabitTracker.ViewModels{
     public class DashboardViewModel:ViewModelBase{
         //Lista automatycznie odswiezajaca XAML, gdy pojawia sie w niej nowe dane
         private ObservableCollection<Habits> _habits = new ObservableCollection<Habits>();
-        public ObservableCollection<HabitCategory> Categories {get;set;} = new();
+
         public ObservableCollection<HabitTypes> HabitTypes {get;set;} = new();
+        public ObservableCollection<Colors> Colors {get;set;} = new();
         
         // Filter collections
         public ObservableCollection<FilterItem> Priorities { get; set; } = new();
@@ -41,18 +43,40 @@ namespace HabitTracker.ViewModels{
         private FilterItem _selectedFrequency;
         public FilterItem SelectedFrequency { get => _selectedFrequency; set { _selectedFrequency = value; OnPropertyChanged(); } }
 
-        private HabitCategory _selectedCategoryFilter;
-        public HabitCategory SelectedCategoryFilter { get => _selectedCategoryFilter; set { _selectedCategoryFilter = value; OnPropertyChanged(); } }
+
 
         //Pola zbierajace dane z formularza
         private string _newHabitName;
         public string NewHabitName{get=>_newHabitName; set{_newHabitName=value; OnPropertyChanged();}}
 
-        private HabitCategory _selectedCategory;
-        public HabitCategory SelectedCategory {get=>_selectedCategory; set{_selectedCategory=value; OnPropertyChanged();}}
+
 
         private HabitTypes _selectedType;
         public HabitTypes SelectedType {get=>_selectedType; set{_selectedType = value; OnPropertyChanged();}}
+
+        // ===== Add Habit Modal Fields =====
+        private string _newHabitType = "Numeric";
+        public string NewHabitType { get => _newHabitType; set { _newHabitType = value; OnPropertyChanged(); } }
+
+        private int _newHabitPriority = 2; // 1=High, 2=Medium, 3=Low
+        public int NewHabitPriority { get => _newHabitPriority; set { _newHabitPriority = value; OnPropertyChanged(); } }
+
+        private string _newHabitFrequency = "Daily";
+        public string NewHabitFrequency { get => _newHabitFrequency; set { _newHabitFrequency = value; OnPropertyChanged(); } }
+
+        private string _newHabitIcon = "❤️";
+        public string NewHabitIcon { get => _newHabitIcon; set { _newHabitIcon = value; OnPropertyChanged(); } }
+
+        private int _newHabitDaysOfWeek = 127; // All days bitmask
+        public int NewHabitDaysOfWeek { get => _newHabitDaysOfWeek; set { _newHabitDaysOfWeek = value; OnPropertyChanged(); } }
+
+        private double _newHabitGoal = 1;
+        public double NewHabitGoal { get => _newHabitGoal; set { _newHabitGoal = value; OnPropertyChanged(); } }
+
+        private string _newHabitUnit = "count";
+        public string NewHabitUnit { get => _newHabitUnit; set { _newHabitUnit = value; OnPropertyChanged(); } }
+
+
 
         public ObservableCollection<Habits> Habits{
             get=>_habits;
@@ -129,12 +153,7 @@ namespace HabitTracker.ViewModels{
             set { _isAddHabitModalOpen = value; OnPropertyChanged(); }
         }
 
-        private bool _isCreateCategoryModalOpen = false;
-        public bool IsCreateCategoryModalOpen
-        {
-            get => _isCreateCategoryModalOpen;
-            set { _isCreateCategoryModalOpen = value; OnPropertyChanged(); }
-        }
+
 
 
         private string _currentMonthYear;
@@ -307,8 +326,12 @@ namespace HabitTracker.ViewModels{
         public async Task LoadHabitsAsync(){
             IsLoading = true;
             try{
-                //pobranie nawykow z DB
-                var response = await SupabaseService.Client.From<Habits>().Get();
+                //pobranie nawykow z DB - tylko aktywne, tego uzytkownika
+                var userId = SupabaseService.Client.Auth.CurrentUser?.Id;
+                var response = await SupabaseService.Client.From<Habits>()
+                    .Filter("user_id", Constants.Operator.Equals, userId)
+                    .Filter("is_archived", Constants.Operator.Equals, "false")
+                    .Get();
                 //update listy na ekranie
                 Habits = new ObservableCollection<Habits>(response.Models);
             }
@@ -322,21 +345,39 @@ namespace HabitTracker.ViewModels{
 
         //Metoda ladujaca dane
         public async Task LoadFormDataAsync(){
+            // Populate defaults first to ensure we have working types even if DB query returns empty (due to RLS or other issues)
+            HabitTypes.Clear();
+            HabitTypes.Add(new HabitTypes { Id = "38e3ca04-c342-4520-9eb9-122c39339f1c", Type = "numeric", DisplayType = "Numeric", RequiresValue = true, DefaultUnit = "count" });
+            HabitTypes.Add(new HabitTypes { Id = "96a85519-7c6b-4787-ac1e-87137f1b2fb8", Type = "timer", DisplayType = "Timer", RequiresValue = true, DefaultUnit = "mins" });
+            HabitTypes.Add(new HabitTypes { Id = "dc75347f-83a0-42b6-a824-e3ac7428fae5", Type = "checkbox", DisplayType = "Checkbox", RequiresValue = false, DefaultUnit = null });
+            SelectedType = HabitTypes.FirstOrDefault();
+
             try{
-                var categories = await SupabaseService.Client.From<HabitCategory>().Get();
-                Categories = new ObservableCollection<HabitCategory>(categories.Models);
-                OnPropertyChanged(nameof(Categories));
-
                 var types = await SupabaseService.Client.From<HabitTypes>().Get();
-                HabitTypes = new ObservableCollection<HabitTypes>(types.Models);
-                OnPropertyChanged(nameof(HabitTypes));
-
-                SelectedCategory = Categories.FirstOrDefault();
-                SelectedType = HabitTypes.FirstOrDefault();
-
+                if (types.Models != null && types.Models.Count > 0)
+                {
+                    HabitTypes.Clear();
+                    foreach(var type in types.Models)
+                        HabitTypes.Add(type);
+                    SelectedType = HabitTypes.FirstOrDefault();
+                }
             }
             catch(Exception ex){
-                System.Windows.MessageBox.Show($"Error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error loading habit types from DB: {ex.Message}");
+            }
+
+            try{
+                // Load colors
+                var colors = await SupabaseService.Client.From<Colors>().Get();
+                Colors.Clear();
+                if (colors.Models != null && colors.Models.Count > 0)
+                {
+                    foreach(var color in colors.Models)
+                        Colors.Add(color);
+                }
+            }
+            catch(Exception ex){
+                System.Diagnostics.Debug.WriteLine($"Error loading colors from DB: {ex.Message}");
             }
         }
 
@@ -352,8 +393,7 @@ namespace HabitTracker.ViewModels{
             // Set name and delegate to CreateHabitAsync to reuse validation/creation logic
             NewHabitName = SelectedBuiltInHabit;
 
-            // Ensure there is a category/type selected
-            if (SelectedCategory == null) SelectedCategory = Categories.FirstOrDefault();
+            // Ensure there is a type selected
             if (SelectedType == null) SelectedType = HabitTypes.FirstOrDefault();
 
             await CreateHabitAsync();
@@ -361,41 +401,81 @@ namespace HabitTracker.ViewModels{
 
         //Dodawanie nawyku
         public async Task CreateHabitAsync(){
-            if(string.IsNullOrWhiteSpace(NewHabitName) || SelectedCategory == null || SelectedType == null){
-                System.Windows.MessageBox.Show("Fullfill all fields!");
+            if(string.IsNullOrWhiteSpace(NewHabitName)){
+                System.Windows.MessageBox.Show("Please enter a habit name.");
                 return;
             }
 
             try{
                 IsLoading = true;
 
+                // Look up HabitType UUID by display name
+                var habitType = HabitTypes.FirstOrDefault(t => 
+                    string.Equals(t.DisplayType, NewHabitType, StringComparison.OrdinalIgnoreCase));
+                
+                if (habitType == null)
+                {
+                    System.Windows.MessageBox.Show($"Habit type '{NewHabitType}' not found in database.");
+                    return;
+                }
+
                 var habit = new Habits{
                     Name = NewHabitName,
-                    CategoryId=SelectedCategory.Id,
-                    HabitTypeId=SelectedType.Id,
-                    //Pobranie id z sesji zalogowanego uzytkownika
+                    HabitTypeId = habitType.Id,
                     UserId = SupabaseService.Client.Auth.CurrentUser.Id,
-                    Period = "Daily",
-                    TargetFrequency = 1,
-                    DaysOfWeek  = 127,
-                    Priority = 1,
-                    IsFlexible = false
+                    Icon = NewHabitIcon,
+                    Period = NewHabitFrequency,
+                    TargetFrequency = (int)NewHabitGoal,
+                    DaysOfWeek = NewHabitDaysOfWeek,
+                    Priority = NewHabitPriority,
+                    IsFlexible = false,
+                    IsArchived = false,
+                    IsSystem = false,
+                    CreatedDate = DateTime.UtcNow
                 };
                 await SupabaseService.Client.From<Habits>().Insert(habit);
 
                 //Reset formularza i refresh listy
-                NewHabitName = string.Empty;
-                IsAddFormVisible = false;
+                ResetAddHabitForm();
+                IsAddHabitModalOpen = false;
                 await LoadHabitsAsync();
 
-                System.Windows.MessageBox.Show("Habit added successfully!");
+                System.Windows.MessageBox.Show("Habit created successfully! \ud83c\udf31");
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error: {ex.Message}");
-                
+                System.Windows.MessageBox.Show($"Error creating habit: {ex.Message}");
             }
             finally{IsLoading = false;}
+        }
+
+
+
+        // Usuwanie (archiwizacja) nawyku
+        public async Task DeleteHabitAsync(Habits habit){
+            try{
+                habit.IsArchived = true;
+                await SupabaseService.Client.From<Habits>()
+                    .Filter("id", Constants.Operator.Equals, habit.Id)
+                    .Set(h => h.IsArchived, true)
+                    .Update();
+                await LoadHabitsAsync();
+            }
+            catch(Exception ex){
+                System.Windows.MessageBox.Show($"Error archiving habit: {ex.Message}");
+            }
+        }
+
+        // Reset formularza Add Habit
+        public void ResetAddHabitForm(){
+            NewHabitName = string.Empty;
+            NewHabitType = "Numeric";
+            NewHabitPriority = 2;
+            NewHabitFrequency = "Daily";
+            NewHabitIcon = "❤️";
+            NewHabitDaysOfWeek = 127;
+            NewHabitGoal = 1;
+            NewHabitUnit = "count";
         }
         
         private string _todayDate;

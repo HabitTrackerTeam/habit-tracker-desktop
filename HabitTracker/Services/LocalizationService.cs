@@ -66,7 +66,7 @@ namespace HabitTracker.Services
         public string ChooseHabitFromList => Get("Wybierz nawyk z listy", "Choose a habit from the list");
         public string AddSelected => Get("Dodaj wybrany", "Add Selected");
         public string HabitName => Get("Nazwa nawyku", "Habit Name");
-        public string Category => Get("Kategoria", "Category");
+
         public string Type => Get("Typ", "Type");
         public string SaveHabit => Get("Zapisz nawyk", "Save Habit");
 
