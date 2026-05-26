@@ -270,6 +270,18 @@ namespace HabitTracker.ViewModels
                 _currentSettings = await UserSettingsService.LoadSettingsAsync(currentUser.Id);
                 ApplySettingsToUI(_currentSettings);
 
+                if (string.IsNullOrEmpty(UserName))
+                {
+                    if (currentUser.UserMetadata != null && currentUser.UserMetadata.ContainsKey("nickname"))
+                    {
+                        UserName = currentUser.UserMetadata["nickname"].ToString() ?? string.Empty;
+                    }
+                    else
+                    {
+                        UserName = currentUser.Email ?? string.Empty;
+                    }
+                }
+
                 UserInitial = !string.IsNullOrEmpty(UserName) ? UserName[0].ToString().ToUpper() : "?";
 
                 StatusMessage = string.Empty;

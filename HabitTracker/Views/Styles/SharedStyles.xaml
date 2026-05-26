@@ -25,10 +25,13 @@
                                         <ControlTemplate TargetType="Button">
                                                 <Grid Background="Transparent">
                                                         <Border x:Name="BgBorder"
-                                                                Background="{DynamicResource InputBgBrush}"
-                                                                CornerRadius="10"
-                                                                Opacity="0"/>
-
+                                                                Background="{TemplateBinding Background}"
+                                                                CornerRadius="8"/>
+                                                        <Border x:Name="ActiveBorder"
+                                                                Background="{TemplateBinding BorderBrush}"
+                                                                Width="{Binding BorderThickness.Right, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                CornerRadius="0,8,8,0"
+                                                                HorizontalAlignment="Right"/>
                                                         <ContentPresenter Margin="{TemplateBinding Padding}"
                                                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                           VerticalAlignment="Center">
@@ -43,14 +46,9 @@
                                                                  Value="True">
                                                                 <Setter Property="Foreground"
                                                                         Value="{DynamicResource TextMainBrush}"/>
-
                                                                 <Trigger.EnterActions>
                                                                         <BeginStoryboard>
                                                                                 <Storyboard>
-                                                                                        <DoubleAnimation Storyboard.TargetName="BgBorder"
-                                                                                                         Storyboard.TargetProperty="Opacity"
-                                                                                                         To="1"
-                                                                                                         Duration="0:0:0.2"/>
                                                                                         <DoubleAnimation Storyboard.TargetName="ContentTransform"
                                                                                                          Storyboard.TargetProperty="X"
                                                                                                          To="5"
@@ -62,14 +60,9 @@
                                                                                 </Storyboard>
                                                                         </BeginStoryboard>
                                                                 </Trigger.EnterActions>
-
                                                                 <Trigger.ExitActions>
                                                                         <BeginStoryboard>
                                                                                 <Storyboard>
-                                                                                        <DoubleAnimation Storyboard.TargetName="BgBorder"
-                                                                                                         Storyboard.TargetProperty="Opacity"
-                                                                                                         To="0"
-                                                                                                         Duration="0:0:0.2"/>
                                                                                         <DoubleAnimation Storyboard.TargetName="ContentTransform"
                                                                                                          Storyboard.TargetProperty="X"
                                                                                                          To="0"
@@ -87,26 +80,20 @@
                                 </Setter.Value>
                         </Setter>
                 </Style>
-                <LinearGradientBrush x:Key="AppBgBrush"
-                                     StartPoint="0,0"
-                                     EndPoint="1,1">
-                        <GradientStop Color="#FFF4F4E9"
-                                      Offset="0.0"/>
-                        <GradientStop Color="#FFE4E8E5"
-                                      Offset="1.0"/>
-                </LinearGradientBrush>
+                <SolidColorBrush x:Key="AppBgBrush"
+                                 Color="#FFF8FAFC"/>
                 <SolidColorBrush x:Key="CardBgBrush"
                                  Color="White"/>
                 <SolidColorBrush x:Key="TextMainBrush"
-                                 Color="#FF4E606C"/>
+                                 Color="#FF0F172A"/>
                 <SolidColorBrush x:Key="TextMutedBrush"
-                                 Color="#FF8B9AA2"/>
+                                 Color="#FF64748B"/>
                 <SolidColorBrush x:Key="AccentGreenBrush"
-                                 Color="#FF328A5D"/>
+                                 Color="#FF166534"/>
                 <SolidColorBrush x:Key="InputBgBrush"
-                                 Color="#FFF8F9FA"/>
+                                 Color="#FFF1F5F9"/>
                 <SolidColorBrush x:Key="InputBorderBrush"
-                                 Color="#FFDDE2E5"/>
+                                 Color="#FFCBD5E1"/>
 
                 <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 

@@ -1,0 +1,333 @@
+<UserControl x:Class="HabitTracker.Views.Tabs.CalendarTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:HabitTracker"
+             xmlns:views="clr-namespace:HabitTracker.Views"
+             Background="Transparent"
+             FontFamily="Inter, Segoe UI">
+
+    <UserControl.Resources>
+        <!-- Calendar Header Labels -->
+        <Style x:Key="DayHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Calendar Day Tile -->
+        <Style x:Key="CalendarDayStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBgBrush}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="Height" Value="100"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBgBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="DayPercentStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#059669"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,4,0,2"/>
+        </Style>
+
+        <Style x:Key="DayDotStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="4"/>
+            <Setter Property="Height" Value="4"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Habit Detail List Item -->
+        <Style x:Key="HabitDetailItemStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource InputBgBrush}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>   <!-- Main Calendar Area -->
+            <ColumnDefinition Width="380"/> <!-- Right Detail Panel -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Main Calendar Area -->
+        <Grid Grid.Column="0" Margin="48, 40">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Page Title -->
+                <RowDefinition Height="Auto"/> <!-- Header -->
+                <RowDefinition Height="Auto"/> <!-- Month/Week Toggle -->
+                <RowDefinition Height="Auto"/> <!-- Week Days -->
+                <RowDefinition Height="*"/>    <!-- Calendar Grid -->
+            </Grid.RowDefinitions>
+
+            <!-- Page Title -->
+            <TextBlock Grid.Row="0" 
+                       Text="{Binding Calendar, Source={StaticResource Loc}}" 
+                       FontSize="28" 
+                       FontWeight="Bold" 
+                       Foreground="{DynamicResource TextMainBrush}" 
+                       Margin="0,0,0,24" />
+
+            <!-- Calendar Header -->
+            <StackPanel Grid.Row="1" Margin="0,0,0,32">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                    <Button Content="&lt;" Command="{Binding PreviousMonthCommand}" Background="Transparent" BorderThickness="0" FontSize="20" FontWeight="Bold" Margin="0,0,15,0" Cursor="Hand" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding CurrentMonthYear}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                    <Button Content="&gt;" Command="{Binding NextMonthCommand}" Background="Transparent" BorderThickness="0" FontSize="20" FontWeight="Bold" Margin="15,0,0,0" Cursor="Hand" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding CurrentProtocolText}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
+
+            <!-- View Toggle -->
+            <Border Grid.Row="2" Background="{DynamicResource InputBgBrush}" CornerRadius="12" HorizontalAlignment="Right" Padding="4" Margin="0,0,0,32">
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding SetMonthlyViewCommand}" BorderThickness="0" Cursor="Hand" Background="Transparent" Padding="0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border CornerRadius="8" Padding="16,8" Background="{TemplateBinding Background}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMonthlyView}" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="Monthly" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMonthlyView}" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button Command="{Binding SetWeeklyViewCommand}" BorderThickness="0" Cursor="Hand" Background="Transparent" Padding="0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border CornerRadius="8" Padding="16,8" Background="{TemplateBinding Background}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMonthlyView}" Value="False">
+                                                    <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="Weekly" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMonthlyView}" Value="False">
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Days of Week Headers -->
+            <UniformGrid Grid.Row="3" Columns="7" Margin="0,0,0,16">
+                <TextBlock Text="MON" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="TUE" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="WED" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="THU" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="FRI" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="SAT" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="SUN" Style="{StaticResource DayHeaderStyle}"/>
+            </UniformGrid>
+
+            <!-- Calendar Grid -->
+            <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding CalendarDays}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="7"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border>
+                                <Border.Style>
+                                    <Style TargetType="Border" BasedOn="{StaticResource CalendarDayStyle}">
+                                        <Setter Property="Opacity" Value="1.0" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
+                                                <Setter Property="Opacity" Value="0.3" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource AccentGreenBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding DayNumber}" HorizontalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
+                                                <Setter Property="FontWeight" Value="Normal" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="Foreground" Value="White" />
+                                                        <Setter Property="FontWeight" Value="Bold" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    
+                                    <TextBlock Text="{Binding PercentageText}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource DayPercentStyle}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding PercentageText}" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding BadgeColor}" Value="#FFF0F0">
+                                                        <Setter Property="Foreground" Value="#EF4444" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="Foreground" Value="White" />
+                                                        <Setter Property="Opacity" Value="0.9" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    
+                                    <Ellipse Fill="{Binding DotColor}">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse" BasedOn="{StaticResource DayDotStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="Fill" Value="White" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Right Detail Panel -->
+        <Border Grid.Column="1" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1,0,0,0">
+            <Grid Margin="32">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Selected Day Title -->
+                    <RowDefinition Height="Auto"/> <!-- Main Progress Score -->
+                    <RowDefinition Height="*"/>    <!-- Habit List & Reflections -->
+                </Grid.RowDefinitions>
+
+                <!-- Header Info -->
+                <Grid Grid.Row="0">
+                    <StackPanel>
+                        <TextBlock Text="SELECTED DAY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
+                        <!-- Hardcoded since there is no selected day data model currently -->
+                        <TextBlock Text="Friday, May 3" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                        <TextBlock Text="Perfect Growth Day" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Button Content="Edit" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Foreground="#059669" FontWeight="Bold" Cursor="Hand"/>
+                </Grid>
+
+                <!-- Big Score Indicator -->
+                <StackPanel Grid.Row="1" Margin="0,48,0,48" HorizontalAlignment="Right">
+                    <TextBlock VerticalAlignment="Bottom">
+                        <Run Text="100" FontSize="56" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}"/>
+                        <Run Text="/100" FontSize="20" Foreground="{DynamicResource TextMutedBrush}"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Scrolling Details Content -->
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden">
+                    <StackPanel>
+                        <!-- Daily Habits Section -->
+                        <StackPanel Margin="0,0,0,40">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                                <Path Data="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Margin="0,0,12,0"/>
+                                <TextBlock Text="Daily Habits" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- Habit Item (Completed) -->
+                            <Border Style="{StaticResource HabitDetailItemStyle}" BorderBrush="{DynamicResource AccentGreenBrush}" BorderThickness="2,0,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="M12,2C6.5,2 2,6.5 2,12C2,17.5 6.5,22 12,22C17.5,22 22,17.5 22,12C22,6.5 17.5,2 12,2M10,17L5,12L6.41,10.59L10,14.17L17.59,6.58L19,8L10,17Z" Fill="#059669" Width="16" Height="16" Margin="0,0,12,0"/>
+                                    <TextBlock Grid.Column="1" Text="Morning Meditation" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TextMainBrush}"/>
+                                    <Border Grid.Column="2" Background="#F0FDF4" CornerRadius="4" Padding="6,2">
+                                        <TextBlock Text="15 MIN" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- Habit Item (Missed) -->
+                            <Border Style="{StaticResource HabitDetailItemStyle}" BorderBrush="#EF4444" BorderThickness="2,0,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59Z" Fill="#EF4444" Width="16" Height="16" Margin="0,0,12,0"/>
+                                    <TextBlock Grid.Column="1" Text="Evening Journaling" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                                    <Border Grid.Column="2" Background="#FEF2F2" CornerRadius="4" Padding="6,2">
+                                        <TextBlock Text="MISSED" FontSize="9" FontWeight="Bold" Foreground="#EF4444"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Reflections Section -->
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                                <Path Data="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Margin="0,0,12,0"/>
+                                <TextBlock Text="Reflections" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <Border Background="{DynamicResource AppBgBrush}" CornerRadius="16" Padding="24">
+                                <Grid>
+                                    <Path Data="M14,17H17L19,13V7H13V13H16M6,13H9L11,9V3H5V9H8L6,13Z" Fill="{DynamicResource InputBorderBrush}" Width="32" Height="32" HorizontalAlignment="Right" VerticalAlignment="Top" Opacity="0.5"/>
+                                    <TextBlock Text="&quot;Felt exceptionally focused today after the morning meditation. The deep work session was productive. Need to maintain this momentum into the weekend.&quot;" 
+                                               FontSize="14" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" FontStyle="Italic" LineHeight="22"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

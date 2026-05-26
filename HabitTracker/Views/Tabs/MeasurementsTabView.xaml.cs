@@ -2,11 +2,11 @@ using System.Windows;
 using System.Windows.Controls;
 using HabitTracker.ViewModels;
 
-namespace HabitTracker.Views
+namespace HabitTracker.Views.Tabs
 {
-    public partial class MeasurementsView : UserControl
+    public partial class MeasurementsTabView : UserControl
     {
-        public MeasurementsView()
+        public MeasurementsTabView()
         {
             InitializeComponent();
         }

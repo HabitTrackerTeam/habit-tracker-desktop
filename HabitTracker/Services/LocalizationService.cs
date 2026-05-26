@@ -41,6 +41,7 @@ namespace HabitTracker.Services
         }
 
         // === Sidebar ===
+        public string Home => Get("Strona główna", "Home");
         public string Dashboard => Get("Panel główny", "Dashboard");
         public string HabitsManager => Get("Zarządzanie nawykami", "Habits Manager");
         public string Calendar => Get("Kalendarz", "Calendar");
