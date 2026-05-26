@@ -3,6 +3,10 @@ using System.Windows.Controls;
 using HabitTracker.ViewModels;
 using System.Linq;
 using HabitTracker.Models;
+using System.Windows.Media;
+using System.Windows.Input;
+using HabitTracker.Services;
+using Supabase.Postgrest;
 
 namespace HabitTracker.Views.Tabs
 {
@@ -192,39 +196,110 @@ namespace HabitTracker.Views.Tabs
                     btn.FontWeight = FontWeights.Normal;
                 }
             }
-        }
-
-
-        private void HabitIconButton_Click(object sender, RoutedEventArgs e)
+        }        private void SelectIconButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button clickedBtn && clickedBtn.Parent is WrapPanel panel)
+            if (IconPickerPopup != null)
             {
-                var greenBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)); // #166534
-                var grayBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 241, 245, 249)); // #F1F5F9
-
-                foreach (var child in panel.Children)
-                {
-                    if (child is Button btn)
-                    {
-                        if (btn == clickedBtn)
-                        {
-                            btn.Background = greenBackground;
-                            btn.Foreground = System.Windows.Media.Brushes.White;
-                        }
-                        else
-                        {
-                            btn.Background = grayBackground;
-                            btn.Foreground = System.Windows.Media.Brushes.Black;
-                        }
-                    }
-                }
-
-                if (_dashboardVM != null && clickedBtn.Content != null)
-                {
-                    _dashboardVM.NewHabitIcon = clickedBtn.Content.ToString();
-                }
+                InitializeEmojiGrid();
+                IconPickerPopup.IsOpen = true;
             }
         }
+
+        private bool _isEmojiGridInitialized = false;
+        private void InitializeEmojiGrid()
+        {
+            if (_isEmojiGridInitialized || EmojiWrapPanel == null) return;
+
+            string[] emojis = new string[]
+            {
+                "❤️", "💪", "🏃", "🧘", "💧", "🚴", "🚶", "🥗", "🍎", "🥦", "🥛", "😴", "🦷",
+                "🧠", "📖", "✏️", "🎯", "💼", "💻", "📚", "✍️", "🎓", "⏰", "📅", "📝",
+                "🧹", "🪴", "🎨", "🎵", "🎸", "🎮", "📸", "🍳", "☕", "🍵", "🐱", "🐶", "🚗", "🔧",
+                "🌱", "⭐", "🏆", "💰", "📈", "🔑", "🛡️", "🔋", "🎒", "🌍", "✈️", "☀️", "🌙", "🍀"
+            };
+
+            EmojiWrapPanel.Children.Clear();
+            foreach (var emoji in emojis)
+            {
+                var btn = new Button
+                {
+                    Content = emoji,
+                    Style = (Style)FindResource("EmojiButtonStyle")
+                };
+
+
+                btn.Click += (s, ev) =>
+                {
+                    if (_dashboardVM != null)
+                    {
+                        _dashboardVM.NewHabitIcon = emoji;
+                    }
+                    if (SelectedIconPreview != null)
+                    {
+                        SelectedIconPreview.Text = emoji;
+                    }
+                    if (IconPickerPopup != null)
+                    {
+                        IconPickerPopup.IsOpen = false;
+                    }
+                };
+
+                EmojiWrapPanel.Children.Add(btn);
+            }
+
+            _isEmojiGridInitialized = true;
+        }
+
+        // ========== DRAG & DROP SORTING ==========
+        private void DragHandle_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement dragHandle && dragHandle.DataContext is Habits draggedHabit)
+            {
+                DragDrop.DoDragDrop(dragHandle, draggedHabit, DragDropEffects.Move);
+            }
+        }
+
+        private void HabitRow_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(typeof(Habits)))
+            {
+                e.Effects = DragDropEffects.Move;
+                e.Handled = true;
+            }
+        }
+
+        private async void HabitRow_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetData(typeof(Habits)) is Habits draggedHabit && sender is FrameworkElement targetElement && targetElement.DataContext is Habits targetHabit)
+            {
+                if (draggedHabit.Id == targetHabit.Id || _dashboardVM == null) return;
+
+                var habits = _dashboardVM.Habits;
+                int oldIndex = habits.IndexOf(draggedHabit);
+                int newIndex = habits.IndexOf(targetHabit);
+
+                if (oldIndex >= 0 && newIndex >= 0 && oldIndex != newIndex)
+                {
+                    habits.Move(oldIndex, newIndex);
+
+                    try
+                    {
+                        for (int i = 0; i < habits.Count; i++)
+                        {
+                            habits[i].SortOrder = i;
+                            await SupabaseService.Client.From<Habits>()
+                                .Filter("id", Constants.Operator.Equals, habits[i].Id)
+                                .Set(h => h.SortOrder, i)
+                                .Update();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error updating sort order: {ex.Message}");
+                    }
+                }
+            }
+        }     
 
         private void EditHabit_Click(object sender, RoutedEventArgs e)
         {
@@ -237,7 +312,7 @@ namespace HabitTracker.Views.Tabs
                 _dashboardVM.NewHabitPriority = habit.Priority;
                 _dashboardVM.NewHabitFrequency = habit.Period ?? "Daily";
                 _dashboardVM.NewHabitDaysOfWeek = habit.DaysOfWeek;
-                _dashboardVM.NewHabitIcon = habit.Icon ?? "❤️";
+                _dashboardVM.NewHabitIcon = habit.Icon ?? "❓";
                 _dashboardVM.NewHabitGoal = habit.TargetFrequency;
                 _dashboardVM.NewHabitUnit = habit.Unit ?? habit.DefaultUnit ?? "count";
                 _dashboardVM.ModalTitle = "Edit Habit";
@@ -295,25 +370,10 @@ namespace HabitTracker.Views.Tabs
                     var priorityButtons = new[] { PriorityLowBtn, PriorityMediumBtn, PriorityHighBtn };
                     ResetButtonGroup(priorityButtons, selectedPriorityBtn);
                 }
-                
-                // Icon Buttons
-                var iconButtons = new[] { IconBtn1, IconBtn2, IconBtn3, IconBtn4, IconBtn5, IconBtn6, IconBtn7, IconBtn8, IconBtn9, IconBtn10 };
-                var greenBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)); // #166534
-                var grayBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 241, 245, 249)); // #F1F5F9
-
-                foreach (var iconBtn in iconButtons)
+                // Icon Preview
+                if (SelectedIconPreview != null)
                 {
-                    if (iconBtn == null) continue;
-                    if (iconBtn.Content?.ToString() == habit.Icon)
-                    {
-                        iconBtn.Background = greenBackground;
-                        iconBtn.Foreground = System.Windows.Media.Brushes.White;
-                    }
-                    else
-                    {
-                        iconBtn.Background = grayBackground;
-                        iconBtn.Foreground = System.Windows.Media.Brushes.Black;
-                    }
+                    SelectedIconPreview.Text = habit.Icon ?? "❓";
                 }
                 
                 // Frequency RadioButtons
@@ -422,23 +482,10 @@ namespace HabitTracker.Views.Tabs
             var priorityButtons = new[] { PriorityLowBtn, PriorityMediumBtn, PriorityHighBtn };
             ResetButtonGroup(priorityButtons, PriorityMediumBtn);
             
-            // Icon WrapPanel Buttons
-            var iconButtons = new[] { IconBtn1, IconBtn2, IconBtn3, IconBtn4, IconBtn5, IconBtn6, IconBtn7, IconBtn8, IconBtn9, IconBtn10 };
-            var greenBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)); // #166534
-            var grayBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 241, 245, 249)); // #F1F5F9
-            foreach(var btn in iconButtons)
+            // Icon Preview Reset
+            if (SelectedIconPreview != null)
             {
-                if (btn == null) continue;
-                if (btn == IconBtn1)
-                {
-                    btn.Background = greenBackground;
-                    btn.Foreground = System.Windows.Media.Brushes.White;
-                }
-                else
-                {
-                    btn.Background = grayBackground;
-                    btn.Foreground = System.Windows.Media.Brushes.Black;
-                }
+                SelectedIconPreview.Text = "❓";
             }
             
             // Reset Days Mask to 127

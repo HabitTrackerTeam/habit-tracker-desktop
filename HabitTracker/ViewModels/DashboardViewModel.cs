@@ -73,7 +73,7 @@ namespace HabitTracker.ViewModels{
         private string _newHabitFrequency = "Daily";
         public string NewHabitFrequency { get => _newHabitFrequency; set { _newHabitFrequency = value; OnPropertyChanged(); } }
 
-        private string _newHabitIcon = "❤️";
+        private string _newHabitIcon = "❓";
         public string NewHabitIcon { get => _newHabitIcon; set { _newHabitIcon = value; OnPropertyChanged(); } }
 
         private int _newHabitDaysOfWeek = 127; // All days bitmask
@@ -343,7 +343,7 @@ namespace HabitTracker.ViewModels{
                     .Filter("user_id", Constants.Operator.Equals, userId)
                     .Filter("is_archived", Constants.Operator.Equals, "false")
                     .Get();
-                var habitsList = response.Models ?? new List<Habits>();
+                var habitsList = response.Models?.OrderBy(h => h.SortOrder).ToList() ?? new List<Habits>();
 
                 if (HabitTypes.Count == 0)
                 {
@@ -613,7 +613,7 @@ namespace HabitTracker.ViewModels{
             NewHabitType = "Numeric";
             NewHabitPriority = 2;
             NewHabitFrequency = "Daily";
-            NewHabitIcon = "❤️";
+            NewHabitIcon = "❓";
             NewHabitDaysOfWeek = 127;
             NewHabitGoal = 1;
             NewHabitUnit = "count";

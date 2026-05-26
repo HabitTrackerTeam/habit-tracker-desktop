@@ -14,15 +14,25 @@ public partial class DashboardView : System.Windows.Controls.UserControl
 
     public DashboardView()
     {
-        InitializeComponent();
-
         _dashboardVM = new DashboardViewModel();
         _measurementsVM = new MeasurementsViewModel();
+
+        InitializeComponent();
 
         MainContentArea.DataContext = _dashboardVM;
         MeasurementsViewControl.DataContext = _measurementsVM;
 
         Loaded += DashboardView_Loaded;
+        this.IsVisibleChanged += DashboardView_IsVisibleChanged;
+    }
+
+    private async void InnerGrid_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.IsVisible && _dashboardVM != null)
+        {
+            await _dashboardVM.LoadFormDataAsync();
+            await _dashboardVM.LoadHabitsAsync();
+        }
     }
 
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
@@ -46,6 +56,15 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         await _dashboardVM.LoadFormDataAsync();
         await _dashboardVM.LoadHabitsAsync();
         UpdateSidebar(NavHome);
+    }
+
+    private async void DashboardView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (this.IsVisible)
+        {
+            await _dashboardVM.LoadFormDataAsync();
+            await _dashboardVM.LoadHabitsAsync();
+        }
     }
 
     private void AddHabit_Click(object sender, RoutedEventArgs e)

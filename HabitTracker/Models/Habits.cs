@@ -70,6 +70,21 @@ namespace HabitTracker.Models{
             }
         }
 
+        private int _sortOrder;
+        [Column("sort_order")]
+        public int SortOrder
+        {
+            get => _sortOrder;
+            set
+            {
+                if (_sortOrder != value)
+                {
+                    _sortOrder = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         //Relacje (Foreign Keys)
         [Reference(typeof(Users))]
         public Users User {get;set;}
