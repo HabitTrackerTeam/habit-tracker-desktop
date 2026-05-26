@@ -193,7 +193,7 @@
                     <!-- Header -->
                     <Grid Grid.Row="0" Margin="0,0,0,24">
                         <StackPanel>
-                            <TextBlock Text="Add New Habit" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                            <TextBlock Text="{Binding ModalTitle}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
                             <TextBlock Text="Plant a new seed for your personal growth journey." FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
                         </StackPanel>
                         <Button HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="CloseAddHabitModal_Click">
@@ -209,8 +209,45 @@
                         </Border>
                     </StackPanel>
 
+                    <!-- Icon Selection for Habit -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                        <TextBlock Text="ICON" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                        <WrapPanel>
+                                <Button x:Name="IconBtn1" Content="❤️" Width="44" Height="44" Padding="0" Background="#166534" Foreground="White" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn2" Content="💪" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn3" Content="🧠" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn4" Content="📖" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn5" Content="🏃" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn6" Content="🧘" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn7" Content="💧" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn8" Content="🎯" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn9" Content="✏️" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                                <Button x:Name="IconBtn10" Content="🌱" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                                </Button>
+                        </WrapPanel>
+                    </StackPanel>
+
                     <!-- Type & Priority -->
-                    <Grid Grid.Row="2" Margin="0,0,0,20">
+                    <Grid Grid.Row="3" Margin="0,0,0,20">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="24"/>
@@ -261,43 +298,6 @@
                             </Border>
                         </StackPanel>
                     </Grid>
-
-                    <!-- Icon Selection for Habit -->
-                    <StackPanel Grid.Row="3" Margin="0,0,0,20">
-                        <TextBlock Text="ICON" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                        <WrapPanel>
-                                <Button x:Name="IconBtn1" Content="❤️" Width="44" Height="44" Padding="0" Background="#166534" Foreground="White" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn2" Content="💪" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn3" Content="🧠" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn4" Content="📖" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn5" Content="🏃" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn6" Content="🧘" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn7" Content="💧" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn8" Content="🎯" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn9" Content="✏️" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                                <Button x:Name="IconBtn10" Content="🌱" Width="44" Height="44" Padding="0" Background="#F1F5F9" FontSize="16" Margin="0,0,6,6" Click="HabitIconButton_Click" Cursor="Hand" BorderThickness="0">
-                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
-                                </Button>
-                        </WrapPanel>
-                    </StackPanel>
 
                     <!-- Frequency -->
                     <StackPanel Grid.Row="4" Margin="0,0,0,20">
@@ -409,7 +409,7 @@
                                 </Button.Resources>
                                 <StackPanel Orientation="Horizontal">
                                     <Path Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" Fill="White" Width="14" Height="14" Margin="0,0,8,0" Stretch="Uniform"/>
-                                    <TextBlock Text="Plant Habit" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding ModalButtonText}" Foreground="White" FontSize="14" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
