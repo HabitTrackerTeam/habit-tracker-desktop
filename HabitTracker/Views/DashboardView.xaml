@@ -6,7 +6,7 @@
              xmlns:tabs="clr-namespace:HabitTracker.Views.Tabs">
     <Grid Visibility="{Binding IsDashboardVisible, Converter={StaticResource BoolToVis}}" IsVisibleChanged="InnerGrid_IsVisibleChanged">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="270" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 

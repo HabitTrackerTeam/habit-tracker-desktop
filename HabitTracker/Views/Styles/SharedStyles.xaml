@@ -94,6 +94,10 @@
                                  Color="#FFF1F5F9"/>
                 <SolidColorBrush x:Key="InputBorderBrush"
                                  Color="#FFCBD5E1"/>
+                <SolidColorBrush x:Key="HabitCheckedBgBrush"
+                                 Color="#FFEBF7EE"/>
+                <SolidColorBrush x:Key="HabitCheckedBorderBrush"
+                                 Color="#FF81C784"/>
 
                 <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 

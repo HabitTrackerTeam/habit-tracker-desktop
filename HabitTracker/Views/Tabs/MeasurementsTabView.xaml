@@ -217,7 +217,7 @@
                                 <TextBlock Text=":" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,5,0" />
                                 <TextBlock Text="{Binding SelectedBodyMetric.LatestValue}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                 <TextBlock Text="{Binding SelectedBodyMetric.Unit, StringFormat=' {0}'}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
-                                <TextBlock Text="{Binding SelectedBodyMetric.Delta, StringFormat={} {0:+0.0;-0.0;0} this month}" FontSize="14" Foreground="#FF328A5D" FontWeight="Bold" VerticalAlignment="Center" Margin="15,0,0,0" />
+                                <TextBlock Text="{Binding SelectedBodyMetric.Delta, StringFormat={} {0:+0.0;-0.0;0}}" FontSize="14" Foreground="#FF328A5D" FontWeight="Bold" VerticalAlignment="Center" Margin="15,0,0,0" /><TextBlock Text="{Binding ThisMonth, Source={StaticResource Loc}}" FontSize="14" Foreground="#FF328A5D" FontWeight="Bold" VerticalAlignment="Center" Margin="2,0,0,0" />
                             </StackPanel>
                         </StackPanel>
 

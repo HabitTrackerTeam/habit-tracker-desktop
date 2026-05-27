@@ -262,7 +262,8 @@ public partial class DashboardView : System.Windows.Controls.UserControl
     {
         if (sender is System.Windows.Controls.Button btn && btn.DataContext is Habits habit)
         {
-            var res = MessageBox.Show($"Are you sure you want to deactivate '{habit.Name}'?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var loc = HabitTracker.Services.LocalizationService.Instance;
+            var res = MessageBox.Show($"{loc.HabitsManager}: '{habit.Name}'?", loc.HabitsManager, MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (res == MessageBoxResult.Yes)
             {
                 _dashboardVM.Habits.Remove(habit);
