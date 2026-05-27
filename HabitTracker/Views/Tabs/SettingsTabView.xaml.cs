@@ -60,16 +60,16 @@ namespace HabitTracker.Views.Tabs
 
                         var attrs = new UserAttributes { Password = passwordWindow.NewPassword };
                         await HabitTracker.Services.SupabaseService.Client.Auth.Update(attrs);
-                        MessageBox.Show("Password changed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show(HabitTracker.Services.LocalizationService.Instance.PasswordChangedOk, "OK", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
-                        MessageBox.Show("User email not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(HabitTracker.Services.LocalizationService.Instance.EmailNotFound, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Failed to change password. Make sure the old password is correct.\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(HabitTracker.Services.LocalizationService.Instance.PasswordChangeFailed + $"\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             DialogOverlay.Visibility = Visibility.Collapsed;

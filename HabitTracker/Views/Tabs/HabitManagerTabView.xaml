@@ -172,14 +172,14 @@
                 </Button.Template>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="+" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center" />
-                    <TextBlock Text="Add Habit" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding AddHabit, Source={StaticResource Loc}}" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
         </Grid>
 
         <!-- Search Bar -->
         <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}" CornerRadius="12" Margin="0,0,0,24">
-            <TextBox x:Name="SearchBox" Tag="Search habits..." Height="44" Background="Transparent" BorderThickness="0" Padding="16,0" VerticalContentAlignment="Center" Foreground="{DynamicResource TextMainBrush}" />
+            <TextBox x:Name="SearchBox" Tag="{Binding SearchHabits, Source={StaticResource Loc}}" Height="44" Background="Transparent" BorderThickness="0" Padding="16,0" VerticalContentAlignment="Center" Foreground="{DynamicResource TextMainBrush}" />
         </Border>
 
         <!-- Filters -->
@@ -191,19 +191,19 @@
             </Grid.ColumnDefinitions>
             
             <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                <TextBlock Text="FREQUENCY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <TextBlock Text="{Binding FrequencyLabel, Source={StaticResource Loc}}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
                     <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedFrequency}" DisplayMemberPath="Name" />
                 </Border>
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="8,0,8,0">
-                <TextBlock Text="PRIORITY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <TextBlock Text="{Binding PriorityLabel, Source={StaticResource Loc}}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
                     <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Priorities}" SelectedItem="{Binding SelectedPriority}" DisplayMemberPath="Name" />
                 </Border>
             </StackPanel>
             <StackPanel Grid.Column="2" Margin="8,0,0,0">
-                <TextBlock Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <TextBlock Text="{Binding StatusLabel, Source={StaticResource Loc}}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
                     <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Statuses}" SelectedItem="{Binding SelectedStatus}" DisplayMemberPath="Name" />
                 </Border>
@@ -228,11 +228,11 @@
                         <ColumnDefinition Width="120" />
                         <ColumnDefinition Width="100" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="HABIT DETAILS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Grid.Column="1" Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="2" Text="PRIORITY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="3" Text="STATUS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{Binding HabitDetailsLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding FrequencyLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="{Binding PriorityLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="{Binding StatusLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="5" Text="{Binding ActionsLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
                 </Grid>
             </Border>
 
@@ -256,10 +256,10 @@
                                     </Grid.ColumnDefinitions>
                                     
                                     <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                        <Border Background="#ECFDF5" Width="40" Height="40" CornerRadius="8">
+                                        <Border Background="{DynamicResource InputBgBrush}" Width="40" Height="40" CornerRadius="8">
                                             <TextBlock Text="{Binding Icon, FallbackValue=💧}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
                                         </Border>
-                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="16,0,0,0" />
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" Margin="16,0,0,0" />
                                     </StackPanel>
                                     
                                     <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
@@ -271,7 +271,7 @@
                                     </Border>
 
                                     <Border Grid.Column="3" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
-                                        <TextBlock x:Name="StatusText" Text="Active" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="StatusText" Text="{Binding StatusActive, Source={StaticResource Loc}}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                     </Border>
                                     
                                     <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -291,16 +291,16 @@
                             </Border>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding Priority}" Value="1">
-                                    <Setter TargetName="PriorityText" Property="Text" Value="High" />
+                                    <Setter TargetName="PriorityText" Property="Text" Value="{Binding Source={StaticResource Loc}, Path=PriorityHigh}" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Priority}" Value="2">
-                                    <Setter TargetName="PriorityText" Property="Text" Value="Medium" />
+                                    <Setter TargetName="PriorityText" Property="Text" Value="{Binding Source={StaticResource Loc}, Path=PriorityMedium}" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Priority}" Value="3">
-                                    <Setter TargetName="PriorityText" Property="Text" Value="Low" />
+                                    <Setter TargetName="PriorityText" Property="Text" Value="{Binding Source={StaticResource Loc}, Path=PriorityLow}" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsArchived}" Value="True">
-                                    <Setter TargetName="StatusText" Property="Text" Value="Archived" />
+                                    <Setter TargetName="StatusText" Property="Text" Value="{Binding Source={StaticResource Loc}, Path=StatusArchived}" />
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
@@ -339,7 +339,7 @@
                     <Grid Grid.Row="0" Margin="0,0,0,24">
                         <StackPanel>
                             <TextBlock Text="{Binding ModalTitle}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
-                            <TextBlock Text="Plant a new seed for your personal growth journey." FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
+                            <TextBlock Text="{Binding PlantNewSeed, Source={StaticResource Loc}}" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
                         </StackPanel>
                         <Button HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="CloseAddHabitModal_Click">
                             <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" Fill="#64748B" Stretch="Uniform" Width="14"/>
@@ -357,7 +357,7 @@
                             <ColumnDefinition Width="*"/>    <!-- Textbox -->
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="HABIT NAME" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding HabitNameLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
 
                         <!-- Left-aligned Select Icon Button (styled like habit list cards) -->
                         <Button Grid.Row="1" Grid.Column="0" x:Name="SelectIconButton" Click="SelectIconButton_Click" Cursor="Hand" Background="#F0FDF4" Width="48" Height="48" BorderThickness="0" Margin="0,0,16,0">
@@ -381,7 +381,7 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Text="Choose an Icon" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,8"/>
+                                    <TextBlock Grid.Row="0" Text="{Binding ChooseIcon, Source={StaticResource Loc}}" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,8"/>
                                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                                         <WrapPanel x:Name="EmojiWrapPanel" HorizontalAlignment="Center" Width="252"/>
                                     </ScrollViewer>
@@ -391,7 +391,7 @@
 
                         <!-- Right-aligned Habit Name input box -->
                         <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="16,12" Height="48">
-                            <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="HabitNameBox" Text="e.g., Daily Meditation" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" FocusVisualStyle="{x:Null}" />
+                            <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="HabitNameBox" Text="" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" FocusVisualStyle="{x:Null}" />
                         </Border>
                     </Grid>
 
@@ -412,13 +412,13 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Button x:Name="TypeNumericBtn" Grid.Column="0" Content="Numeric" Background="White" BorderThickness="0" Foreground="#166534" FontWeight="Bold" FontSize="13" Click="TypeButton_Click" Cursor="Hand">
+                                    <Button x:Name="TypeNumericBtn" Grid.Column="0" Content="{Binding TypeNumeric, Source={StaticResource Loc}}" Background="White" BorderThickness="0" Foreground="#166534" FontWeight="Bold" FontSize="13" Click="TypeButton_Click" Cursor="Hand">
                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                                     </Button>
-                                    <Button x:Name="TypeCheckboxBtn" Grid.Column="1" Content="Checkbox" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" Click="TypeButton_Click" Cursor="Hand">
+                                    <Button x:Name="TypeCheckboxBtn" Grid.Column="1" Content="{Binding TypeCheckbox, Source={StaticResource Loc}}" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" Click="TypeButton_Click" Cursor="Hand">
                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                                     </Button>
-                                    <Button x:Name="TypeTimerBtn" Grid.Column="2" Content="Timer" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" Click="TypeButton_Click" Cursor="Hand">
+                                    <Button x:Name="TypeTimerBtn" Grid.Column="2" Content="{Binding TypeTimer, Source={StaticResource Loc}}" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" Click="TypeButton_Click" Cursor="Hand">
                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                                     </Button>
                                 </Grid>
@@ -426,7 +426,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="PRIORITY" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                            <TextBlock Text="{Binding PriorityLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
                             <Border Background="#F1F5F9" CornerRadius="12" Padding="4">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -434,13 +434,13 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Button x:Name="PriorityLowBtn" Grid.Column="0" Content="Low" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" Click="PriorityButton_Click" Cursor="Hand">
+                                    <Button x:Name="PriorityLowBtn" Grid.Column="0" Content="{Binding PriorityLow, Source={StaticResource Loc}}" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" Click="PriorityButton_Click" Cursor="Hand">
                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                                     </Button>
-                                    <Button x:Name="PriorityMediumBtn" Grid.Column="1" Content="Medium" Background="White" BorderThickness="0" Foreground="#166534" FontWeight="Bold" FontSize="13" Click="PriorityButton_Click" Cursor="Hand">
+                                    <Button x:Name="PriorityMediumBtn" Grid.Column="1" Content="{Binding PriorityMedium, Source={StaticResource Loc}}" Background="White" BorderThickness="0" Foreground="#166534" FontWeight="Bold" FontSize="13" Click="PriorityButton_Click" Cursor="Hand">
                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                                     </Button>
-                                    <Button x:Name="PriorityHighBtn" Grid.Column="2" Content="High" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" Click="PriorityButton_Click" Cursor="Hand">
+                                    <Button x:Name="PriorityHighBtn" Grid.Column="2" Content="{Binding PriorityHigh, Source={StaticResource Loc}}" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" Click="PriorityButton_Click" Cursor="Hand">
                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                                     </Button>
                                 </Grid>
@@ -450,7 +450,7 @@
 
                     <!-- Frequency -->
                     <StackPanel Grid.Row="3" Margin="0,0,0,20">
-                        <TextBlock Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                        <TextBlock Text="{Binding FrequencyLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
                         <Border Background="#F1F5F9" CornerRadius="12" Padding="4">
                             <Grid>
                                 <Grid.Resources>
@@ -565,7 +565,7 @@
                     <!-- Footer Actions -->
                     <Grid Grid.Row="6" Margin="0,32,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Content="Cancel" FontSize="14" FontWeight="SemiBold" Foreground="#64748B" Background="Transparent" BorderThickness="0" Margin="0,0,24,0" Cursor="Hand" Click="CancelAddHabit_Click"/>
+                            <Button Content="{Binding Cancel, Source={StaticResource Loc}}" FontSize="14" FontWeight="SemiBold" Foreground="#64748B" Background="Transparent" BorderThickness="0" Margin="0,0,24,0" Cursor="Hand" Click="CancelAddHabit_Click"/>
                             <Button Background="#166534" BorderThickness="0" Padding="24,14" Cursor="Hand" Click="PlantHabit_Click">
                                 <Button.Resources>
                                     <Style TargetType="Border">

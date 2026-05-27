@@ -10,6 +10,9 @@ public partial class MainWindow : Window
 {
     private LoginViewModel _viewModel;
 
+    /// <summary>Fired whenever the theme changes. Argument is true when dark mode is active.</summary>
+    public static event Action<bool>? ThemeChanged;
+
     public static readonly DependencyProperty HasTextProperty = DependencyProperty.RegisterAttached(
         "HasText",
         typeof(bool),
@@ -77,6 +80,8 @@ public partial class MainWindow : Window
             Application.Current.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFA0A0A0");
             Application.Current.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF1E1E1E");
             Application.Current.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF434346");
+            Application.Current.Resources["HabitCheckedBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF1A3326");
+            Application.Current.Resources["HabitCheckedBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF2E7D52");
         }
         else
         {
@@ -87,7 +92,12 @@ public partial class MainWindow : Window
             Application.Current.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF8B9AA2");
             Application.Current.Resources["InputBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFF8F9FA");
             Application.Current.Resources["InputBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFDDE2E5");
+            Application.Current.Resources["HabitCheckedBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FFEBF7EE");
+            Application.Current.Resources["HabitCheckedBorderBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF81C784");
         }
+
+        // Notify MeasurementsViewModel to refresh chart colors
+        ThemeChanged?.Invoke(isDark);
 
         AuthViewControl.UpdateThemeToggleVisuals(isDark);
         DashboardViewControl.UpdateThemeToggleVisuals(isDark);
