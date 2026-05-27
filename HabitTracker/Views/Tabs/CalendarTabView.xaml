@@ -7,6 +7,8 @@
              FontFamily="Inter, Segoe UI">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        
         <!-- Calendar Header Labels -->
         <Style x:Key="DayHeaderStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="11"/>
@@ -171,6 +173,11 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border>
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding DataContext.SelectDayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                  CommandParameter="{Binding}" />
+                                </Border.InputBindings>
                                 <Border.Style>
                                     <Style TargetType="Border" BasedOn="{StaticResource CalendarDayStyle}">
                                         <Setter Property="Opacity" Value="1.0" />
@@ -239,7 +246,7 @@
             </ScrollViewer>
         </Grid>
 
-        <!-- Right Detail Panel -->
+        <!-- Right Detail Panel (Dynamic) -->
         <Border Grid.Column="1" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1,0,0,0">
             <Grid Margin="32">
                 <Grid.RowDefinitions>
@@ -252,17 +259,15 @@
                 <Grid Grid.Row="0">
                     <StackPanel>
                         <TextBlock Text="SELECTED DAY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
-                        <!-- Hardcoded since there is no selected day data model currently -->
-                        <TextBlock Text="Friday, May 3" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                        <TextBlock Text="Perfect Growth Day" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding SelectedDayDateText}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                        <TextBlock Text="{Binding SelectedDayLabel}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
                     </StackPanel>
-                    <Button Content="Edit" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Foreground="#059669" FontWeight="Bold" Cursor="Hand"/>
                 </Grid>
 
                 <!-- Big Score Indicator -->
                 <StackPanel Grid.Row="1" Margin="0,48,0,48" HorizontalAlignment="Right">
                     <TextBlock VerticalAlignment="Bottom">
-                        <Run Text="100" FontSize="56" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}"/>
+                        <Run Text="{Binding SelectedDayScoreText, Mode=OneWay}" FontSize="56" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}"/>
                         <Run Text="/100" FontSize="20" Foreground="{DynamicResource TextMutedBrush}"/>
                     </TextBlock>
                 </StackPanel>
@@ -277,37 +282,89 @@
                                 <TextBlock Text="Daily Habits" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
 
-                            <!-- Habit Item (Completed) -->
-                            <Border Style="{StaticResource HabitDetailItemStyle}" BorderBrush="{DynamicResource AccentGreenBrush}" BorderThickness="2,0,0,0">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Path Grid.Column="0" Data="M12,2C6.5,2 2,6.5 2,12C2,17.5 6.5,22 12,22C17.5,22 22,17.5 22,12C22,6.5 17.5,2 12,2M10,17L5,12L6.41,10.59L10,14.17L17.59,6.58L19,8L10,17Z" Fill="#059669" Width="16" Height="16" Margin="0,0,12,0"/>
-                                    <TextBlock Grid.Column="1" Text="Morning Meditation" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TextMainBrush}"/>
-                                    <Border Grid.Column="2" Background="#F0FDF4" CornerRadius="4" Padding="6,2">
-                                        <TextBlock Text="15 MIN" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}"/>
-                                    </Border>
-                                </Grid>
-                            </Border>
+                            <!-- Dynamic Habit Items -->
+                            <ItemsControl ItemsSource="{Binding SelectedDayHabits}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,0,8" CornerRadius="12" Padding="16,12" Background="{DynamicResource InputBgBrush}">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="BorderThickness" Value="2,0,0,0" />
+                                                    <Setter Property="BorderBrush" Value="#EF4444" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                            <Setter Property="BorderBrush" Value="{DynamicResource AccentGreenBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
 
-                            <!-- Habit Item (Missed) -->
-                            <Border Style="{StaticResource HabitDetailItemStyle}" BorderBrush="#EF4444" BorderThickness="2,0,0,0">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Path Grid.Column="0" Data="M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59Z" Fill="#EF4444" Width="16" Height="16" Margin="0,0,12,0"/>
-                                    <TextBlock Grid.Column="1" Text="Evening Journaling" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-                                    <Border Grid.Column="2" Background="#FEF2F2" CornerRadius="4" Padding="6,2">
-                                        <TextBlock Text="MISSED" FontSize="9" FontWeight="Bold" Foreground="#EF4444"/>
-                                    </Border>
-                                </Grid>
-                            </Border>
+                                                <!-- Status Icon -->
+                                                <Path Grid.Column="0" Width="16" Height="16" Margin="0,0,12,0">
+                                                    <Path.Style>
+                                                        <Style TargetType="Path">
+                                                            <Setter Property="Data" Value="M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59Z" />
+                                                            <Setter Property="Fill" Value="#EF4444" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                                    <Setter Property="Data" Value="M12,2C6.5,2 2,6.5 2,12C2,17.5 6.5,22 12,22C17.5,22 22,17.5 22,12C22,6.5 17.5,2 12,2M10,17L5,12L6.41,10.59L10,14.17L17.59,6.58L19,8L10,17Z" />
+                                                                    <Setter Property="Fill" Value="#059669" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Path.Style>
+                                                </Path>
+
+                                                <!-- Habit Name -->
+                                                <TextBlock Grid.Column="1" Text="{Binding HabitName}" FontWeight="SemiBold" VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+
+                                                <!-- Status Badge -->
+                                                <Border Grid.Column="2" CornerRadius="4" Padding="6,2">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#FEF2F2" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                                    <Setter Property="Background" Value="#F0FDF4" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding StatusText}" FontSize="9" FontWeight="Bold">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="#EF4444" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
 
                         <!-- Reflections Section -->
@@ -320,8 +377,19 @@
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="16" Padding="24">
                                 <Grid>
                                     <Path Data="M14,17H17L19,13V7H13V13H16M6,13H9L11,9V3H5V9H8L6,13Z" Fill="{DynamicResource InputBorderBrush}" Width="32" Height="32" HorizontalAlignment="Right" VerticalAlignment="Top" Opacity="0.5"/>
-                                    <TextBlock Text="&quot;Felt exceptionally focused today after the morning meditation. The deep work session was productive. Need to maintain this momentum into the weekend.&quot;" 
-                                               FontSize="14" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" FontStyle="Italic" LineHeight="22"/>
+                                    <TextBlock FontSize="14" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" FontStyle="Italic" LineHeight="22">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="{Binding SelectedDayReflection}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SelectedDayReflection}" Value="">
+                                                        <Setter Property="Text" Value="No reflections recorded for this day." />
+                                                        <Setter Property="Opacity" Value="0.5" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </Grid>
                             </Border>
                         </StackPanel>

@@ -188,6 +188,7 @@ namespace HabitTracker.ViewModels{
 
         public ICommand PreviousMonthCommand { get; }
         public ICommand NextMonthCommand { get; }
+        public ICommand SelectDayCommand { get; }
 
         private bool _isMonthlyView = true;
         public bool IsMonthlyView
@@ -201,13 +202,122 @@ namespace HabitTracker.ViewModels{
 
         private DateTime _currentCalendarDate = DateTime.Now;
 
+        // ===== Calendar Day Selection Properties =====
+        private CalendarDayViewModel _selectedDay;
+        public CalendarDayViewModel SelectedDay
+        {
+            get => _selectedDay;
+            set { _selectedDay = value; OnPropertyChanged(); }
+        }
+
+        private ObservableCollection<DayHabitStatusViewModel> _selectedDayHabits = new();
+        public ObservableCollection<DayHabitStatusViewModel> SelectedDayHabits
+        {
+            get => _selectedDayHabits;
+            set { _selectedDayHabits = value; OnPropertyChanged(); }
+        }
+
+        private int _selectedDayScore;
+        public int SelectedDayScore
+        {
+            get => _selectedDayScore;
+            set { _selectedDayScore = value; OnPropertyChanged(); OnPropertyChanged(nameof(SelectedDayScoreText)); }
+        }
+
+        public string SelectedDayScoreText => SelectedDayScore.ToString();
+
+        private string _selectedDayDateText;
+        public string SelectedDayDateText
+        {
+            get => _selectedDayDateText;
+            set { _selectedDayDateText = value; OnPropertyChanged(); }
+        }
+
+        private string _selectedDayLabel;
+        public string SelectedDayLabel
+        {
+            get => _selectedDayLabel;
+            set { _selectedDayLabel = value; OnPropertyChanged(); }
+        }
+
+        private string _selectedDayReflection;
+        public string SelectedDayReflection
+        {
+            get => _selectedDayReflection;
+            set { _selectedDayReflection = value; OnPropertyChanged(); }
+        }
+
+        // ===== Statistics Modal Properties =====
+        private bool _isStatisticsModalOpen = false;
+        public bool IsStatisticsModalOpen
+        {
+            get => _isStatisticsModalOpen;
+            set { _isStatisticsModalOpen = value; OnPropertyChanged(); }
+        }
+
+        // --- TOP-LEVEL STATISTICS PROPERTIES ---
+        private int _growthQuotient;
+        public int GrowthQuotient
+        {
+            get => _growthQuotient;
+            set { _growthQuotient = value; OnPropertyChanged(); }
+        }
+
+        private string _growthQuotientTrend;
+        public string GrowthQuotientTrend
+        {
+            get => _growthQuotientTrend;
+            set { _growthQuotientTrend = value; OnPropertyChanged(); }
+        }
+
+        private ObservableCollection<WeeklyCompletionDay> _weeklyCompletionDays = new();
+        public ObservableCollection<WeeklyCompletionDay> WeeklyCompletionDays
+        {
+            get => _weeklyCompletionDays;
+            set { _weeklyCompletionDays = value; OnPropertyChanged(); }
+        }
+
+        private ObservableCollection<TopHabitViewModel> _topHabits = new();
+        public ObservableCollection<TopHabitViewModel> TopHabits
+        {
+            get => _topHabits;
+            set { _topHabits = value; OnPropertyChanged(); }
+        }
+
+        private ObservableCollection<MilestoneViewModel> _milestones = new();
+        public ObservableCollection<MilestoneViewModel> Milestones
+        {
+            get => _milestones;
+            set { _milestones = value; OnPropertyChanged(); }
+        }
+
+        private HabitStatisticsViewModel _selectedHabitStats;
+        public HabitStatisticsViewModel SelectedHabitStats
+        {
+            get => _selectedHabitStats;
+            set { _selectedHabitStats = value; OnPropertyChanged(); }
+        }
+
+        private ObservableCollection<HabitPerformanceViewModel> _detailedHabitPerformances = new();
+        public ObservableCollection<HabitPerformanceViewModel> DetailedHabitPerformances
+        {
+            get => _detailedHabitPerformances;
+            set { _detailedHabitPerformances = value; OnPropertyChanged(); }
+        }
+
+        public ICommand OpenHabitStatisticsCommand { get; }
+        public ICommand CloseHabitStatisticsCommand { get; }
+
         public DashboardViewModel()
         {
             PreviousMonthCommand = new RelayCommand(_ => ChangeMonth(-1));
             NextMonthCommand = new RelayCommand(_ => ChangeMonth(1));
             SetMonthlyViewCommand = new RelayCommand(_ => IsMonthlyView = true);
             SetWeeklyViewCommand = new RelayCommand(_ => IsMonthlyView = false);
-            GenerateCalendar();
+            SelectDayCommand = new RelayCommand(param => SelectDay(param as CalendarDayViewModel));
+            OpenHabitStatisticsCommand = new RelayCommand(param => OpenHabitStatistics(param as HabitPerformanceViewModel));
+            CloseHabitStatisticsCommand = new RelayCommand(_ => IsStatisticsModalOpen = false);
+            GenerateCalendarPlaceholder();
             
             // Initialize filter options
             InitializeFilters();
@@ -358,8 +468,9 @@ namespace HabitTracker.ViewModels{
                     var todayStart = DateTime.UtcNow.Date;
                     var todayEnd = todayStart.AddDays(1);
                     var logsResponse = await SupabaseService.Client.From<HabitLogs>()
-                        .Filter("log_date", Constants.Operator.GreaterThanOrEqual, todayStart)
-                        .Filter("log_date", Constants.Operator.LessThan, todayEnd)
+                        .Filter("log_date", Constants.Operator.GreaterThanOrEqual, todayStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                        .Filter("log_date", Constants.Operator.LessThan, todayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                        .Order("created_date", Constants.Ordering.Descending)
                         .Get();
                     if (logsResponse.Models != null)
                     {
@@ -417,6 +528,9 @@ namespace HabitTracker.ViewModels{
 
         public async Task SaveHabitLogAsync(Habits habit)
         {
+            var userId = SupabaseService.Client?.Auth?.CurrentUser?.Id;
+            if (string.IsNullOrEmpty(userId)) return;
+
             try
             {
                 var todayStart = DateTime.UtcNow.Date;
@@ -424,8 +538,9 @@ namespace HabitTracker.ViewModels{
                 
                 var logsResponse = await SupabaseService.Client.From<HabitLogs>()
                     .Filter("habit_id", Constants.Operator.Equals, habit.Id)
-                    .Filter("log_date", Constants.Operator.GreaterThanOrEqual, todayStart)
-                    .Filter("log_date", Constants.Operator.LessThan, todayEnd)
+                    .Filter("log_date", Constants.Operator.GreaterThanOrEqual, todayStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Filter("log_date", Constants.Operator.LessThan, todayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Order("created_date", Constants.Ordering.Descending)
                     .Get();
                 
                 var existingLog = logsResponse.Models?.FirstOrDefault();
@@ -445,6 +560,7 @@ namespace HabitTracker.ViewModels{
                     var newLog = new HabitLogs
                     {
                         HabitId = habit.Id,
+                        UserId = userId,
                         LogDate = todayStart,
                         IsCompleted = habit.IsCompleted,
                         NumericValue = habit.CurrentProgress,
@@ -459,6 +575,7 @@ namespace HabitTracker.ViewModels{
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error saving habit log: {ex.Message}");
+                System.Windows.MessageBox.Show($"BŁĄD ZAPISU DO BAZY:\n{ex.Message}", "Błąd Supabase", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
 
@@ -634,64 +751,155 @@ namespace HabitTracker.ViewModels{
         private void ChangeMonth(int monthsToAdd)
         {
             _currentCalendarDate = _currentCalendarDate.AddMonths(monthsToAdd);
-            GenerateCalendar();
+            _ = GenerateCalendarAsync();
         }
 
-        private void GenerateCalendar()
+        /// <summary>
+        /// Placeholder calendar used at construction before user is logged in.
+        /// </summary>
+        private void GenerateCalendarPlaceholder()
         {
             CurrentMonthYear = _currentCalendarDate.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("en-US"));
             var days = new ObservableCollection<CalendarDayViewModel>();
-            
             var firstDayOfMonth = new DateTime(_currentCalendarDate.Year, _currentCalendarDate.Month, 1);
             var daysInMonth = DateTime.DaysInMonth(_currentCalendarDate.Year, _currentCalendarDate.Month);
-            
-            // Assuming week starts on Monday
             int startDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
-            if (startDayOfWeek == 0) startDayOfWeek = 7; // Sunday is 7
-            
+            if (startDayOfWeek == 0) startDayOfWeek = 7;
             var startDate = firstDayOfMonth.AddDays(-(startDayOfWeek - 1));
-            var rnd = new Random();
-            
-            // We usually need 35 or 42 days to fill a calendar grid
-            int totalDays = 42; 
+            int totalDays = 42;
             if (startDayOfWeek == 1 && daysInMonth == 28) totalDays = 28;
             else if (startDayOfWeek + daysInMonth - 1 <= 35) totalDays = 35;
-            
+
             for (int i = 0; i < totalDays; i++)
             {
                 var date = startDate.AddDays(i);
                 bool isCurrentMonth = date.Month == _currentCalendarDate.Month;
                 bool isToday = date.Date == DateTime.Today;
-                
-                int percentage = rnd.Next(40, 100); 
-                if (rnd.Next(0, 10) > 8) percentage = 0;
-                if (isToday) percentage = 100;
+                days.Add(new CalendarDayViewModel
+                {
+                    Date = date,
+                    DayNumber = date.ToString("dd"),
+                    PercentageText = "",
+                    IsCurrentMonth = isCurrentMonth,
+                    IsToday = isToday,
+                    IsSelected = isToday,
+                    BadgeColor = "#F0F2F5",
+                    DotColor = "Transparent"
+                });
+            }
+            CalendarDays = days;
+        }
 
-                string badgeColor = "#E6F4EA"; // Light green
-                string dotColor = "#328A5D"; // Green dot
-                
-                if (percentage < 50) 
+        /// <summary>
+        /// Generates the calendar grid with real data from Supabase.
+        /// Calculates day-by-day completion percentages based on habit_logs.
+        /// </summary>
+        public async Task GenerateCalendarAsync()
+        {
+            CurrentMonthYear = _currentCalendarDate.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("en-US"));
+            var days = new ObservableCollection<CalendarDayViewModel>();
+
+            var firstDayOfMonth = new DateTime(_currentCalendarDate.Year, _currentCalendarDate.Month, 1);
+            var daysInMonth = DateTime.DaysInMonth(_currentCalendarDate.Year, _currentCalendarDate.Month);
+            int startDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+            if (startDayOfWeek == 0) startDayOfWeek = 7;
+            var startDate = firstDayOfMonth.AddDays(-(startDayOfWeek - 1));
+            int totalDays = 42;
+            if (startDayOfWeek == 1 && daysInMonth == 28) totalDays = 28;
+            else if (startDayOfWeek + daysInMonth - 1 <= 35) totalDays = 35;
+
+            var endDate = startDate.AddDays(totalDays - 1);
+
+            // Fetch data from Supabase
+            var userId = SupabaseService.Client?.Auth?.CurrentUser?.Id;
+            List<Habits> userHabits = new();
+            List<HabitLogs> monthLogs = new();
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                try
                 {
-                    badgeColor = "#FFF0F0"; // Light red
-                    dotColor = "#D32F2F"; // Red dot
+                    var habitsResponse = await SupabaseService.Client.From<Habits>()
+                        .Filter("user_id", Constants.Operator.Equals, userId)
+                        .Filter("is_archived", Constants.Operator.Equals, "false")
+                        .Get();
+                    userHabits = habitsResponse.Models ?? new List<Habits>();
+
+                    var utcStartDate = DateTime.SpecifyKind(startDate.Date, DateTimeKind.Utc);
+                    var utcEndDate = DateTime.SpecifyKind(endDate.Date, DateTimeKind.Utc).AddDays(1); // include the whole end day
+
+                    // Use DateTime objects with UTC kind for filtering
+                    var logsResponse = await SupabaseService.Client.From<HabitLogs>()
+                        .Filter("log_date", Constants.Operator.GreaterThanOrEqual, utcStartDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                        .Filter("log_date", Constants.Operator.LessThan, utcEndDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                        .Get();
+                        
+                    var habitIds = new HashSet<string>(userHabits.Select(h => h.Id));
+                    monthLogs = (logsResponse.Models ?? new List<HabitLogs>())
+                                .Where(l => habitIds.Contains(l.HabitId)).ToList();
                 }
-                if (percentage == 0)
+                catch (Exception ex)
                 {
-                    badgeColor = "#F0F2F5"; // Gray
-                    dotColor = "Transparent"; 
+                    System.Diagnostics.Debug.WriteLine($"Error loading calendar data: {ex.Message}");
+                }
+            }
+
+            var logsByDate = monthLogs.GroupBy(l => l.LogDate.Date)
+                                     .ToDictionary(g => g.Key, g => g.ToList());
+
+            // Build habit type map
+            Dictionary<string, HabitTypes> habitTypeMap = new();
+            try
+            {
+                if (HabitTypes != null && HabitTypes.Any())
+                    habitTypeMap = HabitTypes.ToDictionary(t => t.Id, t => t);
+                else
+                {
+                    var typesResp = await SupabaseService.Client.From<HabitTypes>().Get();
+                    habitTypeMap = typesResp.Models.ToDictionary(t => t.Id, t => t);
+                }
+            }
+            catch { }
+
+            for (int i = 0; i < totalDays; i++)
+            {
+                var date = startDate.AddDays(i);
+                bool isCurrentMonth = date.Month == _currentCalendarDate.Month;
+                bool isToday = date.Date == DateTime.Today;
+
+                int planned = 0;
+                int completed = 0;
+
+                foreach (var habit in userHabits)
+                {
+                    if (habit.CreatedDate.Date > date.Date) continue;
+                    if (!IsHabitScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
+
+                    planned++;
+
+                    if (logsByDate.TryGetValue(date.Date, out var dayLogs))
+                    {
+                        var log = dayLogs.FirstOrDefault(l => l.HabitId == habit.Id);
+                        if (log != null)
+                        {
+                            habitTypeMap.TryGetValue(habit.HabitTypeId ?? "", out var habitType);
+                            var typeName = habitType?.Type?.ToLower() ?? "checkbox";
+                            bool isCompleted = typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency;
+                            if (isCompleted) completed++;
+                        }
+                    }
                 }
 
-                if(isToday)
-                {
-                    badgeColor = "#4CA475"; // Darker green for today
-                    dotColor = "#FFFFFF"; // White dot
-                }
+                int percentage = planned > 0 ? (int)Math.Round((double)completed / planned * 100) : -1;
+
+                string badgeColor, dotColor;
+                GetDayColors(percentage, isToday, out badgeColor, out dotColor);
 
                 days.Add(new CalendarDayViewModel
                 {
                     Date = date,
                     DayNumber = date.ToString("dd"),
-                    PercentageText = isCurrentMonth ? $"{percentage}%" : "",
+                    PercentageText = isCurrentMonth && percentage >= 0 ? $"{percentage}%" : "",
                     IsCurrentMonth = isCurrentMonth,
                     IsToday = isToday,
                     IsSelected = isToday,
@@ -699,8 +907,446 @@ namespace HabitTracker.ViewModels{
                     DotColor = dotColor
                 });
             }
-            
+
             CalendarDays = days;
+
+            // Auto-select today
+            var todayDay = days.FirstOrDefault(d => d.IsToday);
+            if (todayDay != null)
+                SelectDay(todayDay);
+        }
+
+        /// <summary>
+        /// Checks if a habit is scheduled for a given day of week using the DaysOfWeek bitmask.
+        /// Bitmask: bit 6=Mon, bit 5=Tue, bit 4=Wed, bit 3=Thu, bit 2=Fri, bit 1=Sat, bit 0=Sun
+        /// </summary>
+        private bool IsHabitScheduledForDay(int daysOfWeekMask, DayOfWeek dayOfWeek)
+        {
+            int bit = dayOfWeek switch
+            {
+                DayOfWeek.Monday => 64,
+                DayOfWeek.Tuesday => 32,
+                DayOfWeek.Wednesday => 16,
+                DayOfWeek.Thursday => 8,
+                DayOfWeek.Friday => 4,
+                DayOfWeek.Saturday => 2,
+                DayOfWeek.Sunday => 1,
+                _ => 0
+            };
+            return (daysOfWeekMask & bit) != 0;
+        }
+
+        private void GetDayColors(int percentage, bool isToday, out string badgeColor, out string dotColor)
+        {
+            if (isToday)
+            {
+                badgeColor = "#4CA475";
+                dotColor = "#FFFFFF";
+                return;
+            }
+
+            if (percentage < 0) { badgeColor = "#F0F2F5"; dotColor = "Transparent"; }
+            else if (percentage == 0) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }
+            else if (percentage < 50) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }
+            else { badgeColor = "#E6F4EA"; dotColor = "#328A5D"; }
+        }
+
+        /// <summary>
+        /// Selects a day in the calendar and loads its habits + reflection from DB.
+        /// </summary>
+        private async void SelectDay(CalendarDayViewModel day)
+        {
+            if (day == null) return;
+
+            foreach (var d in CalendarDays)
+                d.IsSelected = false;
+            day.IsSelected = true;
+            SelectedDay = day;
+
+            SelectedDayDateText = day.Date.ToString("dddd, MMMM d", CultureInfo.GetCultureInfo("en-US"));
+
+            var userId = SupabaseService.Client?.Auth?.CurrentUser?.Id;
+            if (string.IsNullOrEmpty(userId)) return;
+
+            try
+            {
+                var habitsResponse = await SupabaseService.Client.From<Habits>()
+                    .Filter("user_id", Constants.Operator.Equals, userId)
+                    .Filter("is_archived", Constants.Operator.Equals, "false")
+                    .Get();
+                var userHabits = habitsResponse.Models ?? new List<Habits>();
+
+                Dictionary<string, HabitTypes> habitTypeMap = new();
+                try
+                {
+                    if (HabitTypes != null && HabitTypes.Any())
+                        habitTypeMap = HabitTypes.ToDictionary(t => t.Id, t => t);
+                    else
+                    {
+                        var typesResp = await SupabaseService.Client.From<HabitTypes>().Get();
+                        habitTypeMap = (typesResp.Models ?? new List<HabitTypes>()).ToDictionary(t => t.Id, t => t);
+                    }
+                }
+                catch { }
+
+                // Use UTC DateTime range for filtering log_date
+                var utcDayStart = DateTime.SpecifyKind(day.Date.Date, DateTimeKind.Utc);
+                var utcDayEnd = utcDayStart.AddDays(1);
+                var logsResponse = await SupabaseService.Client.From<HabitLogs>()
+                    .Filter("log_date", Constants.Operator.GreaterThanOrEqual, utcDayStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Filter("log_date", Constants.Operator.LessThan, utcDayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Order("created_date", Constants.Ordering.Descending)
+                    .Get();
+                var habitIds = new HashSet<string>(userHabits.Select(h => h.Id));
+                var rawLogs = logsResponse.Models ?? new List<HabitLogs>();
+                var dayLogs = rawLogs.Where(l => habitIds.Contains(l.HabitId)).ToList();
+
+                var habitStatuses = new ObservableCollection<DayHabitStatusViewModel>();
+                int planned = 0, completed = 0;
+
+                foreach (var habit in userHabits)
+                {
+                    if (habit.CreatedDate.Date > day.Date.Date) continue;
+                    if (!IsHabitScheduledForDay(habit.DaysOfWeek, day.Date.DayOfWeek)) continue;
+
+                    planned++;
+                    var log = dayLogs.FirstOrDefault(l => l.HabitId == habit.Id);
+                    habitTypeMap.TryGetValue(habit.HabitTypeId ?? "", out var habitType);
+                    var typeName = habitType?.Type?.ToLower() ?? "checkbox";
+
+                    bool isCompleted = false;
+                    string statusText = "MISSED";
+
+                    if (log != null)
+                    {
+                        if (typeName == "checkbox")
+                        {
+                            isCompleted = log.IsCompleted;
+                            statusText = isCompleted ? "DONE" : "MISSED";
+                        }
+                        else
+                        {
+                            isCompleted = log.NumericValue >= habit.TargetFrequency;
+                            string unit = (habit.Unit ?? habitType?.DefaultUnit ?? "").ToUpper();
+                            statusText = isCompleted ? $"{log.NumericValue} {unit}" : "MISSED";
+                        }
+                    }
+
+                    if (isCompleted) completed++;
+
+                    habitStatuses.Add(new DayHabitStatusViewModel
+                    {
+                        HabitId = habit.Id,
+                        HabitName = habit.Name,
+                        IsCompleted = isCompleted,
+                        StatusText = statusText,
+                        HabitType = typeName
+                    });
+                }
+
+                SelectedDayHabits = habitStatuses;
+                SelectedDayScore = planned > 0 ? (int)Math.Round((double)completed / planned * 100) : 0;
+
+                if (planned == 0) SelectedDayLabel = "No habits planned";
+                else if (SelectedDayScore == 100) SelectedDayLabel = "Perfect Growth Day";
+                else if (SelectedDayScore >= 75) SelectedDayLabel = "Great Progress";
+                else if (SelectedDayScore >= 50) SelectedDayLabel = "Decent Effort";
+                else SelectedDayLabel = "Room for Growth";
+
+                // Fetch reflection/note
+                try
+                {
+                    var noteDateStr = day.Date.ToString("yyyy-MM-dd");
+                    var notesResponse = await SupabaseService.Client.From<Notes>()
+                        .Filter("user_id", Constants.Operator.Equals, userId)
+                        .Filter("note_date", Constants.Operator.Equals, noteDateStr)
+                        .Get();
+                    var note = (notesResponse.Models ?? new List<Notes>()).FirstOrDefault();
+                    SelectedDayReflection = note?.Content ?? "";
+                }
+                catch { SelectedDayReflection = ""; }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading day details: {ex.Message}");
+                SelectedDayLabel = "Error: " + ex.Message;
+                SelectedDayHabits = new ObservableCollection<DayHabitStatusViewModel>();
+            }
+        }
+
+        /// <summary>
+        /// Opens the statistics modal for a specific habit.
+        /// </summary>
+        private async void OpenHabitStatistics(HabitPerformanceViewModel perf)
+        {
+            if (perf == null) return;
+            var stats = new HabitStatisticsViewModel();
+            await stats.CalculateStatisticsAsync(perf.Habit, HabitTypes.ToList());
+            SelectedHabitStats = stats;
+            IsStatisticsModalOpen = true;
+        }
+
+        /// <summary>
+        /// Loads detailed habit performances for the Statistics tab.
+        /// </summary>
+        public async Task LoadStatisticsDataAsync()
+        {
+            var userId = SupabaseService.Client?.Auth?.CurrentUser?.Id;
+            if (string.IsNullOrEmpty(userId)) return;
+
+            try
+            {
+                var habitsResponse = await SupabaseService.Client.From<Habits>()
+                    .Filter("user_id", Constants.Operator.Equals, userId)
+                    .Filter("is_archived", Constants.Operator.Equals, "false")
+                    .Get();
+                var userHabits = habitsResponse.Models;
+
+                Dictionary<string, HabitTypes> habitTypeMap = new();
+                try
+                {
+                    if (HabitTypes != null && HabitTypes.Any())
+                        habitTypeMap = HabitTypes.ToDictionary(t => t.Id, t => t);
+                    else
+                    {
+                        var typesResp = await SupabaseService.Client.From<HabitTypes>().Get();
+                        habitTypeMap = typesResp.Models.ToDictionary(t => t.Id, t => t);
+                    }
+                }
+                catch { }
+
+                // Fetch last 30 days of logs (with UTC boundaries)
+                var thirtyDaysAgo = DateTime.SpecifyKind(DateTime.Today.AddDays(-30), DateTimeKind.Utc);
+                var todayEndUtc = DateTime.SpecifyKind(DateTime.Today.AddDays(1), DateTimeKind.Utc);
+                var logsResponse = await SupabaseService.Client.From<HabitLogs>()
+                    .Filter("log_date", Constants.Operator.GreaterThanOrEqual, thirtyDaysAgo.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Filter("log_date", Constants.Operator.LessThan, todayEndUtc.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Get();
+                var habitIds = new HashSet<string>(userHabits.Select(h => h.Id));
+                var allLogs = (logsResponse.Models ?? new List<HabitLogs>())
+                              .Where(l => habitIds.Contains(l.HabitId)).ToList();
+                var logsByHabit = allLogs.GroupBy(l => l.HabitId).ToDictionary(g => g.Key, g => g.ToList());
+
+                var performances = new ObservableCollection<HabitPerformanceViewModel>();
+
+                foreach (var habit in userHabits)
+                {
+                    habitTypeMap.TryGetValue(habit.HabitTypeId, out var habitType);
+                    var typeName = habitType?.Type?.ToLower() ?? "checkbox";
+                    logsByHabit.TryGetValue(habit.Id, out var habitLogs);
+                    habitLogs ??= new List<HabitLogs>();
+
+                    // Calculate consistency (last 30 days)
+                    int scheduledDays = 0, completedDays = 0;
+                    for (int d = 0; d < 30; d++)
+                    {
+                        var date = DateTime.Today.AddDays(-d);
+                        if (habit.CreatedDate.Date > date.Date) continue;
+                        if (!IsHabitScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
+                        scheduledDays++;
+
+                        var log = habitLogs.FirstOrDefault(l => l.LogDate.Date == date.Date);
+                        if (log != null)
+                        {
+                            bool done = typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency;
+                            if (done) completedDays++;
+                        }
+                    }
+                    int consistency = scheduledDays > 0 ? (int)Math.Round((double)completedDays / scheduledDays * 100) : 0;
+
+                    // Calculate current streak (Option A: skip non-scheduled days)
+                    int currentStreak = 0;
+                    for (int d = 0; d < 365; d++)
+                    {
+                        var date = DateTime.Today.AddDays(-d);
+                        if (habit.CreatedDate.Date > date.Date) break;
+                        if (!IsHabitScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
+
+                        var log = habitLogs.FirstOrDefault(l => l.LogDate.Date == date.Date);
+                        bool done = log != null && (typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency);
+
+                        if (done) currentStreak++;
+                        else break;
+                    }
+
+                    // Calculate trend (last 7 vs previous 7 days)
+                    int recent7 = 0, prev7 = 0, recent7Total = 0, prev7Total = 0;
+                    for (int d = 0; d < 14; d++)
+                    {
+                        var date = DateTime.Today.AddDays(-d);
+                        if (habit.CreatedDate.Date > date.Date) continue;
+                        if (!IsHabitScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
+
+                        var log = habitLogs.FirstOrDefault(l => l.LogDate.Date == date.Date);
+                        bool done = log != null && (typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency);
+
+                        if (d < 7) { recent7Total++; if (done) recent7++; }
+                        else { prev7Total++; if (done) prev7++; }
+                    }
+
+                    double recentRate = recent7Total > 0 ? (double)recent7 / recent7Total * 100 : 0;
+                    double prevRate = prev7Total > 0 ? (double)prev7 / prev7Total * 100 : 0;
+                    double trendChange = recentRate - prevRate;
+                    string trendText = trendChange >= 0 ? $"+{(int)trendChange}%" : $"{(int)trendChange}%";
+
+                    performances.Add(new HabitPerformanceViewModel
+                    {
+                        Habit = habit,
+                        HabitName = habit.Name,
+                        HabitDescription = $"{habitType?.DisplayType ?? typeName}",
+                        Consistency = consistency,
+                        TrendText = trendText,
+                        IsPositiveTrend = trendChange >= 0,
+                        CurrentStreak = currentStreak,
+                        HabitTypeName = typeName,
+                        HabitIcon = habit.Icon ?? "🌱"
+                    });
+                }
+
+                DetailedHabitPerformances = performances;
+
+                // --- CALCULATE TOP-LEVEL STATISTICS ---
+                CalculateTopStatistics(userHabits, habitTypeMap, allLogs);
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading statistics: {ex.Message}");
+            }
+        }
+
+        private void CalculateTopStatistics(List<Habits> userHabits, Dictionary<string, HabitTypes> typeMap, List<HabitLogs> allLogs)
+        {
+            var today = DateTime.Today;
+            int daysSinceMonday = ((int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek) - 1;
+            var startOfWeek = today.AddDays(-daysSinceMonday);
+            var startOfLastWeek = startOfWeek.AddDays(-7);
+
+            int thisWeekPlanned = 0, thisWeekCompleted = 0;
+            int lastWeekPlanned = 0, lastWeekCompleted = 0;
+
+            var weeklyCompletionDays = new ObservableCollection<WeeklyCompletionDay>();
+            var dayNames = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+
+            // Initialize weekly completion days
+            for (int i = 0; i < 7; i++)
+            {
+                weeklyCompletionDays.Add(new WeeklyCompletionDay
+                {
+                    DayName = dayNames[i],
+                    Value = 0,
+                    MaxValue = 0,
+                    BarColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 50, 138, 93))
+                });
+            }
+
+            var logsByDate = allLogs.GroupBy(l => l.LogDate.Date).ToDictionary(g => g.Key, g => g.ToList());
+            var logsByHabit = allLogs.GroupBy(l => l.HabitId).ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var habit in userHabits)
+            {
+                typeMap.TryGetValue(habit.HabitTypeId ?? "", out var type);
+                var typeName = type?.Type?.ToLower() ?? "checkbox";
+
+                // This Week & Last Week
+                for (int d = 0; d < 14; d++)
+                {
+                    var date = startOfLastWeek.AddDays(d);
+                    if (habit.CreatedDate.Date > date) continue;
+                    if (!IsHabitScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
+
+                    bool isThisWeek = d >= 7;
+                    if (isThisWeek) thisWeekPlanned++;
+                    else lastWeekPlanned++;
+
+                    if (isThisWeek) weeklyCompletionDays[d - 7].MaxValue++;
+
+                    if (logsByDate.TryGetValue(date, out var dayLogs))
+                    {
+                        var log = dayLogs.FirstOrDefault(l => l.HabitId == habit.Id);
+                        if (log != null)
+                        {
+                            bool isCompleted = typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency;
+                            if (isCompleted)
+                            {
+                                if (isThisWeek) 
+                                {
+                                    thisWeekCompleted++;
+                                    weeklyCompletionDays[d - 7].Value++;
+                                }
+                                else lastWeekCompleted++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            GrowthQuotient = thisWeekPlanned > 0 ? (int)Math.Round((double)thisWeekCompleted / thisWeekPlanned * 100) : 0;
+            int lastWeekGrowth = lastWeekPlanned > 0 ? (int)Math.Round((double)lastWeekCompleted / lastWeekPlanned * 100) : 0;
+            int diff = GrowthQuotient - lastWeekGrowth;
+            GrowthQuotientTrend = diff >= 0 ? $"+{diff}% from last week" : $"{diff}% from last week";
+            WeeklyCompletionDays = weeklyCompletionDays;
+
+            // Top Habits (Sort by best completion percentage all-time or last 30 days)
+            var topList = new List<TopHabitViewModel>();
+            foreach (var habit in userHabits)
+            {
+                logsByHabit.TryGetValue(habit.Id, out var hLogs);
+                hLogs ??= new List<HabitLogs>();
+                typeMap.TryGetValue(habit.HabitTypeId ?? "", out var type);
+                var typeName = type?.Type?.ToLower() ?? "checkbox";
+
+                int sched = 0, comp = 0;
+                for (int d = 0; d < 30; d++)
+                {
+                    var date = today.AddDays(-d);
+                    if (habit.CreatedDate.Date > date) continue;
+                    if (!IsHabitScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
+                    sched++;
+                    var log = hLogs.FirstOrDefault(l => l.LogDate.Date == date);
+                    if (log != null && (typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency))
+                        comp++;
+                }
+
+                int perc = sched > 0 ? (int)Math.Round((double)comp / sched * 100) : 0;
+                if (perc > 0)
+                {
+                    topList.Add(new TopHabitViewModel
+                    {
+                        Name = habit.Name,
+                        CompletionPercentage = perc,
+                        IconPath = habit.Icon,
+                        IconFgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 50, 138, 93)),
+                        IconBgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 230, 248, 240))
+                    });
+                }
+            }
+
+            TopHabits = new ObservableCollection<TopHabitViewModel>(topList.OrderByDescending(h => h.CompletionPercentage).Take(4));
+
+            // Milestones
+            int totalCompletions = allLogs.Count(l => l.IsCompleted || l.NumericValue > 0); // Simplified total completion check
+            Milestones = new ObservableCollection<MilestoneViewModel>
+            {
+                new MilestoneViewModel
+                {
+                    Title = "Total Completions",
+                    CurrentValue = totalCompletions,
+                    TargetValue = totalCompletions < 100 ? 100 : (totalCompletions < 500 ? 500 : 1000),
+                    IconPath = "M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z",
+                    IconFgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 245, 158, 11)),
+                    IconBgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 245, 158, 11))
+                },
+                new MilestoneViewModel
+                {
+                    Title = "Consistency King",
+                    CurrentValue = GrowthQuotient,
+                    TargetValue = 100,
+                    IconPath = "M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,15.53 16.39,18.43 13,18.92V21.95C18.05,21.43 22,17.18 22,12C22,6.82 18.05,2.57 13,2.05M11,2.05C5.95,2.57 2,6.82 2,12C2,17.18 5.95,21.43 11,21.95V18.92C7.61,18.43 5,15.53 5,12C5,8.47 7.61,5.57 11,5.08V2.05M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z",
+                    IconFgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 59, 130, 246)),
+                    IconBgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 59, 130, 246))
+                }
+            };
         }
     }
 }
