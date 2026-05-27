@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HabitTracker"
-             xmlns:views="clr-namespace:HabitTracker.Views">
+             xmlns:views="clr-namespace:HabitTracker.Views"
+             Background="Transparent">
     <Grid Margin="40,20,20,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -76,27 +77,28 @@
                             <Button Content="{Binding EditProfile, Source={StaticResource Loc}}" Width="120" Height="36" Margin="0,0,0,12" Cursor="Hand" Click="EditProfile_Click">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
-                                        <Border x:Name="border" CornerRadius="18" Background="#EEF2FF" BorderThickness="0" SnapsToDevicePixels="True">
-                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" TextBlock.Foreground="#328A5D" TextBlock.FontWeight="Bold" TextBlock.FontSize="13"/>
+                                        <Border x:Name="border" CornerRadius="18" Background="{DynamicResource InputBgBrush}" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" SnapsToDevicePixels="True">
+                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" TextBlock.Foreground="{DynamicResource TextMainBrush}" TextBlock.FontWeight="Bold" TextBlock.FontSize="13"/>
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="border" Property="Background" Value="#E0E7FF"/>
+                                                <Setter TargetName="border" Property="Background" Value="{DynamicResource InputBorderBrush}"/>
                                             </Trigger>
                                             <Trigger Property="IsPressed" Value="True">
-                                                <Setter TargetName="border" Property="Background" Value="#C7D2FE"/>
+                                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
                             
-                            <TextBlock Text="{Binding ChangePassword, Source={StaticResource Loc}}" Foreground="#328A5D" FontSize="13" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="ChangePassword_Click">
+                            <TextBlock Text="{Binding ChangePassword, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="ChangePassword_Click">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter Property="TextDecorations" Value="Underline"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>

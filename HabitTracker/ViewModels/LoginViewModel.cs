@@ -254,6 +254,18 @@ namespace HabitTracker.ViewModels
                     };
                     LocalAccountService.SaveAccount(loggedAccount);
 
+                    var settings = await UserSettingsService.LoadSettingsAsync(session.User.Id);
+                    if (settings != null)
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+                            {
+                                mainWindow.ApplyTheme(settings.Theme == "dark");
+                            }
+                        });
+                    }
+
                     SetStatus($"Hello {savedNickname}", ColorSuccess);
                     return true;
                 }

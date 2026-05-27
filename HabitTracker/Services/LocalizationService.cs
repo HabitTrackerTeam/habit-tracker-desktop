@@ -66,6 +66,16 @@ namespace HabitTracker.Services
         public string ChooseHabitFromList => Get("Wybierz nawyk z listy", "Choose a habit from the list");
         public string AddSelected => Get("Dodaj wybrany", "Add Selected");
         public string HabitName => Get("Nazwa nawyku", "Habit Name");
+        public string HabitTypeLabel => Get("TYP NAWYKU", "HABIT TYPE");
+        
+        public string FreqDaily => Get("Codziennie", "Daily");
+        public string FreqWeekly => Get("Tygodniowo", "Weekly");
+        public string FreqMonthly => Get("Miesięcznie", "Monthly");
+        public string FreqSpecific => Get("Konkretne", "Specific");
+        
+        public string ScheduleLabel => Get("HARMONOGRAM", "SCHEDULE");
+        public string GoalTargetLabel => Get("CEL", "GOAL / TARGET");
+        public string UnitsLabel => Get("JEDNOSTKI", "UNITS");
 
         public string Type => Get("Typ", "Type");
         public string SaveHabit => Get("Zapisz nawyk", "Save Habit");
@@ -158,5 +168,13 @@ namespace HabitTracker.Services
         // === Week starts ===
         public string Monday => Get("Poniedziałek", "Monday");
         public string Sunday => Get("Niedziela", "Sunday");
+
+        public string MondayShort => Get("Pon", "Mon");
+        public string TuesdayShort => Get("Wt", "Tue");
+        public string WednesdayShort => Get("Śr", "Wed");
+        public string ThursdayShort => Get("Czw", "Thu");
+        public string FridayShort => Get("Pt", "Fri");
+        public string SaturdayShort => Get("Sob", "Sat");
+        public string SundayShort => Get("Nd", "Sun");
     }
 }

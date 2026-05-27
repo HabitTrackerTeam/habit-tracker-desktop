@@ -38,11 +38,22 @@ public partial class MainWindow : Window
         }
     }
 
-    public void HandleThemeToggle(object sender, RoutedEventArgs e)
+    public async void HandleThemeToggle(object sender, RoutedEventArgs e)
     {
         var toggle = sender as System.Windows.Controls.Primitives.ToggleButton;
         bool isDark = toggle?.IsChecked == true;
         ApplyTheme(isDark);
+
+        var currentUser = HabitTracker.Services.SupabaseService.Client.Auth.CurrentUser;
+        if (currentUser != null)
+        {
+            var settings = await HabitTracker.Services.UserSettingsService.LoadSettingsAsync(currentUser.Id);
+            if (settings != null)
+            {
+                settings.Theme = isDark ? "dark" : "light";
+                await HabitTracker.Services.UserSettingsService.SaveSettingsAsync(settings);
+            }
+        }
     }
 
     public void ApplyTheme(bool isDark)
@@ -70,13 +81,7 @@ public partial class MainWindow : Window
         else
         {
             //Tryb jasny
-            var bgBrush = new LinearGradientBrush();
-            bgBrush.StartPoint = new System.Windows.Point(0, 0);
-            bgBrush.EndPoint = new System.Windows.Point(1, 1);
-            bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFF4F4E9"), 0.0));
-            bgBrush.GradientStops.Add(new GradientStop((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFE4E8E5"), 1.0));
-
-            Application.Current.Resources["AppBgBrush"] = bgBrush;
+            Application.Current.Resources["AppBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#F8FAFC");
             Application.Current.Resources["CardBgBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("White");
             Application.Current.Resources["TextMainBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF4E606C");
             Application.Current.Resources["TextMutedBrush"] = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF8B9AA2");
