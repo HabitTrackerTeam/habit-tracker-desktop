@@ -55,6 +55,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
     {
         await _dashboardVM.LoadFormDataAsync();
         await _dashboardVM.LoadHabitsAsync();
+        await _dashboardVM.GenerateCalendarAsync();
         UpdateSidebar(NavHome);
     }
 
@@ -221,16 +222,18 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         UpdateSidebar(NavSettings);
     }
 
-    private void SwitchToCalendar_Click(object sender, RoutedEventArgs e)
+    private async void SwitchToCalendar_Click(object sender, RoutedEventArgs e)
     {
         _dashboardVM.SwitchToCalendar();
         UpdateSidebar(NavCalendar);
+        await _dashboardVM.GenerateCalendarAsync();
     }
 
-    private void SwitchToStatistics_Click(object sender, RoutedEventArgs e)
+    private async void SwitchToStatistics_Click(object sender, RoutedEventArgs e)
     {
         _dashboardVM.SwitchToStatistics();
         UpdateSidebar(NavStatistics);
+        await _dashboardVM.LoadStatisticsDataAsync();
     }
 
     private void SwitchToHome_Click(object sender, RoutedEventArgs e)

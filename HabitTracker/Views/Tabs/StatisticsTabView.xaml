@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HabitTracker"
              xmlns:views="clr-namespace:HabitTracker.Views"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
              Background="Transparent"
              FontFamily="Inter, Segoe UI">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="ChartLabelStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="10"/>
             <Setter Property="FontWeight" Value="Bold"/>
@@ -23,7 +25,8 @@
         </Style>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="48, 40">
             
             <!-- Header -->
@@ -67,7 +70,7 @@
                             <Border Background="#F0FDF4" CornerRadius="20" Padding="12,6" HorizontalAlignment="Left">
                                 <StackPanel Orientation="Horizontal">
                                     <Path Data="M7,14L12,9L17,14H7Z" Fill="{DynamicResource AccentGreenBrush}" Width="12" Height="12" Margin="0,0,4,0"/>
-                                    <TextBlock Text="+12% from last month" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" FontSize="12"/>
+                                    <TextBlock Text="{Binding GrowthQuotientTrend}" FontSize="13" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -91,30 +94,35 @@
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.02" ShadowDepth="0"/>
                     </Border.Effect>
-                    <StackPanel>
-                        <Grid Margin="0,0,0,20">
-                            <TextBlock Text="Growth Milestones" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                            <Path Data="M12,2L14.39,7.62L20.5,8.1L15.84,12.1L17.29,18.05L12,14.88L6.71,18.05L8.16,12.1L3.5,8.1L9.61,7.62L12,2Z" Fill="#D8B4FE" Width="16" Height="16" HorizontalAlignment="Right"/>
-                        </Grid>
-                        
-                        <!-- Milestone Progress Items -->
-                        <StackPanel>
-                            <StackPanel Margin="0,0,0,16">
-                                <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="CONSISTENCY KING" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}"/>
-                                    <TextBlock Text="18/20 DAYS" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <ProgressBar Value="90" Height="6" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource AccentGreenBrush}" BorderThickness="0"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="READING LEVEL 3" FontSize="10" FontWeight="Bold" Foreground="#93C5FD"/>
-                                    <TextBlock Text="450/500 PAGES" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <ProgressBar Value="90" Height="6" Background="{DynamicResource InputBgBrush}" Foreground="#93C5FD" BorderThickness="0"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Milestones}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="20" Margin="0,0,0,16">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Icon -->
+                                        <Border Grid.Column="0" Width="48" Height="48" CornerRadius="12" Background="{Binding IconBgColor}" Margin="0,0,16,0">
+                                            <Path Data="{Binding IconPath}" Fill="{Binding IconFgColor}" Stretch="Uniform" Width="24" Height="24"/>
+                                        </Border>
+
+                                        <!-- Info -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4"/>
+                                            <TextBlock Text="{Binding FormattedProgress}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
+                                        </StackPanel>
+
+                                        <!-- Action (Arrow) -->
+                                        <Path Grid.Column="2" Data="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" Fill="{DynamicResource TextMutedBrush}" Stretch="Uniform" Width="24" Height="24" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Border>
             </Grid>
 
@@ -148,57 +156,30 @@
                         </Grid>
 
                         <!-- Bar Chart Representation -->
-                        <UniformGrid Columns="7" Height="160" VerticalAlignment="Bottom">
-                            <StackPanel VerticalAlignment="Bottom">
-                                <Grid Height="120" Margin="8,0">
-                                    <Border Width="16" Height="120" Background="{DynamicResource InputBgBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                    <Border Width="16" Height="60" Background="{DynamicResource AccentGreenBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                </Grid>
-                                <TextBlock Text="MON" Style="{StaticResource ChartLabelStyle}"/>
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom">
-                                <Grid Height="120" Margin="8,0">
-                                    <Border Width="16" Height="120" Background="{DynamicResource InputBgBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                    <Border Width="16" Height="90" Background="{DynamicResource AccentGreenBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                </Grid>
-                                <TextBlock Text="TUE" Style="{StaticResource ChartLabelStyle}"/>
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom">
-                                <Grid Height="120" Margin="8,0">
-                                    <Border Width="16" Height="120" Background="{DynamicResource InputBgBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                    <Border Width="16" Height="110" Background="{DynamicResource AccentGreenBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                </Grid>
-                                <TextBlock Text="WED" Style="{StaticResource ChartLabelStyle}"/>
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom">
-                                <Grid Height="120" Margin="8,0">
-                                    <Border Width="16" Height="120" Background="{DynamicResource InputBgBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                    <Border Width="16" Height="80" Background="{DynamicResource AccentGreenBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                </Grid>
-                                <TextBlock Text="THU" Style="{StaticResource ChartLabelStyle}"/>
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom">
-                                <Grid Height="120" Margin="8,0">
-                                    <Border Width="16" Height="120" Background="{DynamicResource InputBgBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                    <Border Width="16" Height="120" Background="{DynamicResource AccentGreenBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                </Grid>
-                                <TextBlock Text="FRI" Style="{StaticResource ChartLabelStyle}"/>
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom">
-                                <Grid Height="120" Margin="8,0">
-                                    <Border Width="16" Height="120" Background="{DynamicResource InputBgBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                    <Border Width="16" Height="50" Background="{DynamicResource AccentGreenBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                </Grid>
-                                <TextBlock Text="SAT" Style="{StaticResource ChartLabelStyle}"/>
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom">
-                                <Grid Height="120" Margin="8,0">
-                                    <Border Width="16" Height="120" Background="{DynamicResource InputBgBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                    <Border Width="16" Height="40" Background="{DynamicResource AccentGreenBrush}" CornerRadius="8" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
-                                </Grid>
-                                <TextBlock Text="SUN" Style="{StaticResource ChartLabelStyle}"/>
-                            </StackPanel>
-                        </UniformGrid>
+                        <ItemsControl ItemsSource="{Binding WeeklyCompletionDays}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="1" Columns="7" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        
+                                        <Border Grid.Row="0" Width="16" Height="80" CornerRadius="8" Background="{DynamicResource InputBgBrush}" VerticalAlignment="Bottom" Margin="0,0,0,8">
+                                            <Border Width="16" Height="{Binding BarHeight}" 
+                                                    CornerRadius="8" Background="{Binding BarColor}" VerticalAlignment="Bottom"/>
+                                        </Border>
+                                        
+                                        <TextBlock Grid.Row="1" Text="{Binding DayName}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </Border>
 
@@ -207,41 +188,42 @@
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.02" ShadowDepth="0"/>
                     </Border.Effect>
-                    <StackPanel>
-                        <TextBlock Text="Top Habits" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,24"/>
-                        
-                        <StackPanel Margin="0,0,0,16">
-                            <Grid Margin="0,0,0,8">
-                                <TextBlock Text="Morning Meditation" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                <TextBlock Text="100%" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Right"/>
-                            </Grid>
-                            <ProgressBar Value="100" Height="6" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource AccentGreenBrush}" BorderThickness="0"/>
-                        </StackPanel>
-
-                        <StackPanel Margin="0,0,0,16">
-                            <Grid Margin="0,0,0,8">
-                                <TextBlock Text="Stay Hydrated" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                <TextBlock Text="98%" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Right"/>
-                            </Grid>
-                            <ProgressBar Value="98" Height="6" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource AccentGreenBrush}" BorderThickness="0"/>
-                        </StackPanel>
-
-                        <StackPanel Margin="0,0,0,16">
-                            <Grid Margin="0,0,0,8">
-                                <TextBlock Text="Read 20 Pages" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                <TextBlock Text="85%" FontSize="12" FontWeight="Bold" Foreground="#93C5FD" HorizontalAlignment="Right"/>
-                            </Grid>
-                            <ProgressBar Value="85" Height="6" Background="{DynamicResource InputBgBrush}" Foreground="#93C5FD" BorderThickness="0"/>
-                        </StackPanel>
-
-                        <StackPanel>
-                            <Grid Margin="0,0,0,8">
-                                <TextBlock Text="Gym Session" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                <TextBlock Text="70%" FontSize="12" FontWeight="Bold" Foreground="#D8B4FE" HorizontalAlignment="Right"/>
-                            </Grid>
-                            <ProgressBar Value="70" Height="6" Background="{DynamicResource InputBgBrush}" Foreground="#D8B4FE" BorderThickness="0"/>
-                        </StackPanel>
-                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding TopHabits}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="20" Margin="0,0,0,16">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- Icon -->
+                                        <Border Grid.Column="0" Width="48" Height="48" CornerRadius="12" Background="{Binding IconBgColor}" Margin="0,0,16,0">
+                                            <Path Data="{Binding IconPath}" Fill="{Binding IconFgColor}" Stretch="Uniform" Width="24" Height="24"/>
+                                        </Border>
+                                        
+                                        <!-- Info -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4"/>
+                                            <!-- Mini Progress Bar -->
+                                            <Grid Height="6" Background="{DynamicResource InputBgBrush}" Margin="0,0,32,0"  VerticalAlignment="Center">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="{Binding CompletionPercentage, StringFormat={}{0}*}" />
+                                                    <ColumnDefinition Width="100*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border Grid.Column="0" CornerRadius="3" Background="{Binding IconFgColor}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                        
+                                        <!-- Score -->
+                                        <TextBlock Grid.Column="2" Text="{Binding CompletionPercentage, StringFormat={}{0}%}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Border>
             </Grid>
 
@@ -275,44 +257,244 @@
                             </Grid>
                         </Border>
 
-                        <!-- Row 1 -->
-                        <Border BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="0,1,0,0" Padding="24,16">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="60"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Width="40" Height="40" Background="#F0FDF4" CornerRadius="8" Margin="0,0,16,0">
-                                        <Path Data="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Stretch="Uniform"/>
+                        <!-- Dynamic Rows -->
+                        <ItemsControl ItemsSource="{Binding DetailedHabitPerformances}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="0,1,0,0" Padding="24,16">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="120"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Border Width="40" Height="40" Background="#F0FDF4" CornerRadius="8" Margin="0,0,16,0">
+                                                    <TextBlock Text="{Binding HabitIcon}" Foreground="{DynamicResource AccentGreenBrush}" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding HabitName}" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                                                    <TextBlock Text="{Binding HabitDescription}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding Consistency, StringFormat={}{0}%}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{DynamicResource TextMainBrush}"/>
+                                                <ProgressBar Value="{Binding Consistency}" Width="80" Height="4" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource AccentGreenBrush}" BorderThickness="0" Margin="0,4,0,0"/>
+                                            </StackPanel>
+                                            
+                                            <!-- Trend -->
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding TrendText}" FontWeight="Bold" Margin="0,0,4,0">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#EF4444"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsPositiveTrend}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <Path Width="10" Height="10" Stretch="Uniform">
+                                                    <Path.Style>
+                                                        <Style TargetType="Path">
+                                                            <Setter Property="Data" Value="M7,14L12,9L17,14H7Z"/>
+                                                            <Setter Property="Fill" Value="{DynamicResource AccentGreenBrush}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsPositiveTrend}" Value="False">
+                                                                    <Setter Property="Data" Value="M7,10L12,15L17,10H7Z"/>
+                                                                    <Setter Property="Fill" Value="#EF4444"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Path.Style>
+                                                </Path>
+                                            </StackPanel>
+
+                                            <Border Grid.Column="3" Background="#EEF2FF" CornerRadius="12" Padding="12,4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="M12,18C13.1,18 14,17.1 14,16C14,14.9 13.1,14 12,14C10.9,14 10,14.9 10,16C10,17.1 10.9,18 12,18M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2Z" Fill="#818CF8" Width="12" Height="12" Margin="0,0,4,0"/>
+                                                    <TextBlock Text="{Binding CurrentStreak, StringFormat={}{0}d}" Foreground="#818CF8" FontWeight="Bold" FontSize="11"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Button Grid.Column="4" Content="VIEW STATISTICS" 
+                                                    Command="{Binding DataContext.OpenHabitStatisticsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding Habit}"
+                                                    Background="Transparent" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Right" Cursor="Hand"/>
+                                        </Grid>
                                     </Border>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Stay Hydrated" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                        <TextBlock Text="8 Glasses / Day" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
-                                    </StackPanel>
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <TextBlock Text="98%" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{DynamicResource TextMainBrush}"/>
-                                    <ProgressBar Value="98" Width="80" Height="4" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource AccentGreenBrush}" BorderThickness="0" Margin="0,4,0,0"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="2" Text="Stable" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <Border Grid.Column="3" Background="#EEF2FF" CornerRadius="12" Padding="12,4" HorizontalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Path Data="M12,18C13.1,18 14,17.1 14,16C14,14.9 13.1,14 12,14C10.9,14 10,14.9 10,16C10,17.1 10.9,18 12,18M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2Z" Fill="#818CF8" Width="12" Height="12" Margin="0,0,4,0"/>
-                                        <TextBlock Text="14d" Foreground="#818CF8" FontWeight="Bold" FontSize="11"/>
-                                    </StackPanel>
-                                </Border>
-                                <Button Grid.Column="4" Background="Transparent" BorderThickness="0" HorizontalAlignment="Right">
-                                    <Path Data="M14,3V5H17.59L7,15.59L8.41,17L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" Fill="{DynamicResource TextMutedBrush}" Width="16" Height="16" Stretch="Uniform"/>
-                                </Button>
-                            </Grid>
-                        </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </Border>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>
+
+    <!-- Modal Overlay (Habit Statistics) -->
+    <Grid Visibility="{Binding IsStatisticsModalOpen, Converter={StaticResource BoolToVis}}" Panel.ZIndex="999">
+        <Border Background="#4D000000" />
+        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Margin="0" Padding="32" Width="850" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" Opacity="0.2" BlurRadius="25" ShadowDepth="10" />
+            </Border.Effect>
+
+            <Grid DataContext="{Binding SelectedHabitStats}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Grid.Row="0" Margin="0,0,0,32">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="48" Height="48" Background="#F0FDF4" CornerRadius="12" Margin="0,0,16,0">
+                            <TextBlock Text="{Binding HabitIcon}" Foreground="{DynamicResource AccentGreenBrush}" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{Binding HabitName}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                            <TextBlock Text="{Binding HabitTypeName}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <Button Content="✕" Command="{Binding DataContext.CloseHabitStatisticsCommand, RelativeSource={RelativeSource AncestorType=Grid}}" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMutedBrush}" FontSize="20" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                </Grid>
+
+                <!-- Content -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="320"/>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left Column: KPI Cards -->
+                    <StackPanel Grid.Column="0">
+                        <!-- Streaks Row -->
+                        <UniformGrid Columns="2" Margin="0,0,0,16">
+                            <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,8,0">
+                                <StackPanel>
+                                    <Path Data="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10-4.48 10-10S17.52,2 12,2zm1,15h-2v-2h2v2zm0-4h-2V7h2v6z" Fill="#F59E0B" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding CurrentStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                                    <TextBlock Text="Current Streak (Days)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="8,0,0,0">
+                                <StackPanel>
+                                    <Path Data="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z" Fill="#818CF8" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding LongestStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                                    <TextBlock Text="Longest Streak" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- Weekly Success -->
+                        <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,16,0">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,12">
+                                    <TextBlock Text="Weekly Success" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                                    <TextBlock Text="{Binding WeeklySuccessRate, StringFormat={}{0}%}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ProgressBar Value="{Binding WeeklySuccessRate}" Height="8" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource AccentGreenBrush}" BorderThickness="0"/>
+                                <TextBlock Text="Based on scheduled days in last 7 days" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Total Completions -->
+                        <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20">
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="40" Height="40" Background="#F3F4F6" CornerRadius="20" Margin="0,0,16,0">
+                                    <Path Data="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" Fill="#6B7280" Width="20" Height="20" Stretch="Uniform" Margin="10"/>
+                                </Border>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding TotalCompletions}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                                    <TextBlock Text="Total Completions" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Right Column: Charts & Calendar -->
+                    <StackPanel Grid.Column="2">
+                        <!-- Mini Calendar -->
+                        <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="24" Margin="0,0,0,16">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,16">
+                                    <TextBlock Text="{Binding MiniCalendarMonthYear}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                                    <TextBlock Text="Monthly Completions" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                </Grid>
+                                
+                                <UniformGrid Columns="7" Margin="0,0,0,8">
+                                    <TextBlock Text="M" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="T" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="W" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="T" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="F" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="S" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="S" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                </UniformGrid>
+
+                                <ItemsControl ItemsSource="{Binding MonthlyCompletions}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="7" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Height="36" Margin="2">
+                                                <Grid>
+                                                    <Ellipse Fill="{Binding DotColor}" Width="28" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <Ellipse.Style>
+                                                            <Style TargetType="Ellipse">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsEmpty}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Hidden"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsScheduled}" Value="False">
+                                                                        <Setter Property="Opacity" Value="0.2"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Ellipse.Style>
+                                                    </Ellipse>
+                                                    <TextBlock Text="{Binding DayNumber}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="White"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding DotColor}" Value="#E5E7EB">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Value Trend Chart (Conditional) -->
+                        <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="24" Height="220"
+                                Visibility="{Binding IsNumericOrTimer, Converter={StaticResource BoolToVis}}">
+                            <StackPanel>
+                                <TextBlock Text="Value Trend" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16"/>
+                                <lvc:CartesianChart Series="{Binding ChartSeries}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" Background="Transparent" Margin="0,0,0,0" Height="140" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+        </Grid>
+    </Grid>
 </UserControl>
