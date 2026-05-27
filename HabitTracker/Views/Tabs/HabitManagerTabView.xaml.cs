@@ -86,7 +86,7 @@ namespace HabitTracker.Views.Tabs
                 if (_dashboardVM.NewHabitFrequency == "Specific")
                     _dashboardVM.NewHabitDaysOfWeek = CollectDaysOfWeekBitmask();
                 else
-                    _dashboardVM.NewHabitDaysOfWeek = 127; // all days
+                    _dashboardVM.NewHabitDaysOfWeek = 0; // default no days selected
 
                 await _dashboardVM.CreateHabitAsync();
 
@@ -145,20 +145,24 @@ namespace HabitTracker.Views.Tabs
         {
             if (sender is Button btn)
             {
+                // If it's transparent/gray (has no explicit local background), we make it green
                 var bgBrush = btn.Background as System.Windows.Media.SolidColorBrush;
-                // If it's transparent/gray, we make it green
-                bool isSelected = bgBrush != null && bgBrush.Color == System.Windows.Media.Color.FromArgb(255, 226, 232, 240); 
+                bool isSelected = bgBrush != null && bgBrush.Color == System.Windows.Media.Color.FromArgb(255, 22, 101, 52); 
 
-                if (isSelected)
+                if (!isSelected)
                 {
+                    btn.ClearValue(Control.BackgroundProperty);
+                    btn.ClearValue(Control.ForegroundProperty);
                     btn.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)); // #166534
                     btn.Foreground = System.Windows.Media.Brushes.White;
                     btn.FontWeight = FontWeights.Bold;
                 }
                 else
                 {
-                    btn.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 226, 232, 240)); // #E2E8F0
-                    btn.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 100, 116, 139)); // #64748B
+                    btn.ClearValue(Control.BackgroundProperty);
+                    btn.ClearValue(Control.ForegroundProperty);
+                    btn.SetResourceReference(Control.BackgroundProperty, "InputBgBrush");
+                    btn.SetResourceReference(Control.ForegroundProperty, "TextMutedBrush");
                     btn.FontWeight = FontWeights.Normal;
                 }
             }
@@ -255,16 +259,54 @@ namespace HabitTracker.Views.Tabs
         {
             if (sender is FrameworkElement dragHandle && dragHandle.DataContext is Habits draggedHabit)
             {
+                var parentRow = FindParent<Border>(dragHandle);
+                if (parentRow != null)
+                {
+                    var scaleTransform = new ScaleTransform(1.0, 1.0);
+                    parentRow.RenderTransform = scaleTransform;
+                    parentRow.RenderTransformOrigin = new Point(0.5, 0.5);
+                    
+                    var anim = new System.Windows.Media.Animation.DoubleAnimation(0.97, TimeSpan.FromMilliseconds(150));
+                    scaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                    scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                }
+
                 DragDrop.DoDragDrop(dragHandle, draggedHabit, DragDropEffects.Move);
+
+                if (parentRow != null && parentRow.RenderTransform is ScaleTransform st)
+                {
+                    var anim = new System.Windows.Media.Animation.DoubleAnimation(1.0, TimeSpan.FromMilliseconds(150));
+                    st.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                    st.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                }
             }
+        }
+
+        private T? FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+            if (parentObject == null) return null;
+            if (parentObject is T parent) return parent;
+            return FindParent<T>(parentObject);
         }
 
         private void HabitRow_DragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(Habits)))
+            if (e.Data.GetData(typeof(Habits)) is Habits draggedHabit && sender is FrameworkElement targetElement && targetElement.DataContext is Habits targetHabit)
             {
                 e.Effects = DragDropEffects.Move;
                 e.Handled = true;
+                
+                if (draggedHabit.Id == targetHabit.Id || _dashboardVM == null) return;
+                
+                var habits = _dashboardVM.Habits;
+                int oldIndex = habits.IndexOf(draggedHabit);
+                int newIndex = habits.IndexOf(targetHabit);
+                
+                if (oldIndex >= 0 && newIndex >= 0 && oldIndex != newIndex)
+                {
+                    habits.Move(oldIndex, newIndex);
+                }
             }
         }
 
@@ -425,7 +467,7 @@ namespace HabitTracker.Views.Tabs
                         mask |= bit;
                 }
             }
-            return mask == 0 ? 127 : mask; // fallback to all days if none selected
+            return mask == 0 ? 0 : mask; // fallback to no days if none selected
         }
 
         private void UpdateScheduleButtonsFromMask(int mask)
@@ -441,23 +483,25 @@ namespace HabitTracker.Views.Tabs
             };
 
             var green = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)); // #166534
-            var gray = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 226, 232, 240)); // #E2E8F0
             var textGreen = System.Windows.Media.Brushes.White;
-            var textGray = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 100, 116, 139)); // #64748B
 
             foreach (var (btn, bit) in dayButtons)
             {
                 if (btn == null) continue;
                 if ((mask & bit) != 0)
                 {
+                    btn.ClearValue(Control.BackgroundProperty);
+                    btn.ClearValue(Control.ForegroundProperty);
                     btn.Background = green;
                     btn.Foreground = textGreen;
                     btn.FontWeight = FontWeights.Bold;
                 }
                 else
                 {
-                    btn.Background = gray;
-                    btn.Foreground = textGray;
+                    btn.ClearValue(Control.BackgroundProperty);
+                    btn.ClearValue(Control.ForegroundProperty);
+                    btn.SetResourceReference(Control.BackgroundProperty, "InputBgBrush");
+                    btn.SetResourceReference(Control.ForegroundProperty, "TextMutedBrush");
                     btn.FontWeight = FontWeights.Normal;
                 }
             }
@@ -488,8 +532,8 @@ namespace HabitTracker.Views.Tabs
                 SelectedIconPreview.Text = "❓";
             }
             
-            // Reset Days Mask to 127
-            UpdateScheduleButtonsFromMask(127);
+            // Reset Days Mask to 0 (no days selected)
+            UpdateScheduleButtonsFromMask(0);
         }
 
         // ========== TEXTBOX WATERMARK HANDLERS ==========

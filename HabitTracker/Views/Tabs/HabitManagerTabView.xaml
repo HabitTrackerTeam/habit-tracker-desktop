@@ -24,6 +24,23 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="ScheduleDayButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,1"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <!-- Main Content -->
@@ -168,7 +185,7 @@
                                     
                                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                         <!-- Ikonka kropek (Drag Handle) -->
-                                        <Border Background="Transparent" Cursor="SizeAll" Padding="4" Margin="0,0,8,0" 
+                                        <Border Background="Transparent" Padding="4" Margin="0,0,8,0" 
                                                 PreviewMouseLeftButtonDown="DragHandle_PreviewMouseLeftButtonDown">
                                             <Path Data="M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z" Fill="#94A3B8" Width="14" Height="20" Stretch="Uniform" VerticalAlignment="Center"/>
                                         </Border>
@@ -268,8 +285,8 @@
                         </Popup>
 
                         <!-- Right-aligned Habit Name input box -->
-                        <Border Grid.Row="1" Grid.Column="1" Background="#F8FAFC" CornerRadius="12" Padding="16,12" Height="48">
-                            <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="HabitNameBox" Text="e.g., Daily Meditation" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#94A3B8" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
+                        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="16,12" Height="48">
+                            <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="HabitNameBox" Text="e.g., Daily Meditation" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" FocusVisualStyle="{x:Null}" />
                         </Border>
                     </Grid>
 
@@ -282,7 +299,7 @@
                         </Grid.ColumnDefinitions>
                         
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="HABIT TYPE" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                            <TextBlock Text="{Binding HabitTypeLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
                             <Border Background="#F1F5F9" CornerRadius="12" Padding="4">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -357,39 +374,25 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <RadioButton x:Name="FreqDaily" Grid.Column="0" Content="Daily" GroupName="Frequency" IsChecked="True" Checked="FreqRadio_Checked"/>
-                                <RadioButton x:Name="FreqWeekly" Grid.Column="1" Content="Weekly" GroupName="Frequency" Checked="FreqRadio_Checked"/>
-                                <RadioButton x:Name="FreqMonthly" Grid.Column="2" Content="Monthly" GroupName="Frequency" Checked="FreqRadio_Checked"/>
-                                <RadioButton x:Name="FreqSpecific" Grid.Column="3" Content="Specific" GroupName="Frequency" Checked="FreqRadio_Checked"/>
+                                <RadioButton x:Name="FreqDaily" Grid.Column="0" Content="{Binding FreqDaily, Source={StaticResource Loc}}" GroupName="Frequency" IsChecked="True" Checked="FreqRadio_Checked"/>
+                                <RadioButton x:Name="FreqWeekly" Grid.Column="1" Content="{Binding FreqWeekly, Source={StaticResource Loc}}" GroupName="Frequency" Checked="FreqRadio_Checked"/>
+                                <RadioButton x:Name="FreqMonthly" Grid.Column="2" Content="{Binding FreqMonthly, Source={StaticResource Loc}}" GroupName="Frequency" Checked="FreqRadio_Checked"/>
+                                <RadioButton x:Name="FreqSpecific" Grid.Column="3" Content="{Binding FreqSpecific, Source={StaticResource Loc}}" GroupName="Frequency" Checked="FreqRadio_Checked"/>
                             </Grid>
                         </Border>
                         
                         <!-- Specific Schedule Display -->
-                        <Border x:Name="SchedulePanel" Visibility="Collapsed" Background="#F8FAFC" CornerRadius="12" Padding="12" Margin="0,12,0,0">
+                        <Border x:Name="SchedulePanel" Visibility="Collapsed" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="12" Margin="0,12,0,0">
                             <Grid>
-                                <TextBlock Text="SCHEDULE" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding ScheduleLabel, Source={StaticResource Loc}}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button x:Name="DayMonday" Content="M" Width="28" Height="28" Background="#166534" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DayTuesday" Content="T" Width="28" Height="28" Background="#E2E8F0" Foreground="#64748B" FontSize="11" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DayWednesday" Content="W" Width="28" Height="28" Background="#166534" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DayThursday" Content="T" Width="28" Height="28" Background="#E2E8F0" Foreground="#64748B" FontSize="11" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DayFriday" Content="F" Width="28" Height="28" Background="#166534" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DaySaturday" Content="S" Width="28" Height="28" Background="#E2E8F0" Foreground="#64748B" FontSize="11" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DaySunday" Content="S" Width="28" Height="28" Background="#E2E8F0" Foreground="#64748B" FontSize="11" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
+                                    <Button x:Name="DayMonday" Content="{Binding MondayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="#166534" Foreground="White" FontWeight="Bold" Click="DayButton_Click" />
+                                    <Button x:Name="DayTuesday" Content="{Binding TuesdayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMutedBrush}" Click="DayButton_Click" />
+                                    <Button x:Name="DayWednesday" Content="{Binding WednesdayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="#166534" Foreground="White" FontWeight="Bold" Click="DayButton_Click" />
+                                    <Button x:Name="DayThursday" Content="{Binding ThursdayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMutedBrush}" Click="DayButton_Click" />
+                                    <Button x:Name="DayFriday" Content="{Binding FridayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="#166534" Foreground="White" FontWeight="Bold" Click="DayButton_Click" />
+                                    <Button x:Name="DaySaturday" Content="{Binding SaturdayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMutedBrush}" Click="DayButton_Click" />
+                                    <Button x:Name="DaySunday" Content="{Binding SundayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMutedBrush}" Margin="0" Click="DayButton_Click" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -404,16 +407,46 @@
                         </Grid.ColumnDefinitions>
                         
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="GOAL / TARGET" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                            <Border Background="#F8FAFC" CornerRadius="12" Padding="16,12">
-                                <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="GoalBox" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A" />
+                            <TextBlock Text="{Binding GoalTargetLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8"/>
+                            <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="16,12">
+                                <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="GoalBox" Background="Transparent" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" FocusVisualStyle="{x:Null}"/>
                             </Border>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="UNITS" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                            <Border Background="#F8FAFC" CornerRadius="12" Padding="16,12">
-                                <ComboBox x:Name="UnitsCombo" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A" Padding="0">
+                            <TextBlock Text="{Binding UnitsLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8"/>
+                            <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="16,12">
+                                <ComboBox x:Name="UnitsCombo" OverridesDefaultStyle="True" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" Padding="8,0,0,0" Margin="4,0,0,0" FocusVisualStyle="{x:Null}">
+                                    <ComboBox.Template>
+                                        <ControlTemplate TargetType="ComboBox">
+                                            <Grid>
+                                                <ToggleButton Name="ToggleButton" BorderBrush="Transparent" Background="Transparent" BorderThickness="0" FocusVisualStyle="{x:Null}" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                                    <ToggleButton.Template>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Grid Background="Transparent">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="20" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <Path x:Name="Arrow" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="2" />
+                                                            </Grid>
+                                                        </ControlTemplate>
+                                                    </ToggleButton.Template>
+                                                </ToggleButton>
+                                                <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="0,0,20,0" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                                                <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                                    <Border Name="DropDownBorder" Background="{DynamicResource CardBgBrush}" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" CornerRadius="8" Margin="0,4,0,0">
+                                                        <Border.Effect>
+                                                            <DropShadowEffect BlurRadius="10" Color="Black" Opacity="0.1" ShadowDepth="2"/>
+                                                        </Border.Effect>
+                                                        <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                                        </ScrollViewer>
+                                                    </Border>
+                                                </Popup>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </ComboBox.Template>
                                     <ComboBoxItem Content="mins" />
                                     <ComboBoxItem Content="hours" />
                                     <ComboBoxItem Content="pages" />
