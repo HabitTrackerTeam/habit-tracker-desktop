@@ -10,6 +10,9 @@ namespace HabitTracker.Models{
         [Column("habit_id")]
         public string HabitId{get;set;}
 
+        [Column("user_id")]
+        public string? UserId {get;set;}
+
         [Column("log_date")]
         public DateTime LogDate{get;set;}
 
@@ -22,7 +25,7 @@ namespace HabitTracker.Models{
         [Column("created_date")]
         public DateTime CreatedDate{get;set;}
 
-        [Column("updated_time")]
+        [Column("updated_date")]
         public DateTime UpdatedTime{get;set;}
 
         [Column("status")]
