@@ -30,7 +30,7 @@ namespace HabitTracker.Services
             }
         }
 
-        private string Get(string pl, string en)
+        public string Get(string pl, string en)
         {
             return _currentLanguage == "en" ? en : pl;
         }
@@ -124,6 +124,30 @@ namespace HabitTracker.Services
         public string Add => Get("Dodaj", "Add");
         public string SaveMeasurements => Get("Zapisz pomiary", "Save Measurements");
 
+        // === Measurement messages ===
+        public string MeasAddAtLeastOne => Get("Dodaj co najmniej jeden pomiar, wagę lub wzrost do sesji.", "Please add at least one measurement, weight, or height to the session.");
+        public string MeasAllValid => Get("Wszystkie pomiary muszą mieć wartość większą od 0 przed zapisem.", "All added body part measurements must have a valid value greater than 0 before saving.");
+        public string MeasSavedOk => Get("Pomiary zostały zapisane pomyślnie!", "Measurements saved successfully!");
+        public string MeasSaveError => Get("Błąd podczas zapisywania pomiaru: ", "Error saving measurement: ");
+        public string MeasLoadError => Get("Błąd ładowania pomiarów: ", "Failed to load measurements: ");
+
+        // === BMI statuses ===
+        public string BmiUnderweight => Get("Niedowaga", "Underweight");
+        public string BmiNormal => Get("Prawidłowa", "Normal");
+        public string BmiOverweight => Get("Nadwaga", "Overweight");
+        public string BmiObese => Get("Otyłość", "Obese");
+
+        // === Home tab ===
+        public string DailyMotivation => Get("Małe kroki prowadzą do wielkich zmian. Kwitnij!", "Small steps lead to great growth. Keep blooming.");
+        public string DailyProgress => Get("POSTĘP DNIA", "DAILY PROGRESS");
+        public string DailyNotes => Get("NOTATKI DNIA", "DAILY NOTES");
+        public string DashboardHabitsPlaceholder => Get("Twoje nawyki pojawią się tutaj. Wybierz z listy lub stwórz własne w Zarządzaniu nawykami.", "Personal habits will appear here. Select from the built-in list or create your own in the Habits Manager.");
+
+        // === Settings messages ===
+        public string PasswordChangedOk => Get("Hasło zostało zmienione pomyślnie.", "Password changed successfully.");
+        public string EmailNotFound => Get("Nie znaleziono adresu e-mail użytkownika.", "User email not found.");
+        public string PasswordChangeFailed => Get("Nie udało się zmienić hasła. Sprawdź czy stare hasło jest poprawne.", "Failed to change password. Make sure the old password is correct.");
+
         // === Modals ===
         public string ChangePhoto => Get("ZMIEŃ ZDJĘCIE", "CHANGE PHOTO");
         public string FullName => Get("PEŁNE IMIĘ", "FULL NAME");
@@ -176,5 +200,66 @@ namespace HabitTracker.Services
         public string FridayShort => Get("Pt", "Fri");
         public string SaturdayShort => Get("Sob", "Sat");
         public string SundayShort => Get("Nd", "Sun");
+
+        // === Habit Manager filters / table headers ===
+        public string AddHabit => Get("Dodaj nawyk", "Add Habit");
+        public string SearchHabits => Get("Szukaj nawyków...", "Search habits...");
+        public string FrequencyLabel => Get("CZĘSTOTLIWOŚĆ", "FREQUENCY");
+        public string PriorityLabel => Get("PRIORYTET", "PRIORITY");
+        public string StatusLabel => Get("STATUS", "STATUS");
+        public string HabitDetailsLabel => Get("SZCZEGÓŁY NAWYKU", "HABIT DETAILS");
+        public string ActionsLabel => Get("AKCJE", "ACTIONS");
+        public string PriorityHigh => Get("Wysoki", "High");
+        public string PriorityMedium => Get("Średni", "Medium");
+        public string PriorityLow => Get("Niski", "Low");
+        public string TypeNumeric => Get("Liczba", "Numeric");
+        public string TypeCheckbox => Get("Checkbox", "Checkbox");
+        public string TypeTimer => Get("Timer", "Timer");
+        public string StatusActive => Get("Aktywny", "Active");
+        public string StatusArchived => Get("Zarchiwizowany", "Archived");
+        public string PlantNewHabit => Get("Posadź nawyk", "Plant Habit");
+        public string EditHabit => Get("Edytuj nawyk", "Edit Habit");
+        public string HabitNamePlaceholder => Get("np. Codzienna medytacja", "e.g., Daily Meditation");
+        public string HabitNameLabel => Get("NAZWA NAWYKU", "HABIT NAME");
+        public string ChooseIcon => Get("Wybierz ikonę", "Choose an Icon");
+        public string PlantNewSeed => Get("Posadź nowe nasionko na swojej drodze do rozwoju.", "Plant a new seed for your personal growth journey.");
+
+        // === Statistics ===
+        public string GrowthQuotient => Get("Wskaźnik Wzrostu", "Growth Quotient");
+        public string GrowthQuotientDesc => Get("Twój ogólny wynik wydajności nawyków we wszystkich kategoriach w tym tygodniu.", "Your overall habit performance score across all categories this week.");
+        public string OverallScore => Get("WYNIK OGÓLNY", "OVERALL SCORE");
+        public string WeeklyCompletion => Get("Ukończenia tygodniowe", "Weekly Completion");
+        public string WeeklyCompletionDesc => Get("Wynik wydajności nawyków na dzień", "Habit performance score per day");
+        public string DetailedPerformance => Get("Szczegółowa wydajność", "Detailed Performance");
+        public string DetailedPerformanceDesc => Get("Kliknij nawyk, aby zobaczyć szczegółową analizę", "Click on any habit to see in-depth analytics");
+        public string ViewAll => Get("Pokaż wszystkie →", "View All →");
+        public string ExportToPdf => Get("Eksportuj do PDF", "Export to PDF");
+        public string ConsistencyLabel => Get("KONSEKWENCJA", "CONSISTENCY");
+        public string TrendLabel => Get("TREND", "TREND");
+        public string StreakLabel => Get("SERIA", "STREAK");
+        public string HabitNameHeader => Get("NAZWA NAWYKU", "HABIT NAME");
+        public string ViewStatistics => Get("STATYSTYKI", "VIEW STATISTICS");
+        public string CurrentStreakLabel => Get("Aktualna seria (dni)", "Current Streak (Days)");
+        public string LongestStreakLabel => Get("Najdłuższa seria", "Longest Streak");
+        public string WeeklySuccessLabel => Get("Tygodniowy sukces", "Weekly Success");
+        public string WeeklySuccessDesc => Get("Na podstawie zaplanowanych dni w ostatnich 7 dniach", "Based on scheduled days in last 7 days");
+        public string TotalCompletionsLabel => Get("Łączne ukończenia", "Total Completions");
+        public string ValueTrend => Get("Trend wartości", "Value Trend");
+        public string MonthlyCompletions => Get("Ukończenia miesięczne", "Monthly Completions");
+
+        // === Calendar ===
+        public string MonthlyView => Get("Miesięczny", "Monthly");
+        public string WeeklyView => Get("Tygodniowy", "Weekly");
+        public string SelectedDay => Get("WYBRANY DZIEŃ", "SELECTED DAY");
+        public string DailyHabits => Get("Nawyki dnia", "Daily Habits");
+        public string Reflections => Get("Refleksje", "Reflections");
+        public string NoReflections => Get("Brak refleksji dla tego dnia.", "No reflections recorded for this day.");
+        public string CalDayMonShort => Get("PN", "MON");
+        public string CalDayTueShort => Get("WT", "TUE");
+        public string CalDayWedShort => Get("ŚR", "WED");
+        public string CalDayThuShort => Get("CZW", "THU");
+        public string CalDayFriShort => Get("PT", "FRI");
+        public string CalDaySatShort => Get("SOB", "SAT");
+        public string CalDaySunShort => Get("ND", "SUN");
     }
 }
