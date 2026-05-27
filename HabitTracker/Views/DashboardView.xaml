@@ -12,6 +12,7 @@
 
         <!-- Fixed left sidebar -->
         <Border Grid.Column="0"
+                Background="Transparent"
                 BorderBrush="{DynamicResource InputBorderBrush}"
                 BorderThickness="0,0,1,0"
                 Padding="25,30,20,25">

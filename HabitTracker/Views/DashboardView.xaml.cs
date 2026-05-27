@@ -309,17 +309,16 @@ public partial class DashboardView : System.Windows.Controls.UserControl
 
         if (activeBtn != null)
         {
-            activeBtn.Background = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#ECFDF5"));
+            activeBtn.SetResourceReference(System.Windows.Controls.Control.BackgroundProperty, "CardBgBrush");
             activeBtn.BorderThickness = new System.Windows.Thickness(0, 0, 4, 0);
-            activeBtn.BorderBrush = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#059669"));
+            activeBtn.SetResourceReference(System.Windows.Controls.Control.BorderBrushProperty, "AccentGreenBrush");
             
             if (activeBtn.Content is System.Windows.Controls.StackPanel sp && sp.Children.Count >= 2)
             {
-                var greenBrush = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#047857"));
-                if (sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.Foreground = greenBrush;
+                if (sp.Children[0] is System.Windows.Controls.TextBlock tb1) tb1.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "AccentGreenBrush");
                 if (sp.Children[1] is System.Windows.Controls.TextBlock tb2)
                 {
-                    tb2.Foreground = greenBrush;
+                    tb2.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "AccentGreenBrush");
                     tb2.FontWeight = FontWeights.Bold;
                 }
             }
