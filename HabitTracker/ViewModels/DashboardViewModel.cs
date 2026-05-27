@@ -337,29 +337,40 @@ namespace HabitTracker.ViewModels{
             timer.Interval = TimeSpan.FromMinutes(1);
             timer.Tick += (s, e) => UpdateTodayDate();
             timer.Start();
+
+            // Subscribe to theme changes to refresh calendar color dots
+            HabitTracker.MainWindow.ThemeChanged += OnThemeChanged;
+        }
+
+        private void OnThemeChanged(bool isDark)
+        {
+            // Regenerate calendar so dot/badge colors adapt to the new theme
+            _ = GenerateCalendarAsync();
         }
 
         private void InitializeFilters()
         {
+            var loc = Services.LocalizationService.Instance;
+
             // Priorities
-            Priorities.Add(new FilterItem { Id = "all", Name = "All" });
-            Priorities.Add(new FilterItem { Id = "1", Name = "High" });
-            Priorities.Add(new FilterItem { Id = "2", Name = "Medium" });
-            Priorities.Add(new FilterItem { Id = "3", Name = "Low" });
+            Priorities.Add(new FilterItem { Id = "all", Name = loc.Get("Wszystkie", "All") });
+            Priorities.Add(new FilterItem { Id = "1", Name = loc.PriorityHigh });
+            Priorities.Add(new FilterItem { Id = "2", Name = loc.PriorityMedium });
+            Priorities.Add(new FilterItem { Id = "3", Name = loc.PriorityLow });
             SelectedPriority = Priorities.First();
 
             // Statuses
-            Statuses.Add(new FilterItem { Id = "all", Name = "All" });
-            Statuses.Add(new FilterItem { Id = "active", Name = "Active" });
-            Statuses.Add(new FilterItem { Id = "archived", Name = "Archived" });
-            SelectedStatus = Statuses.First(s => s.Id == "active"); // Default to Active
+            Statuses.Add(new FilterItem { Id = "all", Name = loc.Get("Wszystkie", "All") });
+            Statuses.Add(new FilterItem { Id = "active", Name = loc.StatusActive });
+            Statuses.Add(new FilterItem { Id = "archived", Name = loc.StatusArchived });
+            SelectedStatus = Statuses.First(s => s.Id == "active");
 
             // Frequencies
-            Frequencies.Add(new FilterItem { Id = "all", Name = "All" });
-            Frequencies.Add(new FilterItem { Id = "daily", Name = "Daily" });
-            Frequencies.Add(new FilterItem { Id = "weekly", Name = "Weekly" });
-            Frequencies.Add(new FilterItem { Id = "monthly", Name = "Monthly" });
-            Frequencies.Add(new FilterItem { Id = "specific", Name = "Specific" });
+            Frequencies.Add(new FilterItem { Id = "all", Name = loc.Get("Wszystkie", "All") });
+            Frequencies.Add(new FilterItem { Id = "daily", Name = loc.FreqDaily });
+            Frequencies.Add(new FilterItem { Id = "weekly", Name = loc.FreqWeekly });
+            Frequencies.Add(new FilterItem { Id = "monthly", Name = loc.FreqMonthly });
+            Frequencies.Add(new FilterItem { Id = "specific", Name = loc.FreqSpecific });
             SelectedFrequency = Frequencies.First();
         }
 
@@ -794,7 +805,8 @@ namespace HabitTracker.ViewModels{
 
         private void UpdateTodayDate()
         {
-            TodayDate = DateTime.Now.ToString("yyyy-MM-dd, dddd", CultureInfo.GetCultureInfo("en-US"));
+            var culture = CultureInfo.GetCultureInfo(Services.LocalizationService.Instance.CurrentLanguage == "en" ? "en-US" : "pl-PL");
+            TodayDate = DateTime.Now.ToString("yyyy-MM-dd, dddd", culture);
         }
 
         private void ChangeMonth(int monthsToAdd)
@@ -808,7 +820,8 @@ namespace HabitTracker.ViewModels{
         /// </summary>
         private void GenerateCalendarPlaceholder()
         {
-            CurrentMonthYear = _currentCalendarDate.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("en-US"));
+            var culture = CultureInfo.GetCultureInfo(Services.LocalizationService.Instance.CurrentLanguage == "en" ? "en-US" : "pl-PL");
+            CurrentMonthYear = _currentCalendarDate.ToString("MMMM yyyy", culture);
             var days = new ObservableCollection<CalendarDayViewModel>();
             var firstDayOfMonth = new DateTime(_currentCalendarDate.Year, _currentCalendarDate.Month, 1);
             var daysInMonth = DateTime.DaysInMonth(_currentCalendarDate.Year, _currentCalendarDate.Month);
@@ -845,7 +858,8 @@ namespace HabitTracker.ViewModels{
         /// </summary>
         public async Task GenerateCalendarAsync()
         {
-            CurrentMonthYear = _currentCalendarDate.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("en-US"));
+            var culture = CultureInfo.GetCultureInfo(Services.LocalizationService.Instance.CurrentLanguage == "en" ? "en-US" : "pl-PL");
+            CurrentMonthYear = _currentCalendarDate.ToString("MMMM yyyy", culture);
             var days = new ObservableCollection<CalendarDayViewModel>();
 
             var firstDayOfMonth = new DateTime(_currentCalendarDate.Year, _currentCalendarDate.Month, 1);
@@ -987,6 +1001,20 @@ namespace HabitTracker.ViewModels{
 
         private void GetDayColors(int percentage, bool isToday, out string badgeColor, out string dotColor)
         {
+            // Detect current theme by checking a known dark-mode brush value
+            bool isDark = false;
+            try
+            {
+                var appBgBrush = System.Windows.Application.Current.Resources["AppBgBrush"] as System.Windows.Media.SolidColorBrush;
+                if (appBgBrush != null)
+                {
+                    // Dark mode AppBgBrush is dark (R+G+B < 300)
+                    var c = appBgBrush.Color;
+                    isDark = (c.R + c.G + c.B) < 300;
+                }
+            }
+            catch { }
+
             if (isToday)
             {
                 badgeColor = "#4CA475";
@@ -994,10 +1022,19 @@ namespace HabitTracker.ViewModels{
                 return;
             }
 
-            if (percentage < 0) { badgeColor = "#F0F2F5"; dotColor = "Transparent"; }
-            else if (percentage == 0) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }
-            else if (percentage < 50) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }
-            else { badgeColor = "#E6F4EA"; dotColor = "#328A5D"; }
+            if (isDark)
+            {
+                if (percentage < 0) { badgeColor = "#2D2D2D"; dotColor = "Transparent"; }
+                else if (percentage < 50) { badgeColor = "#4A1A1A"; dotColor = "#E57373"; }
+                else { badgeColor = "#1A3D2E"; dotColor = "#66BB6A"; }
+            }
+            else
+            {
+                if (percentage < 0) { badgeColor = "#F0F2F5"; dotColor = "Transparent"; }
+                else if (percentage == 0) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }
+                else if (percentage < 50) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }
+                else { badgeColor = "#E6F4EA"; dotColor = "#328A5D"; }
+            }
         }
 
         /// <summary>
@@ -1012,7 +1049,8 @@ namespace HabitTracker.ViewModels{
             day.IsSelected = true;
             SelectedDay = day;
 
-            SelectedDayDateText = day.Date.ToString("dddd, MMMM d", CultureInfo.GetCultureInfo("en-US"));
+            var culture = CultureInfo.GetCultureInfo(Services.LocalizationService.Instance.CurrentLanguage == "en" ? "en-US" : "pl-PL");
+            SelectedDayDateText = day.Date.ToString("dddd, MMMM d", culture);
 
             var userId = SupabaseService.Client?.Auth?.CurrentUser?.Id;
             if (string.IsNullOrEmpty(userId)) return;
