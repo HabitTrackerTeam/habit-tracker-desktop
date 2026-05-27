@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
+using System.ComponentModel;
+using System.Windows.Data;
 using HabitTracker.Models;
 using HabitTracker.Services;
 using System.Windows.Input;
@@ -35,13 +37,20 @@ namespace HabitTracker.ViewModels{
 
         // Selected filters
         private FilterItem _selectedPriority;
-        public FilterItem SelectedPriority { get => _selectedPriority; set { _selectedPriority = value; OnPropertyChanged(); } }
+        public FilterItem SelectedPriority { get => _selectedPriority; set { _selectedPriority = value; OnPropertyChanged(); FilteredHabits?.Refresh(); } }
 
         private FilterItem _selectedStatus;
-        public FilterItem SelectedStatus { get => _selectedStatus; set { _selectedStatus = value; OnPropertyChanged(); } }
+        public FilterItem SelectedStatus { get => _selectedStatus; set { _selectedStatus = value; OnPropertyChanged(); FilteredHabits?.Refresh(); } }
 
         private FilterItem _selectedFrequency;
-        public FilterItem SelectedFrequency { get => _selectedFrequency; set { _selectedFrequency = value; OnPropertyChanged(); } }
+        public FilterItem SelectedFrequency { get => _selectedFrequency; set { _selectedFrequency = value; OnPropertyChanged(); FilteredHabits?.Refresh(); } }
+
+        private ICollectionView _filteredHabits;
+        public ICollectionView FilteredHabits
+        {
+            get => _filteredHabits;
+            set { _filteredHabits = value; OnPropertyChanged(); }
+        }
 
 
 
@@ -223,23 +232,24 @@ namespace HabitTracker.ViewModels{
         private void InitializeFilters()
         {
             // Priorities
-            Priorities.Add(new FilterItem { Id = "all", Name = "All Priorities" });
+            Priorities.Add(new FilterItem { Id = "all", Name = "All" });
             Priorities.Add(new FilterItem { Id = "1", Name = "High" });
             Priorities.Add(new FilterItem { Id = "2", Name = "Medium" });
             Priorities.Add(new FilterItem { Id = "3", Name = "Low" });
             SelectedPriority = Priorities.First();
 
             // Statuses
-            Statuses.Add(new FilterItem { Id = "all", Name = "Active Habits" });
-            Statuses.Add(new FilterItem { Id = "active", Name = "Active Only" });
+            Statuses.Add(new FilterItem { Id = "all", Name = "All" });
+            Statuses.Add(new FilterItem { Id = "active", Name = "Active" });
             Statuses.Add(new FilterItem { Id = "archived", Name = "Archived" });
-            SelectedStatus = Statuses.First();
+            SelectedStatus = Statuses.First(s => s.Id == "active"); // Default to Active
 
             // Frequencies
-            Frequencies.Add(new FilterItem { Id = "all", Name = "Every Day" });
+            Frequencies.Add(new FilterItem { Id = "all", Name = "All" });
             Frequencies.Add(new FilterItem { Id = "daily", Name = "Daily" });
             Frequencies.Add(new FilterItem { Id = "weekly", Name = "Weekly" });
             Frequencies.Add(new FilterItem { Id = "monthly", Name = "Monthly" });
+            Frequencies.Add(new FilterItem { Id = "specific", Name = "Specific" });
             SelectedFrequency = Frequencies.First();
         }
 
@@ -341,7 +351,6 @@ namespace HabitTracker.ViewModels{
 
                 var response = await SupabaseService.Client.From<Habits>()
                     .Filter("user_id", Constants.Operator.Equals, userId)
-                    .Filter("is_archived", Constants.Operator.Equals, "false")
                     .Get();
                 var habitsList = response.Models?.OrderBy(h => h.SortOrder).ToList() ?? new List<Habits>();
 
@@ -398,6 +407,18 @@ namespace HabitTracker.ViewModels{
                 }
 
                 Habits = new ObservableCollection<Habits>(habitsList);
+                
+                // Default view used by HomeTab (only show active habits)
+                var defaultView = CollectionViewSource.GetDefaultView(Habits);
+                defaultView.Filter = (obj) => 
+                {
+                    if (obj is Habits h) return !h.IsArchived;
+                    return true;
+                };
+
+                // Independent view for Habit Manager
+                FilteredHabits = new CollectionViewSource { Source = Habits }.View;
+                FilteredHabits.Filter = FilterHabit;
             }
             catch(Exception ex){
                 SetStatus($"Failed to download habits: {ex.Message}","FFD32F2F");
@@ -405,6 +426,34 @@ namespace HabitTracker.ViewModels{
             finally{
                 IsLoading=false;
             }
+        }
+
+        private bool FilterHabit(object obj)
+        {
+            if (obj is Habits habit)
+            {
+                // Status Filter
+                if (SelectedStatus != null && SelectedStatus.Id != "all")
+                {
+                    if (SelectedStatus.Id == "active" && habit.IsArchived) return false;
+                    if (SelectedStatus.Id == "archived" && !habit.IsArchived) return false;
+                }
+
+                // Priority Filter
+                if (SelectedPriority != null && SelectedPriority.Id != "all")
+                {
+                    if (habit.Priority.ToString() != SelectedPriority.Id) return false;
+                }
+
+                // Frequency Filter
+                if (SelectedFrequency != null && SelectedFrequency.Id != "all")
+                {
+                    if (!string.Equals(habit.Period, SelectedFrequency.Id, StringComparison.OrdinalIgnoreCase)) return false;
+                }
+
+                return true;
+            }
+            return false;
         }
 
         private async void Habit_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

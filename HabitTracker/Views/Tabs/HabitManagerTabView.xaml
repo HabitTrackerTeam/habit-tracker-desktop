@@ -41,6 +41,81 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="FilterComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton" BorderBrush="Transparent" Background="Transparent" BorderThickness="0" FocusVisualStyle="{x:Null}" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Grid Background="Transparent">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="30" />
+                                            </Grid.ColumnDefinitions>
+                                            <Path x:Name="Arrow" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="2" />
+                                        </Grid>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="12,0,30,0" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Border Name="DropDownBorder" Background="{DynamicResource CardBgBrush}" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" CornerRadius="8" Margin="0,4,0,0">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="10" Color="Black" Opacity="0.1" ShadowDepth="2"/>
+                                    </Border.Effect>
+                                    <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}"/>
+                        <Setter Property="Padding" Value="12,10"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="6" Margin="4,2">
+                                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardBgBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardBgBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <!-- Main Content -->
@@ -116,21 +191,21 @@
             </Grid.ColumnDefinitions>
             
             <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                <TextBlock Text="PRIORITY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <TextBlock Text="FREQUENCY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
-                    <TextBlock Text="All Priorities" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                    <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedFrequency}" DisplayMemberPath="Name" />
                 </Border>
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="8,0,8,0">
-                <TextBlock Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <TextBlock Text="PRIORITY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
-                    <TextBlock Text="Active Habits" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                    <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Priorities}" SelectedItem="{Binding SelectedPriority}" DisplayMemberPath="Name" />
                 </Border>
             </StackPanel>
             <StackPanel Grid.Column="2" Margin="8,0,0,0">
-                <TextBlock Text="FREQUENCY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <TextBlock Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
-                    <TextBlock Text="Every Day" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                    <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Statuses}" SelectedItem="{Binding SelectedStatus}" DisplayMemberPath="Name" />
                 </Border>
             </StackPanel>
         </Grid>
@@ -147,18 +222,23 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="80" />
                         <ColumnDefinition Width="120" />
-                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="100" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="HABIT DETAILS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
                     <TextBlock Grid.Column="1" Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="2" Text="ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right"/>
+                    <TextBlock Grid.Column="2" Text="PRIORITY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="STATUS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
                 </Grid>
             </Border>
 
             <!-- Scrollable Items -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
-                <ItemsControl ItemsSource="{Binding Habits}">
+                <ItemsControl ItemsSource="{Binding FilteredHabits}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,12" AllowDrop="True" Drop="HabitRow_Drop" DragOver="HabitRow_DragOver">
@@ -168,8 +248,11 @@
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="80" />
+                                        <ColumnDefinition Width="80" />
                                         <ColumnDefinition Width="120" />
-                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="100" />
                                     </Grid.ColumnDefinitions>
                                     
                                     <StackPanel Grid.Column="0" Orientation="Horizontal">
@@ -182,8 +265,16 @@
                                     <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
                                         <TextBlock Text="{Binding Period}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                     </Border>
+
+                                    <Border Grid.Column="2" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
+                                        <TextBlock x:Name="PriorityText" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <Border Grid.Column="3" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
+                                        <TextBlock x:Name="StatusText" Text="Active" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                    </Border>
                                     
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <!-- Ikonka kropek (Drag Handle) -->
                                         <Border Background="Transparent" Padding="4" Margin="0,0,8,0" 
                                                 PreviewMouseLeftButtonDown="DragHandle_PreviewMouseLeftButtonDown">
@@ -198,6 +289,20 @@
                                     </StackPanel>
                                 </Grid>
                             </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Priority}" Value="1">
+                                    <Setter TargetName="PriorityText" Property="Text" Value="High" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Priority}" Value="2">
+                                    <Setter TargetName="PriorityText" Property="Text" Value="Medium" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Priority}" Value="3">
+                                    <Setter TargetName="PriorityText" Property="Text" Value="Low" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                                    <Setter TargetName="StatusText" Property="Text" Value="Archived" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
