@@ -15,6 +15,7 @@ namespace HabitTracker.ViewModels
         private string _statusMessage = string.Empty;
         private string _statusColor = "#FF8B9AA2";
         private bool _isSaving;
+        private bool _isApplyingSettings;
 
         public ObservableCollection<string> AvailableLanguages { get; } = new()
         {
@@ -114,6 +115,11 @@ namespace HabitTracker.ViewModels
                         mainWindow.ApplyTheme(value);
                     }
                 });
+
+                if (!_isApplyingSettings)
+                {
+                    _ = SaveSettingsAsync();
+                }
             }
         }
 
@@ -323,33 +329,41 @@ namespace HabitTracker.ViewModels
 
         private void ApplySettingsToUI(UserSettings settings)
         {
-            SelectedLanguage = settings.Language switch
+            _isApplyingSettings = true;
+            try
             {
-                "pl" => "Polski",
-                "en" => "English",
-                _ => "Polski"
-            };
+                SelectedLanguage = settings.Language switch
+                {
+                    "pl" => "Polski",
+                    "en" => "English",
+                    _ => "Polski"
+                };
 
-            SelectedWeekStart = settings.WeekStart switch
+                SelectedWeekStart = settings.WeekStart switch
+                {
+                    "monday" => "Poniedziałek",
+                    "sunday" => "Niedziela",
+                    _ => "Poniedziałek"
+                };
+
+                SelectedUnits = settings.Units switch
+                {
+                    "metric" => "kg / ml",
+                    "imperial" => "lb / oz",
+                    _ => "kg / ml"
+                };
+
+                UserName = settings.Nickname;
+                IsDailyReminder = settings.DailyReminder;
+                SelectedReminderTime = settings.ReminderTime;
+                IsSoundEnabled = settings.SoundEnabled;
+                IsVibrationEnabled = settings.VibrationEnabled;
+                IsDarkMode = settings.Theme == "dark";
+            }
+            finally
             {
-                "monday" => "Poniedziałek",
-                "sunday" => "Niedziela",
-                _ => "Poniedziałek"
-            };
-
-            SelectedUnits = settings.Units switch
-            {
-                "metric" => "kg / ml",
-                "imperial" => "lb / oz",
-                _ => "kg / ml"
-            };
-
-            UserName = settings.Nickname;
-            IsDailyReminder = settings.DailyReminder;
-            SelectedReminderTime = settings.ReminderTime;
-            IsSoundEnabled = settings.SoundEnabled;
-            IsVibrationEnabled = settings.VibrationEnabled;
-            IsDarkMode = settings.Theme == "dark";
+                _isApplyingSettings = false;
+            }
         }
 
         private void ApplyUIToSettings(UserSettings settings)

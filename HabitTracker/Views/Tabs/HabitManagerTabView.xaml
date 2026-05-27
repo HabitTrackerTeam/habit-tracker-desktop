@@ -2,9 +2,120 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HabitTracker"
-             xmlns:views="clr-namespace:HabitTracker.Views">
+             xmlns:views="clr-namespace:HabitTracker.Views"
+             Background="Transparent">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="EmojiButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Background" Value="#F1F5F9"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ScheduleDayButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,1"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="FilterComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton" BorderBrush="Transparent" Background="Transparent" BorderThickness="0" FocusVisualStyle="{x:Null}" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Grid Background="Transparent">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="30" />
+                                            </Grid.ColumnDefinitions>
+                                            <Path x:Name="Arrow" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="2" />
+                                        </Grid>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="12,0,30,0" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Border Name="DropDownBorder" Background="{DynamicResource CardBgBrush}" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" CornerRadius="8" Margin="0,4,0,0">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="10" Color="Black" Opacity="0.1" ShadowDepth="2"/>
+                                    </Border.Effect>
+                                    <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}"/>
+                        <Setter Property="Padding" Value="12,10"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="6" Margin="4,2">
+                                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardBgBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardBgBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <!-- Main Content -->
@@ -19,13 +130,7 @@
                                 </Setter.Value>
                             </Setter>
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding IsCreateCategoryModalOpen}" Value="True">
-                            <Setter Property="Effect">
-                                <Setter.Value>
-                                    <BlurEffect Radius="15" KernelType="Gaussian" />
-                                </Setter.Value>
-                            </Setter>
-                        </DataTrigger>
+
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
@@ -83,31 +188,24 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             
             <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                <TextBlock Text="PRIORITY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <TextBlock Text="FREQUENCY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
-                    <TextBlock Text="All Priorities" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                    <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedFrequency}" DisplayMemberPath="Name" />
                 </Border>
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="8,0,8,0">
-                <TextBlock Text="CATEGORY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
+                <TextBlock Text="PRIORITY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
-                    <TextBlock Text="All Categories" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                    <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Priorities}" SelectedItem="{Binding SelectedPriority}" DisplayMemberPath="Name" />
                 </Border>
             </StackPanel>
-            <StackPanel Grid.Column="2" Margin="8,0,8,0">
+            <StackPanel Grid.Column="2" Margin="8,0,0,0">
                 <TextBlock Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
-                    <TextBlock Text="Active Habits" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
-                </Border>
-            </StackPanel>
-            <StackPanel Grid.Column="3" Margin="8,0,0,0">
-                <TextBlock Text="FREQUENCY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="4,0,0,4"/>
-                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="8" Height="44">
-                    <TextBlock Text="Every Day" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextMainBrush}"/>
+                    <ComboBox Style="{StaticResource FilterComboBoxStyle}" ItemsSource="{Binding Statuses}" SelectedItem="{Binding SelectedStatus}" DisplayMemberPath="Name" />
                 </Border>
             </StackPanel>
         </Grid>
@@ -124,57 +222,87 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="80" />
                         <ColumnDefinition Width="120" />
-                        <ColumnDefinition Width="120" />
-                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="100" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="HABIT DETAILS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Grid.Column="1" Text="CATEGORY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="2" Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="3" Text="ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right"/>
+                    <TextBlock Grid.Column="1" Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="PRIORITY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="STATUS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
                 </Grid>
             </Border>
 
             <!-- Scrollable Items -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
-                <ItemsControl ItemsSource="{Binding Habits}">
+                <ItemsControl ItemsSource="{Binding FilteredHabits}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                            <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,12" AllowDrop="True" Drop="HabitRow_Drop" DragOver="HabitRow_DragOver">
                                 <Border.Effect>
                                     <DropShadowEffect Color="Black" Opacity="0.03" BlurRadius="4" ShadowDepth="2" Direction="270" />
                                 </Border.Effect>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="80" />
+                                        <ColumnDefinition Width="80" />
                                         <ColumnDefinition Width="120" />
-                                        <ColumnDefinition Width="120" />
-                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="100" />
                                     </Grid.ColumnDefinitions>
                                     
                                     <StackPanel Grid.Column="0" Orientation="Horizontal">
                                         <Border Background="#ECFDF5" Width="40" Height="40" CornerRadius="8">
-                                            <TextBlock Text="{Binding Category.Icon, FallbackValue=đź’§}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
+                                            <TextBlock Text="{Binding Icon, FallbackValue=💧}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
                                         </Border>
                                         <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="16,0,0,0" />
                                     </StackPanel>
                                     
-                                    <TextBlock Grid.Column="1" Text="{Binding Category.Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
-                                    
-                                    <Border Grid.Column="2" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
+                                    <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
                                         <TextBlock Text="{Binding Period}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                     </Border>
+
+                                    <Border Grid.Column="2" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
+                                        <TextBlock x:Name="PriorityText" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <Border Grid.Column="3" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Height="24" HorizontalAlignment="Center" Padding="8,0">
+                                        <TextBlock x:Name="StatusText" Text="Active" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                    </Border>
                                     
-                                    <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- Ikonka kropek (Drag Handle) -->
+                                        <Border Background="Transparent" Padding="4" Margin="0,0,8,0" 
+                                                PreviewMouseLeftButtonDown="DragHandle_PreviewMouseLeftButtonDown">
+                                            <Path Data="M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z" Fill="#94A3B8" Width="14" Height="20" Stretch="Uniform" VerticalAlignment="Center"/>
+                                        </Border>
                                         <Button Click="EditHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" Margin="0,0,4,0" ToolTip="Edit">
-                                            <TextBlock Text="âśŹď¸Ź" FontSize="14" />
+                                            <TextBlock Text="✏️" FontSize="14" />
                                         </Button>
                                         <Button Click="DeleteHabit_Click" DataContext="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="4" ToolTip="Delete">
-                                            <TextBlock Text="đź—‘ď¸Ź" FontSize="14" />
+                                            <TextBlock Text="🗑️" FontSize="14" />
                                         </Button>
                                     </StackPanel>
                                 </Grid>
                             </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Priority}" Value="1">
+                                    <Setter TargetName="PriorityText" Property="Text" Value="High" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Priority}" Value="2">
+                                    <Setter TargetName="PriorityText" Property="Text" Value="Medium" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Priority}" Value="3">
+                                    <Setter TargetName="PriorityText" Property="Text" Value="Low" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                                    <Setter TargetName="StatusText" Property="Text" Value="Archived" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -185,22 +313,22 @@
         <!-- ========== ADD HABIT MODAL ========== -->
         <Grid Visibility="{Binding IsAddHabitModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="999">
             <Border Background="#4D000000" />
-            <Border Background="{DynamicResource CardBgBrush}" 
-                    CornerRadius="15" 
-                    Margin="0" 
-                    Padding="30" 
-                    Width="600" 
-                    HorizontalAlignment="Center" 
-                    VerticalAlignment="Center">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="20" ShadowDepth="5" />
-                </Border.Effect>
-                <Grid>
+            
+            <Grid Width="600" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0">
+                <!-- Shadow Border (separate to prevent ComboBox popup clipping bug in WPF) -->
+                <Border Background="White" CornerRadius="15">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="20" ShadowDepth="5" />
+                    </Border.Effect>
+                </Border>
+                
+                <!-- Main Content Border -->
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" Padding="30">
+                    <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/> <!-- Header -->
-                        <RowDefinition Height="Auto"/> <!-- Habit Name -->
+                        <RowDefinition Height="Auto"/> <!-- Habit Name & Icon -->
                         <RowDefinition Height="Auto"/> <!-- Type & Priority -->
-                        <RowDefinition Height="Auto"/> <!-- Category -->
                         <RowDefinition Height="Auto"/> <!-- Frequency -->
                         <RowDefinition Height="Auto"/> <!-- Goal & Units -->
                         <RowDefinition Height="*"/>    <!-- Spacer -->
@@ -210,7 +338,7 @@
                     <!-- Header -->
                     <Grid Grid.Row="0" Margin="0,0,0,24">
                         <StackPanel>
-                            <TextBlock Text="Add New Habit" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                            <TextBlock Text="{Binding ModalTitle}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
                             <TextBlock Text="Plant a new seed for your personal growth journey." FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
                         </StackPanel>
                         <Button HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="CloseAddHabitModal_Click">
@@ -218,13 +346,54 @@
                         </Button>
                     </Grid>
 
-                    <!-- Habit Name -->
-                    <StackPanel Grid.Row="1" Margin="0,0,0,20">
-                        <TextBlock Text="HABIT NAME" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                        <Border Background="#F8FAFC" CornerRadius="12" Padding="16,12">
-                            <TextBox x:Name="HabitNameBox" Tag="e.g., Daily Meditation" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A" Padding="0" />
+                    <!-- Habit Name & Icon -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/> <!-- Label -->
+                            <RowDefinition Height="Auto"/> <!-- Controls -->
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/> <!-- Icon Button -->
+                            <ColumnDefinition Width="*"/>    <!-- Textbox -->
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="HABIT NAME" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+
+                        <!-- Left-aligned Select Icon Button (styled like habit list cards) -->
+                        <Button Grid.Row="1" Grid.Column="0" x:Name="SelectIconButton" Click="SelectIconButton_Click" Cursor="Hand" Background="#F0FDF4" Width="48" Height="48" BorderThickness="0" Margin="0,0,16,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <TextBlock x:Name="SelectedIconPreview" Text="{Binding NewHabitIcon, FallbackValue=❓}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Button>
+
+                        <Popup Grid.Row="1" Grid.Column="0" x:Name="IconPickerPopup" PlacementTarget="{Binding ElementName=SelectIconButton}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
+                            <Border Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="12" Padding="12,12,4,12" Width="300" Height="220">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" Color="Black" Opacity="0.1" ShadowDepth="3"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Choose an Icon" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,8"/>
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <WrapPanel x:Name="EmojiWrapPanel" HorizontalAlignment="Center" Width="252"/>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+                        </Popup>
+
+                        <!-- Right-aligned Habit Name input box -->
+                        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="16,12" Height="48">
+                            <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="HabitNameBox" Text="e.g., Daily Meditation" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" FocusVisualStyle="{x:Null}" />
                         </Border>
-                    </StackPanel>
+                    </Grid>
 
                     <!-- Type & Priority -->
                     <Grid Grid.Row="2" Margin="0,0,0,20">
@@ -235,7 +404,7 @@
                         </Grid.ColumnDefinitions>
                         
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="HABIT TYPE" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                            <TextBlock Text="{Binding HabitTypeLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
                             <Border Background="#F1F5F9" CornerRadius="12" Padding="4">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -279,49 +448,8 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Category -->
-                    <StackPanel Grid.Row="3" Margin="0,0,0,20">
-                        <TextBlock Text="CATEGORY" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                        <Border Background="#F8FAFC" CornerRadius="12" Padding="16,12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <ComboBox x:Name="CategoryCombo" Grid.Column="0" ItemsSource="{Binding Categories}" DisplayMemberPath="Name" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A" Padding="0" />
-                                <Button Grid.Column="1" Content="+" Background="Transparent" BorderThickness="0" Foreground="#166534" FontSize="18" FontWeight="Bold" Click="NewCategory_Click" VerticalAlignment="Center" Margin="8,0,0,0" Cursor="Hand" />
-                            </Grid>
-                        </Border>
-                        
-                        <!-- Category Style Selection (Mini Row) -->
-                        <Grid Margin="0,12,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Orientation="Horizontal" Grid.Column="0">
-                                <TextBlock Text="ICON" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <Border Background="#166534" Width="32" Height="32" CornerRadius="6" Margin="0,0,4,0">
-                                    <Path Data="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" Fill="White" Width="14" Height="14" Stretch="Uniform"/>
-                                </Border>
-                                <Border Background="#F1F5F9" Width="32" Height="32" CornerRadius="6" Margin="0,0,4,0">
-                                    <Path Data="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4A2,2 0 0,1 2,19V8A2,2 0 0,1 4,6H8V4A2,2 0 0,1 10,2M14,6V4H10V6H14Z" Fill="#64748B" Width="14" Height="14" Stretch="Uniform"/>
-                                </Border>
-                            </StackPanel>
-                            
-                            <StackPanel Orientation="Horizontal" Grid.Column="2">
-                                <TextBlock Text="COLOR" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <Ellipse Width="12" Height="12" Fill="#166534" Margin="0,0,6,0"/>
-                                <Ellipse Width="12" Height="12" Fill="#3B82F6" Margin="0,0,6,0"/>
-                                <Ellipse Width="12" Height="12" Fill="#EF4444" Margin="0,0,6,0"/>
-                                <Ellipse Width="12" Height="12" Fill="#F59E0B" Margin="0,0,0,0"/>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-
                     <!-- Frequency -->
-                    <StackPanel Grid.Row="4" Margin="0,0,0,20">
+                    <StackPanel Grid.Row="3" Margin="0,0,0,20">
                         <TextBlock Text="FREQUENCY" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
                         <Border Background="#F1F5F9" CornerRadius="12" Padding="4">
                             <Grid>
@@ -351,46 +479,32 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <RadioButton x:Name="FreqDaily" Grid.Column="0" Content="Daily" GroupName="Frequency" IsChecked="True" Checked="FreqRadio_Checked"/>
-                                <RadioButton x:Name="FreqWeekly" Grid.Column="1" Content="Weekly" GroupName="Frequency" Checked="FreqRadio_Checked"/>
-                                <RadioButton x:Name="FreqMonthly" Grid.Column="2" Content="Monthly" GroupName="Frequency" Checked="FreqRadio_Checked"/>
-                                <RadioButton x:Name="FreqSpecific" Grid.Column="3" Content="Specific" GroupName="Frequency" Checked="FreqRadio_Checked"/>
+                                <RadioButton x:Name="FreqDaily" Grid.Column="0" Content="{Binding FreqDaily, Source={StaticResource Loc}}" GroupName="Frequency" IsChecked="True" Checked="FreqRadio_Checked"/>
+                                <RadioButton x:Name="FreqWeekly" Grid.Column="1" Content="{Binding FreqWeekly, Source={StaticResource Loc}}" GroupName="Frequency" Checked="FreqRadio_Checked"/>
+                                <RadioButton x:Name="FreqMonthly" Grid.Column="2" Content="{Binding FreqMonthly, Source={StaticResource Loc}}" GroupName="Frequency" Checked="FreqRadio_Checked"/>
+                                <RadioButton x:Name="FreqSpecific" Grid.Column="3" Content="{Binding FreqSpecific, Source={StaticResource Loc}}" GroupName="Frequency" Checked="FreqRadio_Checked"/>
                             </Grid>
                         </Border>
                         
                         <!-- Specific Schedule Display -->
-                        <Border x:Name="SchedulePanel" Visibility="Collapsed" Background="#F8FAFC" CornerRadius="12" Padding="12" Margin="0,12,0,0">
+                        <Border x:Name="SchedulePanel" Visibility="Collapsed" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="12" Margin="0,12,0,0">
                             <Grid>
-                                <TextBlock Text="SCHEDULE" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding ScheduleLabel, Source={StaticResource Loc}}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button x:Name="DayMonday" Content="M" Width="28" Height="28" Background="#166534" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DayTuesday" Content="T" Width="28" Height="28" Background="#E2E8F0" Foreground="#64748B" FontSize="11" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DayWednesday" Content="W" Width="28" Height="28" Background="#166534" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DayThursday" Content="T" Width="28" Height="28" Background="#E2E8F0" Foreground="#64748B" FontSize="11" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DayFriday" Content="F" Width="28" Height="28" Background="#166534" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DaySaturday" Content="S" Width="28" Height="28" Background="#E2E8F0" Foreground="#64748B" FontSize="11" Margin="0,0,4,0" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
-                                    <Button x:Name="DaySunday" Content="S" Width="28" Height="28" Background="#E2E8F0" Foreground="#64748B" FontSize="11" Click="DayButton_Click" Cursor="Hand" BorderThickness="0">
-                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="14"/></Style></Button.Resources>
-                                    </Button>
+                                    <Button x:Name="DayMonday" Content="{Binding MondayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="#166534" Foreground="White" FontWeight="Bold" Click="DayButton_Click" />
+                                    <Button x:Name="DayTuesday" Content="{Binding TuesdayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMutedBrush}" Click="DayButton_Click" />
+                                    <Button x:Name="DayWednesday" Content="{Binding WednesdayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="#166534" Foreground="White" FontWeight="Bold" Click="DayButton_Click" />
+                                    <Button x:Name="DayThursday" Content="{Binding ThursdayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMutedBrush}" Click="DayButton_Click" />
+                                    <Button x:Name="DayFriday" Content="{Binding FridayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="#166534" Foreground="White" FontWeight="Bold" Click="DayButton_Click" />
+                                    <Button x:Name="DaySaturday" Content="{Binding SaturdayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMutedBrush}" Click="DayButton_Click" />
+                                    <Button x:Name="DaySunday" Content="{Binding SundayShort, Source={StaticResource Loc}}" Style="{StaticResource ScheduleDayButtonStyle}" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextMutedBrush}" Margin="0" Click="DayButton_Click" />
                                 </StackPanel>
                             </Grid>
                         </Border>
                     </StackPanel>
 
                     <!-- Goal & Units -->
-                    <Grid Grid.Row="5">
+                    <Grid Grid.Row="4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="24"/>
@@ -398,16 +512,46 @@
                         </Grid.ColumnDefinitions>
                         
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="GOAL / TARGET" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                            <Border Background="#F8FAFC" CornerRadius="12" Padding="16,12">
-                                <TextBox x:Name="GoalBox" Tag="20" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A" Padding="0" />
+                            <TextBlock Text="{Binding GoalTargetLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8"/>
+                            <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="16,12">
+                                <TextBox Style="{StaticResource CenteredTextBoxStyle}" x:Name="GoalBox" Background="Transparent" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" FocusVisualStyle="{x:Null}"/>
                             </Border>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="UNITS" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
-                            <Border Background="#F8FAFC" CornerRadius="12" Padding="16,12">
-                                <ComboBox x:Name="UnitsCombo" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A" Padding="0">
+                            <TextBlock Text="{Binding UnitsLabel, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8"/>
+                            <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="16,12">
+                                <ComboBox x:Name="UnitsCombo" OverridesDefaultStyle="True" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" Padding="8,0,0,0" Margin="4,0,0,0" FocusVisualStyle="{x:Null}">
+                                    <ComboBox.Template>
+                                        <ControlTemplate TargetType="ComboBox">
+                                            <Grid>
+                                                <ToggleButton Name="ToggleButton" BorderBrush="Transparent" Background="Transparent" BorderThickness="0" FocusVisualStyle="{x:Null}" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                                    <ToggleButton.Template>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Grid Background="Transparent">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="20" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <Path x:Name="Arrow" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="2" />
+                                                            </Grid>
+                                                        </ControlTemplate>
+                                                    </ToggleButton.Template>
+                                                </ToggleButton>
+                                                <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="0,0,20,0" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                                                <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                                    <Border Name="DropDownBorder" Background="{DynamicResource CardBgBrush}" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" CornerRadius="8" Margin="0,4,0,0">
+                                                        <Border.Effect>
+                                                            <DropShadowEffect BlurRadius="10" Color="Black" Opacity="0.1" ShadowDepth="2"/>
+                                                        </Border.Effect>
+                                                        <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                                        </ScrollViewer>
+                                                    </Border>
+                                                </Popup>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </ComboBox.Template>
                                     <ComboBoxItem Content="mins" />
                                     <ComboBoxItem Content="hours" />
                                     <ComboBoxItem Content="pages" />
@@ -419,7 +563,7 @@
                     </Grid>
 
                     <!-- Footer Actions -->
-                    <Grid Grid.Row="7" Margin="0,32,0,0">
+                    <Grid Grid.Row="6" Margin="0,32,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="Cancel" FontSize="14" FontWeight="SemiBold" Foreground="#64748B" Background="Transparent" BorderThickness="0" Margin="0,0,24,0" Cursor="Hand" Click="CancelAddHabit_Click"/>
                             <Button Background="#166534" BorderThickness="0" Padding="24,14" Cursor="Hand" Click="PlantHabit_Click">
@@ -430,79 +574,17 @@
                                 </Button.Resources>
                                 <StackPanel Orientation="Horizontal">
                                     <Path Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" Fill="White" Width="14" Height="14" Margin="0,0,8,0" Stretch="Uniform"/>
-                                    <TextBlock Text="Plant Habit" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding ModalButtonText}" Foreground="White" FontSize="14" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </Grid>
-                    <!-- Dimming overlay for when Create Category is open -->
-                    <Border Grid.RowSpan="8" Background="#4D000000" CornerRadius="15" Margin="-30" Visibility="{Binding IsCreateCategoryModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
                 </Grid>
             </Border>
         </Grid>
-
-        <!-- ========== CREATE CATEGORY MODAL ========== -->
-        <Grid Visibility="{Binding IsCreateCategoryModalOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="999">
-            <Border Background="Transparent" />
-            <Border Background="{DynamicResource CardBgBrush}" 
-                    CornerRadius="15" 
-                    Margin="0" 
-                    Padding="30" 
-                    Width="600" 
-                    HorizontalAlignment="Center" 
-                    VerticalAlignment="Center">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="20" ShadowDepth="5" />
-                </Border.Effect>
-                <StackPanel>
-                    <!-- Header -->
-                    <Grid Margin="0,0,0,18">
-                        <StackPanel>
-                            <TextBlock Text="Create New Category" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                            <TextBlock Text="Give your habit category a name, color and icon." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
-                        </StackPanel>
-                        <Button HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Click="CloseCreateCategoryModal_Click" Cursor="Hand">
-                            <TextBlock Text="âś•" FontSize="18" Foreground="{DynamicResource TextMutedBrush}" />
-                        </Button>
-                    </Grid>
-
-                    <!-- Category Name -->
-                    <StackPanel Margin="0,0,0,20">
-                        <TextBlock Text="CATEGORY NAME" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,6" />
-                        <TextBox x:Name="CategoryNameBoxCreateCategory" Tag="e.g., Health &amp; Fitness" Height="40" Padding="12,8,12,8" />
-                    </StackPanel>
-
-                    <!-- Choose Icon -->
-                    <StackPanel Margin="0,0,0,20">
-                        <TextBlock Text="CHOOSE ICON" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,10" />
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="IconBtnCategory1" Content="âś“" Width="44" Height="44" Background="Transparent" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="16" Margin="0,0,12,0" Click="CategoryIconButton_Click" Cursor="Hand" />
-                            <Button x:Name="IconBtnCategory2" Content="đź“‹" Width="44" Height="44" Background="Transparent" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="16" Margin="0,0,12,0" Click="CategoryIconButton_Click" Cursor="Hand" />
-                            <Button x:Name="IconBtnCategory3" Content="đźŽŻ" Width="44" Height="44" Background="Transparent" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="16" Margin="0,0,12,0" Click="CategoryIconButton_Click" Cursor="Hand" />
-                            <Button x:Name="IconBtnCategory4" Content="đź’Ş" Width="44" Height="44" Background="Transparent" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="16" Margin="0,0,12,0" Click="CategoryIconButton_Click" Cursor="Hand" />
-                            <Button x:Name="IconBtnCategory5" Content="đź§ " Width="44" Height="44" Background="Transparent" BorderBrush="#FFDDE2E5" BorderThickness="1" FontSize="16" Click="CategoryIconButton_Click" Cursor="Hand" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- Choose Color -->
-                    <StackPanel Margin="0,0,0,20">
-                        <TextBlock Text="CHOOSE COLOR" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,10" />
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="ColorBtnCategory1" Width="40" Height="40" Background="#328A5D" BorderThickness="0" Margin="0,0,12,0" Click="CategoryColorButton_Click" Cursor="Hand" />
-                            <Button x:Name="ColorBtnCategory2" Width="40" Height="40" Background="#0066CC" BorderThickness="0" Margin="0,0,12,0" Click="CategoryColorButton_Click" Cursor="Hand" />
-                            <Button x:Name="ColorBtnCategory3" Width="40" Height="40" Background="#FF6B6B" BorderThickness="0" Margin="0,0,12,0" Click="CategoryColorButton_Click" Cursor="Hand" />
-                            <Button x:Name="ColorBtnCategory4" Width="40" Height="40" Background="#FFD93D" BorderThickness="0" Margin="0,0,12,0" Click="CategoryColorButton_Click" Cursor="Hand" />
-                            <Button x:Name="ColorBtnCategory5" Width="40" Height="40" Background="#9B59B6" BorderThickness="0" Click="CategoryColorButton_Click" Cursor="Hand" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- Buttons -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
-                        <Button Content="Cancel" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="13" FontWeight="Bold" Click="CancelCreateCategory_Click" Cursor="Hand" Margin="0,0,12,0" Width="70" />
-                        <Button Content="Create Category" Background="#FF328A5D" BorderThickness="0" Foreground="White" FontSize="13" FontWeight="Bold" Click="CreateCategoryButton_Click" Cursor="Hand" Width="130" Height="40" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
         </Grid>
+
+
     </Grid>
 </UserControl>

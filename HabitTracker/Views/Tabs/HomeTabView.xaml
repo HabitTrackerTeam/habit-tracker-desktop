@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HabitTracker"
              xmlns:views="clr-namespace:HabitTracker.Views"
-             Background="#F8FAFC">
+             Background="Transparent">
 
     <UserControl.Resources>
         <Style x:Key="IconButton" TargetType="Button">
@@ -25,15 +25,23 @@
         </Style>
 
         <Style x:Key="HabitItemStyle" TargetType="Border">
-            <Setter Property="Background" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource CardBgBrush}"/>
             <Setter Property="CornerRadius" Value="16"/>
             <Setter Property="Padding" Value="16"/>
             <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="Effect">
                 <Setter.Value>
                     <DropShadowEffect BlurRadius="10" Color="Black" Opacity="0.02" ShadowDepth="0"/>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsGreenHighlighted}" Value="True">
+                    <Setter Property="Background" Value="#FFEBF7EE"/>
+                    <Setter Property="BorderBrush" Value="#FF81C784"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
         <Style x:Key="ModernCheckBox" TargetType="CheckBox">
@@ -91,7 +99,7 @@
             <StackPanel Margin="48, 0, 48, 48">
                 
                 <!-- Welcome Hero -->
-                <Border Background="White" CornerRadius="24" Padding="40" Margin="0,0,0,32">
+                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="24" Padding="40" Margin="0,0,0,32">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="20" Color="Black" Opacity="0.03" ShadowDepth="0"/>
                     </Border.Effect>
@@ -103,19 +111,19 @@
 
                         <StackPanel VerticalAlignment="Center">
                             <!-- Binding TodayDate -->
-                            <TextBlock Text="{Binding TodayDate}" FontSize="40" FontWeight="Bold" Foreground="#0F172A"/>
-                            <TextBlock Text="Small steps lead to great growth. Keep blooming." FontSize="18" Foreground="#64748B" Margin="0,8,0,0"/>
+                            <TextBlock Text="{Binding TodayDate}" FontSize="40" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                            <TextBlock Text="Small steps lead to great growth. Keep blooming." FontSize="18" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0"/>
                         </StackPanel>
 
                         <!-- Circular Progress -->
                         <Grid Grid.Column="1" Width="120" Height="120">
-                            <Ellipse Stroke="#F1F5F9" StrokeThickness="12"/>
-                            <Path Stroke="#166534" StrokeThickness="12" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                            <Ellipse Stroke="{DynamicResource InputBgBrush}" StrokeThickness="12"/>
+                            <Path Stroke="{DynamicResource AccentGreenBrush}" StrokeThickness="12" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   Data="M 60,60 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" 
                                   StrokeDashArray="4 1" Margin="0"/>
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <TextBlock Text="65%" FontSize="28" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
-                                <TextBlock Text="DAILY PROGRESS" FontSize="8" FontWeight="Bold" Foreground="#166534" HorizontalAlignment="Center"/>
+                                <TextBlock Text="65%" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="DAILY PROGRESS" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
                     </Grid>
@@ -131,13 +139,23 @@
                     <!-- Daily Habits List -->
                     <StackPanel Grid.Column="0">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
-                            <Path Data="M12,2C6.5,2 2,6.5 2,12C2,17.5 6.5,22 12,22C17.5,22 22,17.5 22,12C22,6.5 17.5,2 12,2M10,17L5,12L6.41,10.59L10,14.17L17.59,6.58L19,8L10,17Z" Fill="#166534" Width="20" Height="20" Margin="0,0,12,0"/>
+                            <Path Data="M7,5H21V7H7V5M7,11H21V13H7V11M7,17H21V19H7V17M4,4.5A1.5,1.5 0 0,1 5.5,6A1.5,1.5 0 0,1 4,7.5A1.5,1.5 0 0,1 2.5,6A1.5,1.5 0 0,1 4,4.5M4,10.5A1.5,1.5 0 0,1 5.5,12A1.5,1.5 0 0,1 4,13.5A1.5,1.5 0 0,1 2.5,12A1.5,1.5 0 0,1 4,10.5M4,16.5A1.5,1.5 0 0,1 5.5,18A1.5,1.5 0 0,1 4,19.5A1.5,1.5 0 0,1 2.5,18A1.5,1.5 0 0,1 4,16.5Z" Fill="#166534" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
                             <!-- Binding localized MyHabits -->
-                            <TextBlock Text="{Binding MyHabits, Source={StaticResource Loc}}" FontSize="18" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding MyHabits, Source={StaticResource Loc}}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
 
                         <!-- Fallback Content if Habits is empty -->
                         <TextBlock Foreground="#64748B" TextWrapping="Wrap" Margin="0,0,0,16">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Habits.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
                             Personal habits will appear here. Select from the built-in list or create your own in the Habits Manager.
                         </TextBlock>
 
@@ -153,14 +171,42 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <Border Grid.Column="0" Background="#F0FDF4" CornerRadius="12" Width="48" Height="48" Margin="0,0,16,0">
-                                                <Path Data="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" Fill="#166534" Width="20" Height="20" Stretch="Uniform"/>
+                                                <TextBlock Text="{Binding Icon, FallbackValue=🌱}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
                                             </Border>
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Foreground="#0F172A"/>
-                                                <!-- Added a placeholder frequency since we don't have exactly mapped property -->
-                                                <TextBlock Text="Target frequency" FontSize="13" Foreground="#64748B"/>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextMainBrush}"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Period}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                </StackPanel>
                                             </StackPanel>
-                                            <CheckBox Grid.Column="2" Style="{StaticResource ModernCheckBox}"/>
+                                            
+                                            <!-- Checkbox Habit Input -->
+                                            <CheckBox Grid.Column="2" 
+                                                      Style="{StaticResource ModernCheckBox}"
+                                                      IsChecked="{Binding IsCompleted, Mode=TwoWay}"
+                                                      Visibility="{Binding IsCheckboxType, Converter={StaticResource BoolToVis}}"
+                                                      VerticalAlignment="Center"/>
+                                                      
+                                            <!-- Numeric/Timer Habit Input -->
+                                            <StackPanel Grid.Column="2" 
+                                                        Orientation="Horizontal" 
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{Binding IsNumericOrTimerType, Converter={StaticResource BoolToVis}}">
+                                                <Border Background="{DynamicResource InputBgBrush}" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" Width="60" Height="36">
+                                                    <TextBox Style="{StaticResource CenteredTextBoxStyle}"
+                                                             Text="{Binding CurrentProgressText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             Background="Transparent"
+                                                             BorderThickness="0"
+                                                             VerticalContentAlignment="Center"
+                                                             HorizontalContentAlignment="Center"
+                                                             FontSize="14"
+                                                             FontWeight="SemiBold"
+                                                             Foreground="{DynamicResource TextMainBrush}"/>
+                                                </Border>
+                                                <TextBlock Text=" / " FontSize="14" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                                <TextBlock Text="{Binding TargetFrequency}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                                <TextBlock Text="{Binding DisplayUnit}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -171,12 +217,12 @@
                     <!-- Reflection Section -->
                     <StackPanel Grid.Column="2">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
-                            <Path Data="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" Fill="#166534" Width="20" Height="20" Margin="0,0,12,0"/>
+                            <Path Data="M14,10H19.5L14,4.5V10M5,3H15L21,9V21A2,2 0 0,1 19,23H5C3.89,23 3,22.1 3,21V5C3,3.89 3.89,3 5,3M5,5V7H11V5H5M5,9V11H13V9H5M5,13V15H19V13H5M5,17V19H19V17H5Z" Fill="#166534" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
                             <!-- Binding localized MyNotes -->
-                            <TextBlock Text="{Binding MyNotes, Source={StaticResource Loc}}" FontSize="18" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding MyNotes, Source={StaticResource Loc}}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
 
-                        <Border Background="White" CornerRadius="16" Padding="24" Height="400">
+                        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="24" Height="400">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.02" ShadowDepth="0"/>
                             </Border.Effect>
@@ -186,9 +232,9 @@
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="DAILY NOTES" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,16"/>
+                                <TextBlock Grid.Row="0" Text="DAILY NOTES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,16"/>
                                 <!-- Binding for the Notes Box -->
-                                <TextBox Grid.Row="1" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="#0F172A">
+                                <TextBox Grid.Row="1" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="{DynamicResource TextMainBrush}">
                                     <TextBox.Resources>
                                         <VisualBrush x:Key="HintBrush" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left" AlignmentY="Top">
                                             <VisualBrush.Visual>

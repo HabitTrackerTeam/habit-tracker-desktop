@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:HabitTracker"
              xmlns:views="clr-namespace:HabitTracker.Views"
              xmlns:tabs="clr-namespace:HabitTracker.Views.Tabs">
-    <Grid Visibility="{Binding IsDashboardVisible, Converter={StaticResource BoolToVis}}">
+    <Grid Visibility="{Binding IsDashboardVisible, Converter={StaticResource BoolToVis}}" IsVisibleChanged="InnerGrid_IsVisibleChanged">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240" />
             <ColumnDefinition Width="*" />
@@ -12,6 +12,7 @@
 
         <!-- Fixed left sidebar -->
         <Border Grid.Column="0"
+                Background="Transparent"
                 BorderBrush="{DynamicResource InputBorderBrush}"
                 BorderThickness="0,0,1,0"
                 Padding="25,30,20,25">
