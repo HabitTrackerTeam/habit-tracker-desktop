@@ -217,7 +217,7 @@
                                 <TextBlock Text=":" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,5,0" />
                                 <TextBlock Text="{Binding SelectedBodyMetric.LatestValue}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                 <TextBlock Text="{Binding SelectedBodyMetric.Unit, StringFormat=' {0}'}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
-                                <TextBlock Text="{Binding SelectedBodyMetric.Delta, StringFormat={} {0:+0.0;-0.0;0}}" FontSize="14" Foreground="#FF328A5D" FontWeight="Bold" VerticalAlignment="Center" Margin="15,0,0,0" /><TextBlock Text="{Binding ThisMonth, Source={StaticResource Loc}}" FontSize="14" Foreground="#FF328A5D" FontWeight="Bold" VerticalAlignment="Center" Margin="2,0,0,0" />
+                                <TextBlock Text="{Binding SelectedBodyMetric.Delta, StringFormat={} {0:+0.0;-0.0;0}}" FontSize="14" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" VerticalAlignment="Center" Margin="15,0,0,0" /><TextBlock Text="{Binding ThisMonth, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" VerticalAlignment="Center" Margin="2,0,0,0" />
                             </StackPanel>
                         </StackPanel>
 
@@ -254,16 +254,16 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="{Binding WeightKg, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="12" Margin="0,0,0,5" />
-                            <Border Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1" CornerRadius="8" Height="42">
-                                <TextBox Text="{Binding NewWeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{x:Null}" Padding="10,0" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" />
+                            <TextBlock Text="{Binding WeightKg, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                            <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="12,0" Height="48">
+                                <TextBox Text="{Binding NewWeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" />
                             </Border>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="{Binding HeightCm, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="12" Margin="0,0,0,5" />
-                            <Border Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1" CornerRadius="8" Height="42">
-                                <TextBox Text="{Binding NewHeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{x:Null}" Padding="10,0" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" />
+                            <TextBlock Text="{Binding HeightCm, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                            <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="12,0" Height="48">
+                                <TextBox Text="{Binding NewHeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" />
                             </Border>
                         </StackPanel>
                     </Grid>
@@ -276,18 +276,18 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableBodyParts}" SelectedItem="{Binding SelectedBodyPartToAdd}" DisplayMemberPath="DisplayName" Margin="0,0,15,0" Height="42" Padding="15,0" VerticalContentAlignment="Center" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1">
+                        <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableBodyParts}" SelectedItem="{Binding SelectedBodyPartToAdd}" DisplayMemberPath="DisplayName" Margin="0,0,15,0" Height="48" Padding="16,0" VerticalContentAlignment="Center" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Background="{DynamicResource InputBgBrush}" BorderThickness="0">
                             <ComboBox.Resources>
                                 <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="8"/>
+                                    <Setter Property="CornerRadius" Value="12"/>
                                 </Style>
                             </ComboBox.Resources>
                         </ComboBox>
 
-                        <Button Grid.Column="1" Content="{Binding Add, Source={StaticResource Loc}}" Command="{Binding AddMeasurementCommand}" Background="#FF328A5D" Foreground="White" FontWeight="Bold" Padding="30,0" Height="42" BorderThickness="0" Cursor="Hand">
+                        <Button Grid.Column="1" Content="{Binding Add, Source={StaticResource Loc}}" Command="{Binding AddMeasurementCommand}" Background="{DynamicResource AccentGreenBrush}" Foreground="White" FontWeight="Bold" Padding="30,0" Height="48" BorderThickness="0" Cursor="Hand">
                             <Button.Resources>
                                 <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="8"/>
+                                    <Setter Property="CornerRadius" Value="12"/>
                                 </Style>
                             </Button.Resources>
                         </Button>
@@ -307,17 +307,17 @@
 
                                         <TextBlock Grid.Column="0" Text="{Binding BodyPartName}" VerticalAlignment="Center" Foreground="{DynamicResource TextMainBrush}" FontSize="14"/>
 
-                                        <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1" CornerRadius="8" Width="100" Height="36" Padding="0">
+                                        <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Width="100" Height="40" Padding="0">
                                             <Grid>
-                                                <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Style="{x:Null}" Padding="0" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" />
+                                                <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" />
                                             </Grid>
                                         </Border>
                                         <TextBlock Grid.Column="2" Text="cm" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="10,0,15,0" FontSize="14"/>
 
-                                        <Button Grid.Column="3" Content="✕" Command="{Binding DataContext.RemoveMeasurementCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" Background="#FFD9534F" Foreground="White" FontWeight="Bold" Width="36" Height="36" BorderThickness="0" Cursor="Hand" ToolTip="Remove">
+                                        <Button Grid.Column="3" Content="✕" Command="{Binding DataContext.RemoveMeasurementCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" Background="#FFD9534F" Foreground="White" FontWeight="Bold" Width="40" Height="40" BorderThickness="0" Cursor="Hand" ToolTip="Remove">
                                             <Button.Resources>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="CornerRadius" Value="8"/>
+                                                    <Setter Property="CornerRadius" Value="12"/>
                                                 </Style>
                                             </Button.Resources>
                                         </Button>
@@ -327,10 +327,10 @@
                         </ItemsControl>
                     </ScrollViewer>
 
-                    <Button Content="{Binding SaveMeasurements, Source={StaticResource Loc}}" Click="SaveMeasurement_Click" Background="#FF328A5D" Foreground="White" FontWeight="Bold" Padding="30,0" Height="48" BorderThickness="0" Cursor="Hand" Margin="0,10,0,0">
+                    <Button Content="{Binding SaveMeasurements, Source={StaticResource Loc}}" Click="SaveMeasurement_Click" Background="{DynamicResource AccentGreenBrush}" Foreground="White" FontWeight="Bold" Padding="30,0" Height="48" BorderThickness="0" Cursor="Hand" Margin="0,10,0,0">
                         <Button.Resources>
                             <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="8"/>
+                                <Setter Property="CornerRadius" Value="12"/>
                             </Style>
                         </Button.Resources>
                     </Button>
