@@ -169,8 +169,8 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <Border Grid.Column="0" Background="#F0FDF4" CornerRadius="12" Width="48" Height="48" Margin="0,0,16,0">
-                                                <TextBlock Text="{Binding Icon, FallbackValue=🌱}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+                                            <Border Grid.Column="0" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Width="48" Height="48" Margin="0,0,16,0">
+                                                <TextBlock Text="{Binding Icon, FallbackValue=🌱}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="{DynamicResource TextMainBrush}"/>
                                             </Border>
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextMainBrush}"/>

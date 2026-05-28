@@ -138,7 +138,7 @@ namespace HabitTracker.Services
         public string BmiObese => Get("Otyłość", "Obese");
 
         // === Home tab ===
-        public string DailyMotivation => Get("Małe kroki prowadzą do wielkich zmian. Kwitnij!", "Small steps lead to great growth. Keep blooming.");
+        public string DailyMotivation => Get("Małe kroki prowadzą do wielkich zmian.", "Small steps lead to great growth.");
         public string DailyProgress => Get("POSTĘP DNIA", "DAILY PROGRESS");
         public string DailyNotes => Get("NOTATKI DNIA", "DAILY NOTES");
         public string DashboardHabitsPlaceholder => Get("Twoje nawyki pojawią się tutaj. Wybierz z listy lub stwórz własne w Zarządzaniu nawykami.", "Personal habits will appear here. Select from the built-in list or create your own in the Habits Manager.");
