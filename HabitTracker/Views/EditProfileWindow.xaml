@@ -4,15 +4,15 @@
         Title="Edit Profile"
         Width="400"
         SizeToContent="Height"
-        Background="White"
+        Background="Transparent"
         WindowStyle="None"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         AllowsTransparency="True"
         BorderThickness="0">
-    <Border Background="White" CornerRadius="12" Margin="10">
+    <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" Margin="10">
         <Border.Effect>
-            <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="20" ShadowDepth="4"/>
+            <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="20" ShadowDepth="5"/>
         </Border.Effect>
         <Grid Margin="24">
             <Grid.RowDefinitions>
@@ -25,15 +25,15 @@
             
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,24">
-                <TextBlock Text="{Binding EditProfile, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="16" Foreground="#1C1C1C" VerticalAlignment="Center"/>
-                <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="#1C1C1C" FontSize="16" Cursor="Hand" Click="Close_Click"/>
+                <TextBlock Text="{Binding EditProfile, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMutedBrush}" FontSize="18" FontWeight="Bold" Cursor="Hand" Click="Close_Click"/>
             </Grid>
             
             <!-- Avatar Section -->
             <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,24">
                 <Grid Width="100" Height="100">
-                    <Ellipse Fill="#F0F4F2" Width="100" Height="100"/>
-                    <TextBlock x:Name="AvatarInitial" Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36" Foreground="#328A5D" FontWeight="Bold" />
+                    <Ellipse Fill="{DynamicResource InputBgBrush}" Width="100" Height="100"/>
+                    <TextBlock x:Name="AvatarInitial" Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" />
                     
                     <!-- Avatar image (shown when a photo is selected) -->
                     <Ellipse x:Name="AvatarImageEllipse" Width="100" Height="100" Visibility="Collapsed">
@@ -42,7 +42,7 @@
                         </Ellipse.Fill>
                     </Ellipse>
                     
-                    <Button Width="28" Height="28" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4" Background="#328A5D" Foreground="White" BorderThickness="2" BorderBrush="White" Cursor="Hand" Click="ChangePhoto_Click">
+                    <Button Width="28" Height="28" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4" Background="{DynamicResource AccentGreenBrush}" Foreground="White" BorderThickness="2" BorderBrush="{DynamicResource CardBgBrush}" Cursor="Hand" Click="ChangePhoto_Click">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Grid>
@@ -53,19 +53,15 @@
                         </Button.Template>
                     </Button>
                 </Grid>
-                <TextBlock Text="{Binding ChangePhoto, Source={StaticResource Loc}}" Foreground="#328A5D" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" Margin="0,12,0,0" Cursor="Hand" MouseLeftButtonUp="ChangePhoto_Click"/>
+                <TextBlock Text="{Binding ChangePhoto, Source={StaticResource Loc}}" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" Margin="0,12,0,0" Cursor="Hand" MouseLeftButtonUp="ChangePhoto_Click"/>
             </StackPanel>
             
             <!-- Full Name -->
             <StackPanel Grid.Row="2" Margin="0,0,0,24">
-                <TextBlock Text="{Binding FullName, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="11" Foreground="#8C9B9F" Margin="0,0,0,6"/>
-                <TextBox x:Name="FullNameInput" Height="48" Padding="12,0" Background="#F2F3F5" BorderBrush="Transparent" BorderThickness="0" Foreground="#1C1C1C" FontSize="14" VerticalContentAlignment="Center">
-                    <TextBox.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="8"/>
-                        </Style>
-                    </TextBox.Resources>
-                </TextBox>
+                <TextBlock Text="{Binding FullName, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,6"/>
+                <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="12,0" Height="48">
+                    <TextBox x:Name="FullNameInput" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" />
+                </Border>
             </StackPanel>
             
             <!-- Error message -->
@@ -73,8 +69,8 @@
             
             <!-- Actions -->
             <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="{Binding Cancel, Source={StaticResource Loc}}" Width="90" Height="38" Margin="0,0,12,0" Click="Close_Click" Background="Transparent" Foreground="#8C9B9F" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
-                <Button Content="{Binding SaveChanges, Source={StaticResource Loc}}" Width="120" Height="38" Click="Save_Click" Background="#328A5D" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                <Button Content="{Binding Cancel, Source={StaticResource Loc}}" Width="90" Height="38" Margin="0,0,12,0" Click="Close_Click" Background="Transparent" Foreground="{DynamicResource TextMutedBrush}" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+                <Button Content="{Binding SaveChanges, Source={StaticResource Loc}}" Width="120" Height="38" Click="Save_Click" Background="{DynamicResource AccentGreenBrush}" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="8"/>
