@@ -102,7 +102,7 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
-                                    <TextBlock Text="Monthly" FontWeight="SemiBold">
+                                    <TextBlock Text="{Binding MonthlyView, Source={StaticResource Loc}}" FontWeight="SemiBold">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
@@ -132,7 +132,7 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
-                                    <TextBlock Text="Weekly" FontWeight="SemiBold">
+                                    <TextBlock Text="{Binding WeeklyView, Source={StaticResource Loc}}" FontWeight="SemiBold">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
@@ -153,13 +153,13 @@
 
             <!-- Days of Week Headers -->
             <UniformGrid Grid.Row="3" Columns="7" Margin="0,0,0,16">
-                <TextBlock Text="MON" Style="{StaticResource DayHeaderStyle}"/>
-                <TextBlock Text="TUE" Style="{StaticResource DayHeaderStyle}"/>
-                <TextBlock Text="WED" Style="{StaticResource DayHeaderStyle}"/>
-                <TextBlock Text="THU" Style="{StaticResource DayHeaderStyle}"/>
-                <TextBlock Text="FRI" Style="{StaticResource DayHeaderStyle}"/>
-                <TextBlock Text="SAT" Style="{StaticResource DayHeaderStyle}"/>
-                <TextBlock Text="SUN" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="{Binding CalDayMonShort, Source={StaticResource Loc}}" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="{Binding CalDayTueShort, Source={StaticResource Loc}}" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="{Binding CalDayWedShort, Source={StaticResource Loc}}" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="{Binding CalDayThuShort, Source={StaticResource Loc}}" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="{Binding CalDayFriShort, Source={StaticResource Loc}}" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="{Binding CalDaySatShort, Source={StaticResource Loc}}" Style="{StaticResource DayHeaderStyle}"/>
+                <TextBlock Text="{Binding CalDaySunShort, Source={StaticResource Loc}}" Style="{StaticResource DayHeaderStyle}"/>
             </UniformGrid>
 
             <!-- Calendar Grid -->
@@ -258,7 +258,7 @@
                 <!-- Header Info -->
                 <Grid Grid.Row="0">
                     <StackPanel>
-                        <TextBlock Text="SELECTED DAY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
+                        <TextBlock Text="{Binding SelectedDay, Source={StaticResource Loc}}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
                         <TextBlock Text="{Binding SelectedDayDateText}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                         <TextBlock Text="{Binding SelectedDayLabel}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
                     </StackPanel>
@@ -279,7 +279,7 @@
                         <StackPanel Margin="0,0,0,40">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
                                 <Path Data="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Margin="0,0,12,0"/>
-                                <TextBlock Text="Daily Habits" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding DailyHabits, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <!-- Dynamic Habit Items -->
@@ -371,7 +371,7 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
                                 <Path Data="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Margin="0,0,12,0"/>
-                                <TextBlock Text="Reflections" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Reflections, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
                             
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="16" Padding="24">
@@ -383,7 +383,7 @@
                                                 <Setter Property="Text" Value="{Binding SelectedDayReflection}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding SelectedDayReflection}" Value="">
-                                                        <Setter Property="Text" Value="No reflections recorded for this day." />
+                                                        <Setter Property="Text" Value="{Binding NoReflections, Source={StaticResource Loc}}" />
                                                         <Setter Property="Opacity" Value="0.5" />
                                                     </DataTrigger>
                                                 </Style.Triggers>

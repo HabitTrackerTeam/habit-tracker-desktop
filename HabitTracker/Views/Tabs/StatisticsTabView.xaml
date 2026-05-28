@@ -45,7 +45,7 @@
                     </Button.Template>
                     <StackPanel Orientation="Horizontal">
                         <Path Data="M19,12V19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19M12.5,3L15.03,5.53L10.5,10.06L11.94,11.5L16.47,6.97L19,9.5V3H12.5Z" Fill="White" Width="18" Height="18" Margin="0,0,8,0" Stretch="Uniform"/>
-                        <TextBlock Text="Export to PDF" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ExportToPdf, Source={StaticResource Loc}}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
             </Grid>
@@ -65,8 +65,8 @@
                     </Border.Effect>
                     <Grid>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Growth Quotient" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                            <TextBlock Text="Your overall habit performance score across all categories this week." FontSize="13" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" MaxWidth="280" HorizontalAlignment="Left" Margin="0,8,0,24"/>
+                            <TextBlock Text="{Binding GrowthQuotient, Source={StaticResource Loc}}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                            <TextBlock Text="{Binding GrowthQuotientDesc, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" MaxWidth="280" HorizontalAlignment="Left" Margin="0,8,0,24"/>
                             <Border Background="#F0FDF4" CornerRadius="20" Padding="12,6" HorizontalAlignment="Left">
                                 <StackPanel Orientation="Horizontal">
                                     <Path Data="M7,14L12,9L17,14H7Z" Fill="{DynamicResource AccentGreenBrush}" Width="12" Height="12" Margin="0,0,4,0"/>
@@ -83,7 +83,7 @@
                                   StrokeDashArray="8 1" Opacity="1"/>
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <TextBlock Text="84%" FontSize="40" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" HorizontalAlignment="Center"/>
-                                <TextBlock Text="OVERALL SCORE" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding OverallScore, Source={StaticResource Loc}}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
                     </Grid>
@@ -142,8 +142,8 @@
                     <StackPanel>
                         <Grid Margin="0,0,0,32">
                             <StackPanel>
-                                <TextBlock Text="Weekly Completion" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                <TextBlock Text="Habit performance score per day" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
+                                <TextBlock Text="{Binding WeeklyCompletion, Source={StaticResource Loc}}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                                <TextBlock Text="{Binding WeeklyCompletionDesc, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
                             </StackPanel>
                             <!-- Date Selector -->
                             <Border HorizontalAlignment="Right" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Padding="12,8">
@@ -231,10 +231,10 @@
             <StackPanel>
                 <Grid Margin="0,0,0,24">
                     <StackPanel>
-                        <TextBlock Text="Detailed Performance" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                        <TextBlock Text="Click on any habit to see in-depth analytics" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding DetailedPerformance, Source={StaticResource Loc}}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                        <TextBlock Text="{Binding DetailedPerformanceDesc, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
                     </StackPanel>
-                    <TextBlock Text="View All →" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" Cursor="Hand"/>
+                    <TextBlock Text="{Binding ViewAll, Source={StaticResource Loc}}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" Cursor="Hand"/>
                 </Grid>
 
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16">
@@ -249,11 +249,11 @@
                                     <ColumnDefinition Width="150"/>
                                     <ColumnDefinition Width="60"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="HABIT NAME" Style="{StaticResource TableHeaderStyle}"/>
-                                <TextBlock Grid.Column="1" Text="CONSISTENCY" Style="{StaticResource TableHeaderStyle}" HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Text="TREND" Style="{StaticResource TableHeaderStyle}" HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="3" Text="STREAK" Style="{StaticResource TableHeaderStyle}" HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="4" Text="ACTIONS" Style="{StaticResource TableHeaderStyle}" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding HabitNameHeader, Source={StaticResource Loc}}" Style="{StaticResource TableHeaderStyle}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding ConsistencyLabel, Source={StaticResource Loc}}" Style="{StaticResource TableHeaderStyle}" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding TrendLabel, Source={StaticResource Loc}}" Style="{StaticResource TableHeaderStyle}" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="{Binding StreakLabel, Source={StaticResource Loc}}" Style="{StaticResource TableHeaderStyle}" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="{Binding ActionsLabel, Source={StaticResource Loc}}" Style="{StaticResource TableHeaderStyle}" HorizontalAlignment="Right"/>
                             </Grid>
                         </Border>
 
@@ -320,7 +320,7 @@
                                                     <TextBlock Text="{Binding CurrentStreak, StringFormat={}{0}d}" Foreground="#818CF8" FontWeight="Bold" FontSize="11"/>
                                                 </StackPanel>
                                             </Border>
-                                            <Button Grid.Column="4" Content="VIEW STATISTICS" 
+                                            <Button Grid.Column="4" Content="{Binding ViewStatistics, Source={StaticResource Loc}}" 
                                                     Command="{Binding DataContext.OpenHabitStatisticsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                     CommandParameter="{Binding Habit}"
                                                     Background="Transparent" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Right" Cursor="Hand"/>
@@ -380,7 +380,7 @@
                                 <StackPanel>
                                     <Path Data="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10-4.48 10-10S17.52,2 12,2zm1,15h-2v-2h2v2zm0-4h-2V7h2v6z" Fill="#F59E0B" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                                     <TextBlock Text="{Binding CurrentStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                    <TextBlock Text="Current Streak (Days)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    <TextBlock Text="{Binding CurrentStreakLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
                             </Border>
 
@@ -388,7 +388,7 @@
                                 <StackPanel>
                                     <Path Data="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z" Fill="#818CF8" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                                     <TextBlock Text="{Binding LongestStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                    <TextBlock Text="Longest Streak" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    <TextBlock Text="{Binding LongestStreakLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
@@ -397,11 +397,11 @@
                         <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,16,0">
                             <StackPanel>
                                 <Grid Margin="0,0,0,12">
-                                    <TextBlock Text="Weekly Success" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+                                    <TextBlock Text="{Binding WeeklySuccessLabel, Source={StaticResource Loc}}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                                     <TextBlock Text="{Binding WeeklySuccessRate, StringFormat={}{0}%}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Right"/>
                                 </Grid>
                                 <ProgressBar Value="{Binding WeeklySuccessRate}" Height="8" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource AccentGreenBrush}" BorderThickness="0"/>
-                                <TextBlock Text="Based on scheduled days in last 7 days" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0"/>
+                                <TextBlock Text="{Binding WeeklySuccessDesc, Source={StaticResource Loc}}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0"/>
                             </StackPanel>
                         </Border>
 
@@ -413,7 +413,7 @@
                                 </Border>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="{Binding TotalCompletions}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                    <TextBlock Text="Total Completions" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    <TextBlock Text="{Binding TotalCompletionsLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -426,17 +426,17 @@
                             <StackPanel>
                                 <Grid Margin="0,0,0,16">
                                     <TextBlock Text="{Binding MiniCalendarMonthYear}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
-                                    <TextBlock Text="Monthly Completions" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                    <TextBlock Text="{Binding MonthlyCompletions, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                                 </Grid>
                                 
                                 <UniformGrid Columns="7" Margin="0,0,0,8">
-                                    <TextBlock Text="M" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="T" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="W" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="T" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="F" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="S" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="S" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding MondayShort, Source={StaticResource Loc}}" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding TuesdayShort, Source={StaticResource Loc}}" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding WednesdayShort, Source={StaticResource Loc}}" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding ThursdayShort, Source={StaticResource Loc}}" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding FridayShort, Source={StaticResource Loc}}" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding SaturdayShort, Source={StaticResource Loc}}" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding SundayShort, Source={StaticResource Loc}}" Style="{StaticResource ChartLabelStyle}" Margin="0,0,0,8"/>
                                 </UniformGrid>
 
                                 <ItemsControl ItemsSource="{Binding MonthlyCompletions}">
@@ -487,7 +487,7 @@
                         <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="24" Height="220"
                                 Visibility="{Binding IsNumericOrTimer, Converter={StaticResource BoolToVis}}">
                             <StackPanel>
-                                <TextBlock Text="Value Trend" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16"/>
+                                <TextBlock Text="{Binding ValueTrend, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,16"/>
                                 <lvc:CartesianChart Series="{Binding ChartSeries}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" Background="Transparent" Margin="0,0,0,0" Height="140" />
                             </StackPanel>
                         </Border>

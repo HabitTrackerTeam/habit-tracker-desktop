@@ -108,6 +108,27 @@ namespace HabitTracker.ViewModels
             OpenLogModalCommand = new RelayCommand(_ => IsModalOpen = true);
             CloseLogModalCommand = new RelayCommand(_ => IsModalOpen = false);
             SaveMeasurementCommand = new AsyncRelayCommand(SaveMeasurementAsync);
+
+            // Subscribe to theme changes to refresh chart axis colors
+            HabitTracker.MainWindow.ThemeChanged += OnThemeChanged;
+        }
+
+        private void OnThemeChanged(bool isDark)
+        {
+            // Refresh axis paint colors to match the new theme
+            var labelColor = isDark ? new SKColor(160, 160, 160) : SKColors.Gray;
+            var separatorColor = isDark ? new SKColor(80, 80, 80) : SKColors.LightGray;
+
+            if (XAxes != null && XAxes.Length > 0)
+            {
+                XAxes[0].LabelsPaint = new SolidColorPaint(labelColor);
+                OnPropertyChanged(nameof(XAxes));
+            }
+            if (YAxes != null && YAxes.Length > 0)
+            {
+                YAxes[0].SeparatorsPaint = new SolidColorPaint(separatorColor) { StrokeThickness = 1, PathEffect = new LiveChartsCore.SkiaSharpView.Painting.Effects.DashEffect(new float[] { 3, 3 }) };
+                OnPropertyChanged(nameof(YAxes));
+            }
         }
 
         private bool CanExecuteAddMeasurement(object obj)
@@ -251,7 +272,7 @@ namespace HabitTracker.ViewModels
             }
             catch (Exception ex)
             {
-                HabitTracker.Views.CustomMessageBox.Show($"Failed to load measurements: {ex.Message}");
+                HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasLoadError + ex.Message);
             }
             finally
             {
@@ -266,10 +287,11 @@ namespace HabitTracker.ViewModels
                 var heightInMeters = CurrentHeight / 100.0;
                 BmiValue = Math.Round(CurrentWeight / (heightInMeters * heightInMeters), 1);
 
-                if (BmiValue < 18.5) BmiStatus = "Underweight";
-                else if (BmiValue < 25) BmiStatus = "Normal";
-                else if (BmiValue < 30) BmiStatus = "Overweight";
-                else BmiStatus = "Obese";
+                var loc = LocalizationService.Instance;
+                if (BmiValue < 18.5) BmiStatus = loc.BmiUnderweight;
+                else if (BmiValue < 25) BmiStatus = loc.BmiNormal;
+                else if (BmiValue < 30) BmiStatus = loc.BmiOverweight;
+                else BmiStatus = loc.BmiObese;
             }
         }
 
@@ -358,14 +380,14 @@ namespace HabitTracker.ViewModels
         {
             if (!CurrentSessionMeasurements.Any() && !NewWeightValue.HasValue && !NewHeightValue.HasValue)
             {
-                HabitTracker.Views.CustomMessageBox.Show("Please add at least one measurement, weight, or height to the session.");
+                HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasAddAtLeastOne);
                 return;
             }
 
             var validItems = CurrentSessionMeasurements.Where(i => i.Value.HasValue && i.Value.Value > 0).ToList();
             if (validItems.Count != CurrentSessionMeasurements.Count)
             {
-                HabitTracker.Views.CustomMessageBox.Show("All added body part measurements must have a valid value greater than 0 before saving.");
+                HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasAllValid);
                 return;
             }
 
@@ -478,11 +500,11 @@ namespace HabitTracker.ViewModels
                 } // This closes: if (validItems.Any())
 
                 await LoadMeasurementsAsync();
-                HabitTracker.Views.CustomMessageBox.Show("Measurements saved successfully!");
+                HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasSavedOk);
             }
             catch (Exception ex)
             {
-                HabitTracker.Views.CustomMessageBox.Show($"Error saving measurement: {ex.Message}");
+                HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasSaveError + ex.Message);
             }
             finally
             {

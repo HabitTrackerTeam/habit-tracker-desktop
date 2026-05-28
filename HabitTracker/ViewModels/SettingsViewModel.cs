@@ -22,10 +22,14 @@ namespace HabitTracker.ViewModels
             "Polski", "English"
         };
 
-        public ObservableCollection<string> AvailableWeekStarts { get; } = new()
+        public ObservableCollection<string> AvailableWeekStarts
         {
-            "Poniedziałek", "Niedziela"
-        };
+            get
+            {
+                var loc = Services.LocalizationService.Instance;
+                return new ObservableCollection<string> { loc.Monday, loc.Sunday };
+            }
+        }
 
         public ObservableCollection<string> AvailableUnits { get; } = new()
         {
@@ -45,13 +49,15 @@ namespace HabitTracker.ViewModels
             { 
                 _selectedLanguage = value; 
                 OnPropertyChanged();
-                // Immediately apply language change to the UI
-                var langCode = value switch
-                {
-                    "English" => "en",
-                    _ => "pl"
-                };
-                LocalizationService.Instance.CurrentLanguage = langCode;
+                OnPropertyChanged(nameof(AvailableWeekStarts));
+                
+                // Keep the selection valid if the language changes
+                if (_selectedWeekStart == "Monday" || _selectedWeekStart == "Poniedziałek")
+                    SelectedWeekStart = Services.LocalizationService.Instance.Monday;
+                else if (_selectedWeekStart == "Sunday" || _selectedWeekStart == "Niedziela")
+                    SelectedWeekStart = Services.LocalizationService.Instance.Sunday;
+
+                // Language is applied only when user clicks Save Settings
             }
         }
 
@@ -106,20 +112,7 @@ namespace HabitTracker.ViewModels
                 if (_isDarkMode == value) return;
                 _isDarkMode = value; 
                 OnPropertyChanged(); 
-                
-                // Programmatically apply theme safely on UI thread
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
-                    {
-                        mainWindow.ApplyTheme(value);
-                    }
-                });
-
-                if (!_isApplyingSettings)
-                {
-                    _ = SaveSettingsAsync();
-                }
+                // Theme is applied only when user clicks Save Settings
             }
         }
 
@@ -311,14 +304,31 @@ namespace HabitTracker.ViewModels
 
                 ApplyUIToSettings(_currentSettings);
 
+                // Apply language to live UI
+                var langCode = SelectedLanguage switch
+                {
+                    "English" => "en",
+                    _ => "pl"
+                };
+                LocalizationService.Instance.CurrentLanguage = langCode;
+
+                // Apply theme to live UI
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+                    {
+                        mainWindow.ApplyTheme(IsDarkMode);
+                    }
+                });
+
                 await UserSettingsService.SaveSettingsAsync(_currentSettings);
 
-                StatusMessage = "Settings saved successfully!";
+                StatusMessage = LocalizationService.Instance.SaveSettings + " ✓";
                 StatusColor = "#FF328A5D";
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Error saving settings: {ex.Message}";
+                StatusMessage = $"Error: {ex.Message}";
                 StatusColor = "#FFD32F2F";
             }
             finally
@@ -341,9 +351,9 @@ namespace HabitTracker.ViewModels
 
                 SelectedWeekStart = settings.WeekStart switch
                 {
-                    "monday" => "Poniedziałek",
-                    "sunday" => "Niedziela",
-                    _ => "Poniedziałek"
+                    "monday" => Services.LocalizationService.Instance.Monday,
+                    "sunday" => Services.LocalizationService.Instance.Sunday,
+                    _ => Services.LocalizationService.Instance.Monday
                 };
 
                 SelectedUnits = settings.Units switch
@@ -375,12 +385,9 @@ namespace HabitTracker.ViewModels
                 _ => "pl"
             };
 
-            settings.WeekStart = SelectedWeekStart switch
-            {
-                "Poniedziałek" => "monday",
-                "Niedziela" => "sunday",
-                _ => "monday"
-            };
+            var loc = Services.LocalizationService.Instance;
+            
+            settings.WeekStart = SelectedWeekStart == loc.Monday || SelectedWeekStart == "Poniedziałek" || SelectedWeekStart == "Monday" ? "monday" : "sunday";
 
             settings.Units = SelectedUnits switch
             {
