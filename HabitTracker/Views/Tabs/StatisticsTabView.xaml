@@ -271,8 +271,8 @@
                                                 <ColumnDefinition Width="120"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Orientation="Horizontal">
-                                                <Border Width="40" Height="40" Background="#F0FDF4" CornerRadius="8" Margin="0,0,16,0">
-                                                    <TextBlock Text="{Binding HabitIcon}" Foreground="{DynamicResource AccentGreenBrush}" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Border Width="40" Height="40" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Margin="0,0,16,0">
+                                                    <TextBlock Text="{Binding HabitIcon}" Foreground="{DynamicResource TextMainBrush}" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                                 </Border>
                                                 <StackPanel VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding HabitName}" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
@@ -352,8 +352,8 @@
                 <!-- Header -->
                 <Grid Grid.Row="0" Margin="0,0,0,32">
                     <StackPanel Orientation="Horizontal">
-                        <Border Width="48" Height="48" Background="#F0FDF4" CornerRadius="12" Margin="0,0,16,0">
-                            <TextBlock Text="{Binding HabitIcon}" Foreground="{DynamicResource AccentGreenBrush}" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Border Width="48" Height="48" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Margin="0,0,16,0">
+                            <TextBlock Text="{Binding HabitIcon}" Foreground="{DynamicResource TextMainBrush}" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="{Binding HabitName}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>

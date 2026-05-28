@@ -500,7 +500,6 @@ namespace HabitTracker.ViewModels
                 } // This closes: if (validItems.Any())
 
                 await LoadMeasurementsAsync();
-                HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasSavedOk);
             }
             catch (Exception ex)
             {
