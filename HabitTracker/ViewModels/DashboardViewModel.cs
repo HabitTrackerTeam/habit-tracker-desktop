@@ -329,7 +329,7 @@ namespace HabitTracker.ViewModels{
             GenerateCalendarPlaceholder();
             
             // Initialize filter options
-            InitializeFilters();
+            UpdateFilterTranslations();
             
             // Initialize today's date and start timer to update it every minute
             UpdateTodayDate();
@@ -340,6 +340,17 @@ namespace HabitTracker.ViewModels{
 
             // Subscribe to theme changes to refresh calendar color dots
             HabitTracker.MainWindow.ThemeChanged += OnThemeChanged;
+            
+            // Subscribe to language changes to update filter lists
+            Services.LocalizationService.Instance.PropertyChanged += OnLocalizationPropertyChanged;
+        }
+
+        private void OnLocalizationPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Services.LocalizationService.CurrentLanguage))
+            {
+                UpdateFilterTranslations();
+            }
         }
 
         private void OnThemeChanged(bool isDark)
@@ -348,22 +359,30 @@ namespace HabitTracker.ViewModels{
             _ = GenerateCalendarAsync();
         }
 
-        private void InitializeFilters()
+        private void UpdateFilterTranslations()
         {
             var loc = Services.LocalizationService.Instance;
+
+            var selPrio = SelectedPriority?.Id;
+            var selStat = SelectedStatus?.Id;
+            var selFreq = SelectedFrequency?.Id;
+
+            Priorities.Clear();
+            Statuses.Clear();
+            Frequencies.Clear();
 
             // Priorities
             Priorities.Add(new FilterItem { Id = "all", Name = loc.Get("Wszystkie", "All") });
             Priorities.Add(new FilterItem { Id = "1", Name = loc.PriorityHigh });
             Priorities.Add(new FilterItem { Id = "2", Name = loc.PriorityMedium });
             Priorities.Add(new FilterItem { Id = "3", Name = loc.PriorityLow });
-            SelectedPriority = Priorities.First();
+            SelectedPriority = Priorities.FirstOrDefault(p => p.Id == selPrio) ?? Priorities.First();
 
             // Statuses
             Statuses.Add(new FilterItem { Id = "all", Name = loc.Get("Wszystkie", "All") });
             Statuses.Add(new FilterItem { Id = "active", Name = loc.StatusActive });
             Statuses.Add(new FilterItem { Id = "archived", Name = loc.StatusArchived });
-            SelectedStatus = Statuses.First(s => s.Id == "active");
+            SelectedStatus = Statuses.FirstOrDefault(s => s.Id == selStat) ?? Statuses.First(s => s.Id == "active");
 
             // Frequencies
             Frequencies.Add(new FilterItem { Id = "all", Name = loc.Get("Wszystkie", "All") });
@@ -371,7 +390,7 @@ namespace HabitTracker.ViewModels{
             Frequencies.Add(new FilterItem { Id = "weekly", Name = loc.FreqWeekly });
             Frequencies.Add(new FilterItem { Id = "monthly", Name = loc.FreqMonthly });
             Frequencies.Add(new FilterItem { Id = "specific", Name = loc.FreqSpecific });
-            SelectedFrequency = Frequencies.First();
+            SelectedFrequency = Frequencies.FirstOrDefault(f => f.Id == selFreq) ?? Frequencies.First();
         }
 
 
@@ -635,7 +654,7 @@ namespace HabitTracker.ViewModels{
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error saving habit log: {ex.Message}");
-                System.Windows.MessageBox.Show($"BŁĄD ZAPISU DO BAZY:\n{ex.Message}", "Błąd Supabase", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"BŁĄD ZAPISU DO BAZY:\n{ex.Message}");
             }
         }
 
@@ -682,7 +701,6 @@ namespace HabitTracker.ViewModels{
         {
             if (string.IsNullOrWhiteSpace(SelectedBuiltInHabit))
             {
-                System.Windows.MessageBox.Show("Please select a habit from the list.");
                 return;
             }
 
@@ -698,7 +716,6 @@ namespace HabitTracker.ViewModels{
         //Dodawanie nawyku
         public async Task CreateHabitAsync(){
             if(string.IsNullOrWhiteSpace(NewHabitName)){
-                System.Windows.MessageBox.Show("Please enter a habit name.");
                 return;
             }
 
@@ -711,7 +728,6 @@ namespace HabitTracker.ViewModels{
                 
                 if (habitType == null)
                 {
-                    System.Windows.MessageBox.Show($"Habit type '{NewHabitType}' not found in database.");
                     return;
                 }
 
@@ -730,7 +746,7 @@ namespace HabitTracker.ViewModels{
                         .Filter("id", Constants.Operator.Equals, EditingHabit.Id)
                         .Update(EditingHabit);
 
-                    System.Windows.MessageBox.Show("Habit updated successfully! ✏️");
+                    // Updated silently
                 }
                 else
                 {
@@ -751,7 +767,7 @@ namespace HabitTracker.ViewModels{
                     };
                     await SupabaseService.Client.From<Habits>().Insert(habit);
 
-                    System.Windows.MessageBox.Show("Habit created successfully! 🌱");
+                    // Created silently
                 }
 
                 //Reset formularza i refresh listy
@@ -761,7 +777,7 @@ namespace HabitTracker.ViewModels{
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error saving habit: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error saving habit: {ex.Message}");
             }
             finally{IsLoading = false;}
         }
@@ -779,7 +795,7 @@ namespace HabitTracker.ViewModels{
                 await LoadHabitsAsync();
             }
             catch(Exception ex){
-                System.Windows.MessageBox.Show($"Error archiving habit: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error archiving habit: {ex.Message}");
             }
         }
 

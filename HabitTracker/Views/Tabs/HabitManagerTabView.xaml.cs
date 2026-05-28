@@ -95,7 +95,7 @@ namespace HabitTracker.Views.Tabs
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"Wystąpił błąd podczas zapisywania nawyku: {ex.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"Wystąpił błąd podczas zapisywania nawyku: {ex.Message}");
             }
         }
 
@@ -187,16 +187,20 @@ namespace HabitTracker.Views.Tabs
                 
                 if (btn == selectedBtn)
                 {
-                    btn.Background = System.Windows.Media.Brushes.White;
+                    btn.ClearValue(Control.BackgroundProperty);
+                    btn.SetResourceReference(Control.BackgroundProperty, "CardBgBrush");
                     btn.BorderThickness = new Thickness(0);
-                    btn.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)); // #166534
+                    btn.ClearValue(Control.ForegroundProperty);
+                    btn.SetResourceReference(Control.ForegroundProperty, "AccentGreenBrush");
                     btn.FontWeight = FontWeights.Bold;
                 }
                 else
                 {
+                    btn.ClearValue(Control.BackgroundProperty);
                     btn.Background = System.Windows.Media.Brushes.Transparent;
                     btn.BorderThickness = new Thickness(0);
-                    btn.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 100, 116, 139)); // #64748B
+                    btn.ClearValue(Control.ForegroundProperty);
+                    btn.SetResourceReference(Control.ForegroundProperty, "TextMutedBrush");
                     btn.FontWeight = FontWeights.Normal;
                 }
             }
@@ -370,7 +374,7 @@ namespace HabitTracker.Views.Tabs
                 if (HabitNameBox != null)
                 {
                     HabitNameBox.Text = habit.Name;
-                    HabitNameBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 15, 23, 42)); // Active color
+                    HabitNameBox.SetResourceReference(Control.ForegroundProperty, "TextMainBrush");
                 }
                 if (GoalBox != null)
                 {
@@ -435,11 +439,7 @@ namespace HabitTracker.Views.Tabs
         {
             if (_dashboardVM != null && sender is System.Windows.Controls.Button btn && btn.DataContext is Habits habit)
             {
-                var res = System.Windows.MessageBox.Show($"Are you sure you want to deactivate '{habit.Name}'?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (res == MessageBoxResult.Yes)
-                {
-                    await _dashboardVM.DeleteHabitAsync(habit);
-                }
+                await _dashboardVM.DeleteHabitAsync(habit);
             }
         }
 
@@ -513,7 +513,7 @@ namespace HabitTracker.Views.Tabs
             if (HabitNameBox != null)
             {
                 HabitNameBox.Text = "e.g., Daily Meditation";
-                HabitNameBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 148, 163, 184)); // #94A3B8
+                HabitNameBox.SetResourceReference(Control.ForegroundProperty, "TextMutedBrush");
             }
             if (GoalBox != null) GoalBox.Text = string.Empty;
             if (UnitsCombo != null) UnitsCombo.SelectedIndex = 3; // default "count"
@@ -544,7 +544,7 @@ namespace HabitTracker.Views.Tabs
                 if (tb.Text.StartsWith("e.g.,"))
                 {
                     tb.Text = string.Empty;
-                    tb.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 15, 23, 42)); // #0F172A
+                    tb.SetResourceReference(Control.ForegroundProperty, "TextMainBrush");
                 }
             }
         }
@@ -559,7 +559,7 @@ namespace HabitTracker.Views.Tabs
                         tb.Text = "e.g., Daily Meditation";
 
                         
-                    tb.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 148, 163, 184)); // #94A3B8
+                    tb.SetResourceReference(Control.ForegroundProperty, "TextMutedBrush");
                 }
             }
         }
