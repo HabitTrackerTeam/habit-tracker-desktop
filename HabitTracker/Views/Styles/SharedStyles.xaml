@@ -284,6 +284,84 @@
                         </Setter>
                 </Style>
 
+                <Style x:Key="NoPlaceholderTextBoxStyle" TargetType="TextBox">
+                        <Setter Property="Background"
+                                Value="{DynamicResource InputBgBrush}"/>
+                        <Setter Property="BorderBrush"
+                                Value="{DynamicResource InputBorderBrush}"/>
+                        <Setter Property="BorderThickness"
+                                Value="1"/>
+                        <Setter Property="Foreground"
+                                Value="{DynamicResource TextMainBrush}"/>
+                        <Setter Property="FontSize"
+                                Value="14"/>
+                        <Setter Property="VerticalContentAlignment"
+                                Value="Center"/>
+                        <Setter Property="Template">
+                                <Setter.Value>
+                                        <ControlTemplate TargetType="TextBox">
+                                                <Grid>
+                                                        <Border x:Name="InputBorder"
+                                                                CornerRadius="10"
+                                                                Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"/>
+                                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                                      Margin="12,0"
+                                                                      VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsKeyboardFocusWithin"
+                                                                 Value="True">
+                                                                <Setter TargetName="InputBorder"
+                                                                        Property="BorderBrush"
+                                                                        Value="{DynamicResource AccentGreenBrush}"/>
+                                                        </Trigger>
+                                                </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                </Setter.Value>
+                        </Setter>
+                </Style>
+
+                <Style x:Key="NoPlaceholderPasswordBoxStyle" TargetType="PasswordBox">
+                        <Setter Property="Background"
+                                Value="{DynamicResource InputBgBrush}"/>
+                        <Setter Property="BorderBrush"
+                                Value="{DynamicResource InputBorderBrush}"/>
+                        <Setter Property="BorderThickness"
+                                Value="1"/>
+                        <Setter Property="Foreground"
+                                Value="{DynamicResource TextMainBrush}"/>
+                        <Setter Property="FontSize"
+                                Value="14"/>
+                        <Setter Property="VerticalContentAlignment"
+                                Value="Center"/>
+                        <Setter Property="Template">
+                                <Setter.Value>
+                                        <ControlTemplate TargetType="PasswordBox">
+                                                <Grid>
+                                                        <Border x:Name="PasswordInputBorder"
+                                                                CornerRadius="10"
+                                                                Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"/>
+                                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                                      Margin="12,0"
+                                                                      VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsKeyboardFocusWithin"
+                                                                 Value="True">
+                                                                <Setter TargetName="PasswordInputBorder"
+                                                                        Property="BorderBrush"
+                                                                        Value="{DynamicResource AccentGreenBrush}"/>
+                                                        </Trigger>
+                                                </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                </Setter.Value>
+                        </Setter>
+                </Style>
+
                 <Style x:Key="CenteredTextBoxStyle" TargetType="TextBox">
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="BorderBrush" Value="Transparent"/>
