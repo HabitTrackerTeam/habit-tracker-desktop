@@ -256,14 +256,14 @@
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="{Binding WeightKg, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
                             <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="12,0" Height="48">
-                                <TextBox Text="{Binding NewWeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" />
+                                <TextBox Text="{Binding NewWeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" PreviewTextInput="NumericTextBox_PreviewTextInput" DataObject.Pasting="NumericTextBox_Pasting" PreviewKeyDown="NumericTextBox_PreviewKeyDown" />
                             </Border>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="{Binding HeightCm, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
                             <Border Background="{DynamicResource InputBgBrush}" CornerRadius="12" Padding="12,0" Height="48">
-                                <TextBox Text="{Binding NewHeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" />
+                                <TextBox Text="{Binding NewHeightValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" PreviewTextInput="NumericTextBox_PreviewTextInput" DataObject.Pasting="NumericTextBox_Pasting" PreviewKeyDown="NumericTextBox_PreviewKeyDown" />
                             </Border>
                         </StackPanel>
                     </Grid>
@@ -309,7 +309,7 @@
 
                                         <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Width="100" Height="40" Padding="0">
                                             <Grid>
-                                                <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" />
+                                                <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CenteredTextBoxStyle}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMainBrush}" FontSize="14" FocusVisualStyle="{x:Null}" PreviewTextInput="NumericTextBox_PreviewTextInput" DataObject.Pasting="NumericTextBox_Pasting" PreviewKeyDown="NumericTextBox_PreviewKeyDown" />
                                             </Grid>
                                         </Border>
                                         <TextBlock Grid.Column="2" Text="cm" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="10,0,15,0" FontSize="14"/>

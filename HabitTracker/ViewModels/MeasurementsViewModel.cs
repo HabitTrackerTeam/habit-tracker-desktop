@@ -59,11 +59,11 @@ namespace HabitTracker.ViewModels
         private string _bmiStatus = "";
         public string BmiStatus { get => _bmiStatus; set { _bmiStatus = value; OnPropertyChanged(); } }
 
-        private double? _newWeightValue;
-        public double? NewWeightValue { get => _newWeightValue; set { _newWeightValue = value; OnPropertyChanged(); } }
+        private string _newWeightValue = "";
+        public string NewWeightValue { get => _newWeightValue; set { _newWeightValue = value; OnPropertyChanged(); } }
 
-        private double? _newHeightValue;
-        public double? NewHeightValue { get => _newHeightValue; set { _newHeightValue = value; OnPropertyChanged(); } }
+        private string _newHeightValue = "";
+        public string NewHeightValue { get => _newHeightValue; set { _newHeightValue = value; OnPropertyChanged(); } }
 
         private bool _isModalOpen;
         public bool IsModalOpen
@@ -280,6 +280,17 @@ namespace HabitTracker.ViewModels
             }
         }
 
+        /// <summary>
+        /// Parses a string to double, accepting both '.' and ',' as decimal separators.
+        /// </summary>
+        public static bool TryParseDouble(string input, out double result)
+        {
+            result = 0;
+            if (string.IsNullOrWhiteSpace(input)) return false;
+            string normalized = input.Replace(',', '.');
+            return double.TryParse(normalized, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
+        }
+
         private void CalculateBmi()
         {
             if (CurrentHeight > 0)
@@ -378,13 +389,16 @@ namespace HabitTracker.ViewModels
 
         public async Task SaveMeasurementAsync()
         {
-            if (!CurrentSessionMeasurements.Any() && !NewWeightValue.HasValue && !NewHeightValue.HasValue)
+            bool hasWeight = TryParseDouble(NewWeightValue, out double parsedWeight) && parsedWeight > 0;
+            bool hasHeight = TryParseDouble(NewHeightValue, out double parsedHeight) && parsedHeight > 0;
+
+            if (!CurrentSessionMeasurements.Any() && !hasWeight && !hasHeight)
             {
                 HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasAddAtLeastOne);
                 return;
             }
 
-            var validItems = CurrentSessionMeasurements.Where(i => i.Value.HasValue && i.Value.Value > 0).ToList();
+            var validItems = CurrentSessionMeasurements.Where(i => i.ParsedValue.HasValue && i.ParsedValue.Value > 0).ToList();
             if (validItems.Count != CurrentSessionMeasurements.Count)
             {
                 HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasAllValid);
@@ -402,10 +416,10 @@ namespace HabitTracker.ViewModels
                 var todayDateString = MeasurementDate.ToString("yyyy-MM-dd");
 
                 // 2. ZAPIS WAGI I WZROSTU (Prawdziwy UPSERT)
-                if (NewWeightValue.HasValue || NewHeightValue.HasValue)
+                if (hasWeight || hasHeight)
                 {
-                    double w = NewWeightValue ?? CurrentWeight;
-                    double h = NewHeightValue ?? CurrentHeight;
+                    double w = hasWeight ? parsedWeight : CurrentWeight;
+                    double h = hasHeight ? parsedHeight : CurrentHeight;
 
                     var bmEntry = new HabitTracker.Models.BodyMetrics
                     {
@@ -422,8 +436,8 @@ namespace HabitTracker.ViewModels
                     await SupabaseService.Client.From<HabitTracker.Models.BodyMetrics>().Upsert(bmEntry, options);
 
                     // Wyczyszczenie inputów po udanym zapisie
-                    NewWeightValue = null;
-                    NewHeightValue = null;
+                    NewWeightValue = "";
+                    NewHeightValue = "";
                 }
 
                 // Proceed with existing circumferences setup only if there are items
@@ -470,7 +484,7 @@ namespace HabitTracker.ViewModels
 
                             if (existingLog != null)
                             {
-                                existingLog.Value = item.Value.Value;
+                                existingLog.Value = item.ParsedValue.Value;
                                 await SupabaseService.Client.From<CircumferenceLogs>().Update(existingLog);
                             }
                             else
@@ -480,7 +494,7 @@ namespace HabitTracker.ViewModels
                                     Id = Guid.NewGuid().ToString(),
                                     SessionId = sessionId,
                                     BodyPartId = item.BodyPartId,
-                                    Value = item.Value.Value
+                                    Value = item.ParsedValue.Value
                                 };
                                 await SupabaseService.Client.From<CircumferenceLogs>().Insert(log);
                             }
@@ -500,6 +514,8 @@ namespace HabitTracker.ViewModels
                 } // This closes: if (validItems.Any())
 
                 await LoadMeasurementsAsync();
+
+                HabitTracker.Views.CustomMessageBox.Show(LocalizationService.Instance.MeasSavedOk);
             }
             catch (Exception ex)
             {

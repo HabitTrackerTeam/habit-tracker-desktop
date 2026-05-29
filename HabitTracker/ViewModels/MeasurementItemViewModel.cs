@@ -8,14 +8,28 @@ namespace HabitTracker.ViewModels
         public string BodyPartId { get; set; }
         public string BodyPartName { get; set; }
 
-        private double? _value;
-        public double? Value
+        private string _value = "";
+        public string Value
         {
             get => _value;
             set
             {
                 _value = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ParsedValue));
+            }
+        }
+
+        /// <summary>
+        /// Returns the parsed double value (supports '.' and ','), or null if invalid.
+        /// </summary>
+        public double? ParsedValue
+        {
+            get
+            {
+                if (MeasurementsViewModel.TryParseDouble(Value, out double result))
+                    return result;
+                return null;
             }
         }
     }
