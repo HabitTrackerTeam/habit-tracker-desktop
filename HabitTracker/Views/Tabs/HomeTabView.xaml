@@ -75,23 +75,11 @@
 
         <!-- Top Search/Actions Bar -->
         <Grid Grid.Row="0" Margin="48, 24">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Home, Source={StaticResource Loc}}" 
+            <TextBlock Text="{Binding Home, Source={StaticResource Loc}}" 
                        FontSize="28" 
                        FontWeight="Bold" 
                        Foreground="{DynamicResource TextMainBrush}" 
                        VerticalAlignment="Center"/>
-
-            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <Button Style="{StaticResource IconButton}" Content="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M12,22A2,2 0 0,1 10,20H14A2,2 0 0,1 12,22Z"/>
-                <Button Style="{StaticResource IconButton}" Content="M12,18C8.69,18 6,15.31 6,12C6,8.69 8.69,6 12,6V18M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"/>
-            </StackPanel>
         </Grid>
 
         <!-- Dashboard Content -->
@@ -118,11 +106,11 @@
                         <!-- Circular Progress -->
                         <Grid Grid.Column="1" Width="120" Height="120">
                             <Ellipse Stroke="{DynamicResource InputBgBrush}" StrokeThickness="12"/>
-                            <Path Stroke="{DynamicResource AccentGreenBrush}" StrokeThickness="12" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                            <Path Stroke="{DynamicResource AccentGreenBrush}" StrokeThickness="{Binding DailyProgressStrokeThickness}" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   Data="M 60,60 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" 
-                                  StrokeDashArray="4 1" Margin="0"/>
+                                  StrokeDashArray="{Binding DailyProgressDashArray}" Margin="0"/>
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <TextBlock Text="65%" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding DailyProgressText}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" HorizontalAlignment="Center"/>
                                 <TextBlock Text="{Binding DailyProgress, Source={StaticResource Loc}}" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
