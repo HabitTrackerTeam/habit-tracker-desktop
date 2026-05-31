@@ -586,6 +586,9 @@ namespace HabitTracker.ViewModels{
                 // Independent view for Habit Manager
                 FilteredHabits = new CollectionViewSource { Source = Habits }.View;
                 FilteredHabits.Filter = FilterHabit;
+
+                // Calculate daily progress for the circular indicator
+                RecalculateDailyProgress();
             }
             catch(Exception ex){
                 SetStatus($"Failed to download habits: {ex.Message}","FFD32F2F");
@@ -628,6 +631,7 @@ namespace HabitTracker.ViewModels{
             if (sender is Habits habit && (e.PropertyName == nameof(habit.IsCompleted) || e.PropertyName == nameof(habit.CurrentProgress)))
             {
                 await SaveHabitLogAsync(habit);
+                RecalculateDailyProgress();
             }
         }
 
@@ -849,6 +853,55 @@ namespace HabitTracker.ViewModels{
         {
             var culture = CultureInfo.GetCultureInfo(Services.LocalizationService.Instance.CurrentLanguage == "en" ? "en-US" : "pl-PL");
             TodayDate = DateTime.Now.ToString("yyyy-MM-dd, dddd", culture);
+        }
+
+        // ===== Daily Progress Circle Properties =====
+        private int _dailyProgressPercentage;
+        public int DailyProgressPercentage
+        {
+            get => _dailyProgressPercentage;
+            set { _dailyProgressPercentage = value; OnPropertyChanged(); OnPropertyChanged(nameof(DailyProgressText)); OnPropertyChanged(nameof(DailyProgressDashArray)); }
+        }
+
+        public string DailyProgressText => $"{DailyProgressPercentage}%";
+
+        /// <summary>
+        /// StrokeDashArray for the progress arc. Circle circumference = 2π×48 ≈ 301.59.
+        /// WPF StrokeDashArray units are in multiples of StrokeThickness (12),
+        /// so the total dash length is 301.59 / 12 ≈ 25.13.
+        /// </summary>
+        public System.Windows.Media.DoubleCollection DailyProgressDashArray
+        {
+            get
+            {
+                double totalUnits = (2 * Math.PI * 48) / 12; // ≈ 25.13
+                double filled = totalUnits * DailyProgressPercentage / 100.0;
+                double gap = totalUnits - filled;
+                if (filled <= 0) filled = 0.001;
+                return new System.Windows.Media.DoubleCollection { filled, gap > 0 ? gap : 0 };
+            }
+        }
+
+        /// <summary>
+        /// Recalculates daily progress percentage from currently loaded active habits.
+        /// </summary>
+        private void RecalculateDailyProgress()
+        {
+            if (Habits == null || Habits.Count == 0)
+            {
+                DailyProgressPercentage = 0;
+                return;
+            }
+
+            var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
+            if (activeHabits.Count == 0)
+            {
+                DailyProgressPercentage = 0;
+                return;
+            }
+
+            int completed = activeHabits.Count(h => h.IsGreenHighlighted);
+            DailyProgressPercentage = (int)Math.Round((double)completed / activeHabits.Count * 100);
         }
 
         private void ChangeMonth(int monthsToAdd)
