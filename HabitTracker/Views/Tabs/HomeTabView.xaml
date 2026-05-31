@@ -106,7 +106,7 @@
                         <!-- Circular Progress -->
                         <Grid Grid.Column="1" Width="120" Height="120">
                             <Ellipse Stroke="{DynamicResource InputBgBrush}" StrokeThickness="12"/>
-                            <Path Stroke="{DynamicResource AccentGreenBrush}" StrokeThickness="12" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                            <Path Stroke="{DynamicResource AccentGreenBrush}" StrokeThickness="{Binding DailyProgressStrokeThickness}" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   Data="M 60,60 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" 
                                   StrokeDashArray="{Binding DailyProgressDashArray}" Margin="0"/>
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">

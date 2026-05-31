@@ -860,10 +860,19 @@ namespace HabitTracker.ViewModels{
         public int DailyProgressPercentage
         {
             get => _dailyProgressPercentage;
-            set { _dailyProgressPercentage = value; OnPropertyChanged(); OnPropertyChanged(nameof(DailyProgressText)); OnPropertyChanged(nameof(DailyProgressDashArray)); }
+            set 
+            { 
+                _dailyProgressPercentage = value; 
+                OnPropertyChanged(); 
+                OnPropertyChanged(nameof(DailyProgressText)); 
+                OnPropertyChanged(nameof(DailyProgressDashArray)); 
+                OnPropertyChanged(nameof(DailyProgressStrokeThickness)); 
+            }
         }
 
         public string DailyProgressText => $"{DailyProgressPercentage}%";
+
+        public double DailyProgressStrokeThickness => DailyProgressPercentage > 0 ? 12 : 0;
 
         /// <summary>
         /// StrokeDashArray for the progress arc. Circle circumference = 2π×48 ≈ 301.59.
@@ -877,13 +886,15 @@ namespace HabitTracker.ViewModels{
                 double totalUnits = (2 * Math.PI * 48) / 12; // ≈ 25.13
                 double filled = totalUnits * DailyProgressPercentage / 100.0;
                 double gap = totalUnits - filled;
-                if (filled <= 0) filled = 0.001;
+                if (filled <= 0) filled = 0;
                 return new System.Windows.Media.DoubleCollection { filled, gap > 0 ? gap : 0 };
             }
         }
 
         /// <summary>
         /// Recalculates daily progress percentage from currently loaded active habits.
+        /// Checkbox habits count as 0% or 100%. Numeric/timer habits count proportionally
+        /// (e.g. 5/10 mins = 50% of that habit), capped at 100%.
         /// </summary>
         private void RecalculateDailyProgress()
         {
@@ -900,8 +911,25 @@ namespace HabitTracker.ViewModels{
                 return;
             }
 
-            int completed = activeHabits.Count(h => h.IsGreenHighlighted);
-            DailyProgressPercentage = (int)Math.Round((double)completed / activeHabits.Count * 100);
+            double totalProgress = 0;
+            foreach (var h in activeHabits)
+            {
+                if (h.IsCheckboxType)
+                {
+                    // Checkbox: 0 or 1
+                    totalProgress += h.IsCompleted ? 1.0 : 0.0;
+                }
+                else
+                {
+                    // Numeric/Timer: partial progress, capped at 100%
+                    if (h.TargetFrequency > 0)
+                        totalProgress += Math.Min(h.CurrentProgress / h.TargetFrequency, 1.0);
+                    else
+                        totalProgress += h.CurrentProgress > 0 ? 1.0 : 0.0;
+                }
+            }
+
+            DailyProgressPercentage = (int)Math.Round(totalProgress / activeHabits.Count * 100);
         }
 
         private void ChangeMonth(int monthsToAdd)
