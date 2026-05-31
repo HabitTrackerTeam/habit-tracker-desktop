@@ -256,6 +256,32 @@ namespace HabitTracker.ViewModels{
             set { _selectedDayReflection = value; OnPropertyChanged(); }
         }
 
+        // ===== Daily Note Auto-Save Properties =====
+        private string _dailyNoteContent = "";
+        private string _dailyNoteStatusText = "";
+        private DispatcherTimer _noteSaveDebounceTimer;
+        private string _currentNoteId;
+
+        public string DailyNoteContent
+        {
+            get => _dailyNoteContent;
+            set
+            {
+                if (_dailyNoteContent != value)
+                {
+                    _dailyNoteContent = value;
+                    OnPropertyChanged();
+                    DebounceSaveNote();
+                }
+            }
+        }
+
+        public string DailyNoteStatusText
+        {
+            get => _dailyNoteStatusText;
+            set { _dailyNoteStatusText = value; OnPropertyChanged(); }
+        }
+
         // ===== Statistics Modal Properties =====
         private bool _isStatisticsModalOpen = false;
         public bool IsStatisticsModalOpen
@@ -1450,6 +1476,120 @@ namespace HabitTracker.ViewModels{
                     IconBgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 59, 130, 246))
                 }
             };
+        }
+
+        // ===== Daily Note Auto-Save Methods =====
+
+        /// <summary>
+        /// Resetuje/startuje debounce timer – zapis nastąpi po 1.5s bez zmian.
+        /// </summary>
+        private void DebounceSaveNote()
+        {
+            if (_noteSaveDebounceTimer == null)
+            {
+                _noteSaveDebounceTimer = new DispatcherTimer();
+                _noteSaveDebounceTimer.Interval = TimeSpan.FromMilliseconds(1500);
+                _noteSaveDebounceTimer.Tick += async (s, e) =>
+                {
+                    _noteSaveDebounceTimer.Stop();
+                    await SaveDailyNoteAsync();
+                };
+            }
+            _noteSaveDebounceTimer.Stop();
+            _noteSaveDebounceTimer.Start();
+        }
+
+        /// <summary>
+        /// Ładuje notatkę na dziś z Supabase.
+        /// </summary>
+        public async Task LoadDailyNoteAsync()
+        {
+            // Reset stanu notatki (czyści starą notatkę np. po zmianie konta)
+            _currentNoteId = null;
+            _dailyNoteContent = "";
+            DailyNoteStatusText = "";
+            OnPropertyChanged(nameof(DailyNoteContent));
+
+            var userId = SupabaseService.Client?.Auth?.CurrentUser?.Id;
+            if (string.IsNullOrEmpty(userId)) return;
+
+            try
+            {
+                var todayStr = DateTime.UtcNow.Date.ToString("yyyy-MM-dd");
+                var response = await SupabaseService.Client.From<Notes>()
+                    .Filter("user_id", Constants.Operator.Equals, userId)
+                    .Filter("note_date", Constants.Operator.Equals, todayStr)
+                    .Get();
+                var note = response.Models?.FirstOrDefault();
+                if (note != null)
+                {
+                    _currentNoteId = note.Id;
+                    _dailyNoteContent = note.Content ?? "";
+                    OnPropertyChanged(nameof(DailyNoteContent));
+                }
+                else
+                {
+                    _currentNoteId = null;
+                    _dailyNoteContent = "";
+                    OnPropertyChanged(nameof(DailyNoteContent));
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading daily note: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Upsert notatki dziennej do Supabase (insert lub update).
+        /// </summary>
+        private async Task SaveDailyNoteAsync()
+        {
+            var userId = SupabaseService.Client?.Auth?.CurrentUser?.Id;
+            if (string.IsNullOrEmpty(userId)) return;
+
+            try
+            {
+                var todayDate = DateTime.UtcNow.Date;
+
+                if (!string.IsNullOrEmpty(_currentNoteId))
+                {
+                    // UPDATE istniejącej notatki
+                    var note = new Notes
+                    {
+                        Id = _currentNoteId,
+                        UserId = userId,
+                        NoteDate = todayDate,
+                        Content = DailyNoteContent,
+                        CreatedDate = todayDate
+                    };
+                    await SupabaseService.Client.From<Notes>()
+                        .Filter("id", Constants.Operator.Equals, _currentNoteId)
+                        .Update(note);
+                }
+                else
+                {
+                    // INSERT nowej notatki
+                    var note = new Notes
+                    {
+                        UserId = userId,
+                        NoteDate = todayDate,
+                        Content = DailyNoteContent,
+                        CreatedDate = DateTime.UtcNow
+                    };
+                    var result = await SupabaseService.Client.From<Notes>().Insert(note);
+                    _currentNoteId = result.Models?.FirstOrDefault()?.Id;
+                }
+
+                var loc = Services.LocalizationService.Instance;
+                DailyNoteStatusText = $"{loc.Get("Autozapisano o", "Auto-saved at")} {DateTime.Now:HH:mm}";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving daily note: {ex.Message}");
+                var loc = Services.LocalizationService.Instance;
+                DailyNoteStatusText = loc.Get("Błąd zapisu", "Save error");
+            }
         }
     }
 }
