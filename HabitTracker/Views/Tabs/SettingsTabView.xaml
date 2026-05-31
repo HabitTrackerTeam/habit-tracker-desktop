@@ -205,6 +205,6 @@
             </StackPanel>
         </ScrollViewer>
 
-        <Border x:Name="DialogOverlay" Grid.RowSpan="2" Background="#99000000" Visibility="Collapsed" Panel.ZIndex="999" />
+        <Border x:Name="DialogOverlay" Grid.RowSpan="2" Background="#4D000000" Visibility="Collapsed" Panel.ZIndex="999" />
     </Grid>
 </UserControl>

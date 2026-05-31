@@ -195,9 +195,9 @@
                                                                            Foreground="{DynamicResource TextMutedBrush}"
                                                                            Margin="0,0,0,8"/>
                                                                 <TextBox x:Name="EmailInput"
+                                                                         Style="{StaticResource NoPlaceholderTextBoxStyle}"
                                                                          Height="56"
                                                                          Margin="0,0,0,14"
-                                                                         Tag="E-mail"
                                                                          Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
 
                                                                 <TextBlock Text="{Binding Password, Source={StaticResource Loc}}"
@@ -207,15 +207,15 @@
                                                                            Margin="0,0,0,8"/>
                                                                 <Grid Margin="0,0,0,14">
                                                                         <TextBox x:Name="LoginPasswordVisible"
+                                                                                 Style="{StaticResource NoPlaceholderTextBoxStyle}"
                                                                                  Height="56"
-                                                                                 Tag="Password"
                                                                                  Padding="0,0,44,0"
                                                                                  KeyDown="PasswordBox_KeyDown"
                                                                                  Visibility="Collapsed"/>
 
                                                                         <PasswordBox x:Name="LoginPassword"
+                                                                                     Style="{StaticResource NoPlaceholderPasswordBoxStyle}"
                                                                                      Height="56"
-                                                                                     Tag="Password"
                                                                                      Padding="0,0,44,0"
                                                                                      KeyDown="PasswordBox_KeyDown"/>
 
