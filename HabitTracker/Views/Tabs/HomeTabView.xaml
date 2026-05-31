@@ -233,7 +233,8 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Text="{Binding DailyNotes, Source={StaticResource Loc}}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,16"/>
                                 <!-- Binding for the Notes Box -->
-                                <TextBox Grid.Row="1" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="{DynamicResource TextMainBrush}">
+                                <TextBox Grid.Row="1" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="{DynamicResource TextMainBrush}"
+                                         Text="{Binding DailyNoteContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <TextBox.Resources>
                                         <VisualBrush x:Key="HintBrush" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left" AlignmentY="Top">
                                             <VisualBrush.Visual>
@@ -252,7 +253,7 @@
                                         </Style>
                                     </TextBox.Style>
                                 </TextBox>
-                                <TextBlock Grid.Row="2" Text="Auto-saved at 09:15 AM" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontSize="10" Foreground="#CBD5E1"/>
+                                <TextBlock Grid.Row="2" Text="{Binding DailyNoteStatusText}" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontSize="10" Foreground="#CBD5E1"/>
                             </Grid>
                         </Border>
                     </StackPanel>
