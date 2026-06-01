@@ -19,6 +19,7 @@ namespace HabitTracker.Views.Tabs
             if (_dashboardVM != null)
             {
                 await _dashboardVM.LoadHabitsAsync();
+                await _dashboardVM.LoadDailyNoteAsync();
             }
         }
     }

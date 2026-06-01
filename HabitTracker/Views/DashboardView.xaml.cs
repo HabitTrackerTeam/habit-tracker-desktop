@@ -32,6 +32,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         {
             await _dashboardVM.LoadFormDataAsync();
             await _dashboardVM.LoadHabitsAsync();
+            await _dashboardVM.LoadDailyNoteAsync();
         }
     }
 
@@ -55,6 +56,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
     {
         await _dashboardVM.LoadFormDataAsync();
         await _dashboardVM.LoadHabitsAsync();
+        await _dashboardVM.LoadDailyNoteAsync();
         await _dashboardVM.GenerateCalendarAsync();
         UpdateSidebar(NavHome);
     }
@@ -65,6 +67,7 @@ public partial class DashboardView : System.Windows.Controls.UserControl
         {
             await _dashboardVM.LoadFormDataAsync();
             await _dashboardVM.LoadHabitsAsync();
+            await _dashboardVM.LoadDailyNoteAsync();
         }
     }
 
