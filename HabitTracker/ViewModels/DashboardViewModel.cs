@@ -891,6 +891,38 @@ namespace HabitTracker.ViewModels{
             }
         }
 
+        private int _progressAnimationId = 0;
+        private int _targetDailyProgressPercentage = 0;
+
+        private async void AnimateProgressTo(int targetProgress)
+        {
+            _targetDailyProgressPercentage = targetProgress;
+            int currentId = ++_progressAnimationId;
+
+            while (_dailyProgressPercentage != _targetDailyProgressPercentage)
+            {
+                if (_progressAnimationId != currentId)
+                    return; // Another animation started
+
+                if (_dailyProgressPercentage < _targetDailyProgressPercentage)
+                {
+                    int step = (_targetDailyProgressPercentage - _dailyProgressPercentage) > 20 ? 2 : 1;
+                    DailyProgressPercentage += step;
+                    if (DailyProgressPercentage > _targetDailyProgressPercentage)
+                        DailyProgressPercentage = _targetDailyProgressPercentage;
+                }
+                else
+                {
+                    int step = (_dailyProgressPercentage - _targetDailyProgressPercentage) > 20 ? 2 : 1;
+                    DailyProgressPercentage -= step;
+                    if (DailyProgressPercentage < _targetDailyProgressPercentage)
+                        DailyProgressPercentage = _targetDailyProgressPercentage;
+                }
+
+                await Task.Delay(15);
+            }
+        }
+
         /// <summary>
         /// Recalculates daily progress percentage from currently loaded active habits.
         /// Checkbox habits count as 0% or 100%. Numeric/timer habits count proportionally
@@ -900,14 +932,14 @@ namespace HabitTracker.ViewModels{
         {
             if (Habits == null || Habits.Count == 0)
             {
-                DailyProgressPercentage = 0;
+                AnimateProgressTo(0);
                 return;
             }
 
             var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
             if (activeHabits.Count == 0)
             {
-                DailyProgressPercentage = 0;
+                AnimateProgressTo(0);
                 return;
             }
 
@@ -923,13 +955,14 @@ namespace HabitTracker.ViewModels{
                 {
                     // Numeric/Timer: partial progress, capped at 100%
                     if (h.TargetFrequency > 0)
-                        totalProgress += Math.Min(h.CurrentProgress / h.TargetFrequency, 1.0);
+                        totalProgress += Math.Min((double)h.CurrentProgress / h.TargetFrequency, 1.0);
                     else
                         totalProgress += h.CurrentProgress > 0 ? 1.0 : 0.0;
                 }
             }
 
-            DailyProgressPercentage = (int)Math.Round(totalProgress / activeHabits.Count * 100);
+            int targetProgress = (int)Math.Round(totalProgress / activeHabits.Count * 100);
+            AnimateProgressTo(targetProgress);
         }
 
         private void ChangeMonth(int monthsToAdd)
