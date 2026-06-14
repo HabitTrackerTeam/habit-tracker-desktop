@@ -4,16 +4,23 @@
              xmlns:local="clr-namespace:HabitTracker"
              xmlns:views="clr-namespace:HabitTracker.Views"
              Background="Transparent">
-    <Grid Margin="40,20,20,20">
+    <Grid Margin="40,32,40,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,24">
-            <TextBlock Text="{Binding Settings, Source={StaticResource Loc}}" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4" />
-            <TextBlock Text="{Binding ManageAccount, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
-        </StackPanel>
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,24" MinHeight="60">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Top">
+                <TextBlock Text="{Binding Settings, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                <TextBlock Text="{Binding ManageAccount, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+        </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,14,20">
             <StackPanel Orientation="Vertical">
