@@ -31,7 +31,6 @@
         <Style x:Key="DayPercentStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="10"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="#059669"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0,4,0,2"/>
         </Style>
@@ -212,16 +211,15 @@
                                         </TextBlock.Style>
                                     </TextBlock>
                                     
+                                    <!-- Percentage text: color from DotColor via Style setter so IsSelected trigger can override to White -->
                                     <TextBlock Text="{Binding PercentageText}">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock" BasedOn="{StaticResource DayPercentStyle}">
+                                                <Setter Property="Foreground" Value="{Binding DotColor}" />
                                                 <Setter Property="Visibility" Value="Visible" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding PercentageText}" Value="">
                                                         <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding BadgeColor}" Value="#FFF0F0">
-                                                        <Setter Property="Foreground" Value="#EF4444" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                                         <Setter Property="Foreground" Value="White" />
@@ -231,10 +229,12 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    
-                                    <Ellipse Fill="{Binding DotColor}">
+
+                                    <!-- Dot: color from DotColor via Style setter so IsSelected trigger can override to White -->
+                                    <Ellipse>
                                         <Ellipse.Style>
                                             <Style TargetType="Ellipse" BasedOn="{StaticResource DayDotStyle}">
+                                                <Setter Property="Fill" Value="{Binding DotColor}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                                         <Setter Property="Fill" Value="White" />
