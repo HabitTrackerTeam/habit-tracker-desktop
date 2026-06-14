@@ -77,11 +77,16 @@
 
             <!-- Calendar Header -->
             <StackPanel Grid.Row="1" Margin="0,0,0,32">
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                    <Button Content="&lt;" Command="{Binding PreviousMonthCommand}" Background="Transparent" BorderThickness="0" FontSize="20" FontWeight="Bold" Margin="0,0,15,0" Cursor="Hand" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding CurrentMonthYear}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
-                    <Button Content="&gt;" Command="{Binding NextMonthCommand}" Background="Transparent" BorderThickness="0" FontSize="20" FontWeight="Bold" Margin="15,0,0,0" Cursor="Hand" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
-                </StackPanel>
+                <Grid Margin="0,0,0,4" HorizontalAlignment="Left" Width="300">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="&lt;" Command="{Binding PreviousMonthCommand}" Background="Transparent" BorderThickness="0" FontSize="20" FontWeight="Bold" Cursor="Hand" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding CurrentMonthYear}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Button Grid.Column="2" Content="&gt;" Command="{Binding NextMonthCommand}" Background="Transparent" BorderThickness="0" FontSize="20" FontWeight="Bold" Cursor="Hand" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                </Grid>
                 <TextBlock Text="{Binding CurrentProtocolText}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
 

@@ -257,6 +257,8 @@ namespace HabitTracker.ViewModels
                     var settings = await UserSettingsService.LoadSettingsAsync(session.User.Id);
                     if (settings != null)
                     {
+                        LocalizationService.Instance.CurrentLanguage = settings.Language;
+
                         System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
                             if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
