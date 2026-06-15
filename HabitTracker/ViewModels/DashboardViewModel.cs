@@ -1749,18 +1749,4 @@ namespace HabitTracker.ViewModels{
             }
         }
     }
-}                   _currentNoteId = result.Models?.FirstOrDefault()?.Id;
-                }
-
-                var loc = Services.LocalizationService.Instance;
-                DailyNoteStatusText = $"{loc.Get("Autozapisano o", "Auto-saved at")} {DateTime.Now:HH:mm}";
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error saving daily note: {ex.Message}");
-                var loc = Services.LocalizationService.Instance;
-                DailyNoteStatusText = loc.Get("Błąd zapisu", "Save error");
-            }
-        }
-    }
 }
