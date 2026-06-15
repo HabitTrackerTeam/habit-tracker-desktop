@@ -1086,30 +1086,30 @@ namespace HabitTracker.ViewModels{
                 bool isCurrentMonth = date.Month == _currentCalendarDate.Month;
                 bool isToday = date.Date == DateTime.Today;
 
-                int planned = 0;
-                int completed = 0;
+                // Weighted day score (priority weights + sqrt partial-progress curve)
+                double totalWeight = 0.0;
+                double weightedScore = 0.0;
+                bool anyPlanned = false;
 
                 foreach (var habit in userHabits)
                 {
                     if (habit.CreatedDate.Date > date.Date) continue;
                     if (!IsHabitScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
 
-                    planned++;
+                    anyPlanned = true;
+                    double weight = GetPriorityWeight(habit.Priority);
+                    totalWeight += weight;
 
-                    if (logsByDate.TryGetValue(date.Date, out var dayLogs))
-                    {
-                        var log = dayLogs.FirstOrDefault(l => l.HabitId == habit.Id);
-                        if (log != null)
-                        {
-                            habitTypeMap.TryGetValue(habit.HabitTypeId ?? "", out var habitType);
-                            var typeName = habitType?.Type?.ToLower() ?? "checkbox";
-                            bool isCompleted = typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency;
-                            if (isCompleted) completed++;
-                        }
-                    }
+                    logsByDate.TryGetValue(date.Date, out var dayLogs);
+                    var log = dayLogs?.FirstOrDefault(l => l.HabitId == habit.Id);
+                    habitTypeMap.TryGetValue(habit.HabitTypeId ?? "", out var habitType);
+                    var typeName = habitType?.Type?.ToLower() ?? "checkbox";
+                    weightedScore += CalculateHabitContribution(log, habit, typeName) * weight;
                 }
 
-                int percentage = planned > 0 ? (int)Math.Round((double)completed / planned * 100) : -1;
+                int percentage = anyPlanned && totalWeight > 0
+                    ? (int)Math.Round(weightedScore / totalWeight * 100)
+                    : -1;
 
                 string badgeColor, dotColor;
                 GetDayColors(percentage, isToday, out badgeColor, out dotColor);
@@ -1141,6 +1141,10 @@ namespace HabitTracker.ViewModels{
         /// </summary>
         private bool IsHabitScheduledForDay(int daysOfWeekMask, DayOfWeek dayOfWeek)
         {
+            // Treat a zero mask as "every day" — prevents habits from being
+            // silently hidden in the calendar due to an unset bitmask.
+            if (daysOfWeekMask == 0) return true;
+
             int bit = dayOfWeek switch
             {
                 DayOfWeek.Monday => 64,
@@ -1153,6 +1157,39 @@ namespace HabitTracker.ViewModels{
                 _ => 0
             };
             return (daysOfWeekMask & bit) != 0;
+        }
+
+        /// <summary>
+        /// Returns the priority weight used in the weighted day score.
+        /// Priority 1 = High (×3), 2 = Medium (×2), 3 = Low (×1).
+        /// </summary>
+        private static double GetPriorityWeight(int priority)
+        {
+            return priority switch
+            {
+                1 => 3.0,
+                2 => 2.0,
+                _ => 1.0
+            };
+        }
+
+        /// <summary>
+        /// Calculates a 0.0–1.0 contribution score for a single habit.
+        /// Checkbox: binary. Numeric/Timer: sqrt curve (rewards partial progress).
+        /// e.g. 25% of goal → score 0.50 | 50% → 0.71 | 100% → 1.00
+        /// </summary>
+        private static double CalculateHabitContribution(HabitLogs? log, Habits habit, string typeName)
+        {
+            if (log == null) return 0.0;
+
+            if (typeName == "checkbox")
+                return log.IsCompleted ? 1.0 : 0.0;
+
+            if (habit.TargetFrequency <= 0)
+                return log.NumericValue > 0 ? 1.0 : 0.0;
+
+            double rawProgress = Math.Min(log.NumericValue / habit.TargetFrequency, 1.0);
+            return Math.Sqrt(rawProgress);
         }
 
         private void GetDayColors(int percentage, bool isToday, out string badgeColor, out string dotColor)
@@ -1171,25 +1208,24 @@ namespace HabitTracker.ViewModels{
             }
             catch { }
 
-            if (isToday)
-            {
-                badgeColor = "#4CA475";
-                dotColor = "#FFFFFF";
-                return;
-            }
-
+            // 5-tier color scale: Red / Orange / Yellow / Green / Blue
             if (isDark)
             {
-                if (percentage < 0) { badgeColor = "#2D2D2D"; dotColor = "Transparent"; }
-                else if (percentage < 50) { badgeColor = "#4A1A1A"; dotColor = "#E57373"; }
-                else { badgeColor = "#1A3D2E"; dotColor = "#66BB6A"; }
+                if (percentage < 0)       { badgeColor = "#2D2D2D"; dotColor = "Transparent"; } // No habits
+                else if (percentage < 30) { badgeColor = "#4A1A1A"; dotColor = "#E57373"; }    // Red
+                else if (percentage < 50) { badgeColor = "#4A2E1A"; dotColor = "#FF8C42"; }    // Orange
+                else if (percentage < 70) { badgeColor = "#3D3A1A"; dotColor = "#F5C842"; }    // Yellow
+                else if (percentage < 90) { badgeColor = "#1A3D2E"; dotColor = "#66BB6A"; }    // Green
+                else                      { badgeColor = "#1A2D4A"; dotColor = "#64B5F6"; }    // Blue (≥90%)
             }
             else
             {
-                if (percentage < 0) { badgeColor = "#F0F2F5"; dotColor = "Transparent"; }
-                else if (percentage == 0) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }
-                else if (percentage < 50) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }
-                else { badgeColor = "#E6F4EA"; dotColor = "#328A5D"; }
+                if (percentage < 0)       { badgeColor = "#F0F2F5"; dotColor = "Transparent"; } // No habits
+                else if (percentage < 30) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }    // Red
+                else if (percentage < 50) { badgeColor = "#FFF4ED"; dotColor = "#E65100"; }    // Orange
+                else if (percentage < 70) { badgeColor = "#FFFFF0"; dotColor = "#F9A825"; }    // Yellow
+                else if (percentage < 90) { badgeColor = "#E6F4EA"; dotColor = "#328A5D"; }    // Green
+                else                      { badgeColor = "#E8F0FE"; dotColor = "#1565C0"; }    // Blue (≥90%)
             }
         }
 
@@ -1245,7 +1281,8 @@ namespace HabitTracker.ViewModels{
                 var dayLogs = rawLogs.Where(l => habitIds.Contains(l.HabitId)).ToList();
 
                 var habitStatuses = new ObservableCollection<DayHabitStatusViewModel>();
-                int planned = 0, completed = 0;
+                int planned = 0;
+                double totalWeight = 0.0, weightedScore = 0.0;
 
                 foreach (var habit in userHabits)
                 {
@@ -1253,6 +1290,9 @@ namespace HabitTracker.ViewModels{
                     if (!IsHabitScheduledForDay(habit.DaysOfWeek, day.Date.DayOfWeek)) continue;
 
                     planned++;
+                    double weight = GetPriorityWeight(habit.Priority);
+                    totalWeight += weight;
+
                     var log = dayLogs.FirstOrDefault(l => l.HabitId == habit.Id);
                     habitTypeMap.TryGetValue(habit.HabitTypeId ?? "", out var habitType);
                     var typeName = habitType?.Type?.ToLower() ?? "checkbox";
@@ -1275,7 +1315,8 @@ namespace HabitTracker.ViewModels{
                         }
                     }
 
-                    if (isCompleted) completed++;
+                    // Weighted contribution (sqrt curve for numeric/timer)
+                    weightedScore += CalculateHabitContribution(log, habit, typeName) * weight;
 
                     habitStatuses.Add(new DayHabitStatusViewModel
                     {
@@ -1288,7 +1329,9 @@ namespace HabitTracker.ViewModels{
                 }
 
                 SelectedDayHabits = habitStatuses;
-                SelectedDayScore = planned > 0 ? (int)Math.Round((double)completed / planned * 100) : 0;
+                SelectedDayScore = planned > 0 && totalWeight > 0
+                    ? (int)Math.Round(weightedScore / totalWeight * 100)
+                    : 0;
 
                 if (planned == 0) SelectedDayLabel = "No habits planned";
                 else if (SelectedDayScore == 100) SelectedDayLabel = "Perfect Growth Day";
