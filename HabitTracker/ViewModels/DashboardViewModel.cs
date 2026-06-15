@@ -1072,9 +1072,22 @@ namespace HabitTracker.ViewModels{
                 bool isCurrentMonth = date.Month == _currentCalendarDate.Month;
                 bool isToday = date.Date == DateTime.Today;
 
-                // Use centralised DailyScoreCalculator for consistent scoring
-                var dayLogsList = logsByDate.TryGetValue(date.Date, out var dayLogs) ? dayLogs : new List<HabitLogs>();
-                var scoreResult = DailyScoreCalculator.CalculateDailyScore(date, userHabits, dayLogsList, habitTypeMap);
+                DailyScoreCalculator.DailyScoreResult scoreResult;
+
+                if (isToday && Habits != null && Habits.Count > 0)
+                {
+                    // TODAY: use in-memory state to guarantee the calendar percentage
+                    // matches the home dashboard exactly (avoids DB race conditions).
+                    var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
+                    scoreResult = DailyScoreCalculator.CalculateFromLiveState(activeHabits, habitTypeMap);
+                }
+                else
+                {
+                    // Historical days: use database logs
+                    var dayLogsList = logsByDate.TryGetValue(date.Date, out var dayLogs) ? dayLogs : new List<HabitLogs>();
+                    scoreResult = DailyScoreCalculator.CalculateDailyScore(date, userHabits, dayLogsList, habitTypeMap);
+                }
+
                 int percentage = scoreResult.PlannedCount > 0 ? scoreResult.Percentage : -1;
 
                 string badgeColor, dotColor;
@@ -1161,12 +1174,6 @@ namespace HabitTracker.ViewModels{
 
             try
             {
-                var habitsResponse = await SupabaseService.Client.From<Habits>()
-                    .Filter("user_id", Constants.Operator.Equals, userId)
-                    .Filter("is_archived", Constants.Operator.Equals, "false")
-                    .Get();
-                var userHabits = habitsResponse.Models ?? new List<Habits>();
-
                 Dictionary<string, HabitTypes> habitTypeMap = new();
                 try
                 {
@@ -1180,20 +1187,38 @@ namespace HabitTracker.ViewModels{
                 }
                 catch { }
 
-                // Use UTC DateTime range for filtering log_date
-                var utcDayStart = DateTime.SpecifyKind(day.Date.Date, DateTimeKind.Utc);
-                var utcDayEnd = utcDayStart.AddDays(1);
-                var logsResponse = await SupabaseService.Client.From<HabitLogs>()
-                    .Filter("log_date", Constants.Operator.GreaterThanOrEqual, utcDayStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
-                    .Filter("log_date", Constants.Operator.LessThan, utcDayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
-                    .Order("created_date", Constants.Ordering.Descending)
-                    .Get();
-                var habitIds = new HashSet<string>(userHabits.Select(h => h.Id));
-                var rawLogs = logsResponse.Models ?? new List<HabitLogs>();
-                var dayLogs = rawLogs.Where(l => habitIds.Contains(l.HabitId)).ToList();
+                DailyScoreCalculator.DailyScoreResult scoreResult;
+                bool isToday = day.Date.Date == DateTime.Today;
 
-                // Use centralised DailyScoreCalculator — same logic as calendar tiles & home dashboard
-                var scoreResult = DailyScoreCalculator.CalculateDailyScore(day.Date, userHabits, dayLogs, habitTypeMap);
+                if (isToday && Habits != null && Habits.Count > 0)
+                {
+                    // TODAY: use in-memory state to guarantee the detail panel
+                    // matches the home dashboard exactly (avoids DB race conditions).
+                    var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
+                    scoreResult = DailyScoreCalculator.CalculateFromLiveState(activeHabits, habitTypeMap);
+                }
+                else
+                {
+                    // Historical day: fetch from database
+                    var habitsResponse = await SupabaseService.Client.From<Habits>()
+                        .Filter("user_id", Constants.Operator.Equals, userId)
+                        .Filter("is_archived", Constants.Operator.Equals, "false")
+                        .Get();
+                    var userHabits = habitsResponse.Models ?? new List<Habits>();
+
+                    var utcDayStart = DateTime.SpecifyKind(day.Date.Date, DateTimeKind.Utc);
+                    var utcDayEnd = utcDayStart.AddDays(1);
+                    var logsResponse = await SupabaseService.Client.From<HabitLogs>()
+                        .Filter("log_date", Constants.Operator.GreaterThanOrEqual, utcDayStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                        .Filter("log_date", Constants.Operator.LessThan, utcDayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                        .Order("created_date", Constants.Ordering.Descending)
+                        .Get();
+                    var habitIds = new HashSet<string>(userHabits.Select(h => h.Id));
+                    var rawLogs = logsResponse.Models ?? new List<HabitLogs>();
+                    var dayLogs = rawLogs.Where(l => habitIds.Contains(l.HabitId)).ToList();
+
+                    scoreResult = DailyScoreCalculator.CalculateDailyScore(day.Date, userHabits, dayLogs, habitTypeMap);
+                }
 
                 var habitStatuses = new ObservableCollection<DayHabitStatusViewModel>();
                 foreach (var detail in scoreResult.Details)
