@@ -52,6 +52,7 @@ namespace HabitTracker.Services
         public string Logout => Get("Wyloguj", "Logout");
 
         // === Dashboard ===
+        public string HomeSubtitle => Get("Oto podsumowanie twojej dzisiejszej aktywności", "Here is a summary of your activity today");
         public string MyHabits => Get("Moje nawyki", "My Habits");
         public string MyNotes => Get("Moje notatki", "My Notes");
         public string DashboardWelcome => Get(

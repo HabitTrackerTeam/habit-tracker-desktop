@@ -120,7 +120,7 @@
     </UserControl.Resources>
     <Grid>
         <!-- Main Content -->
-        <Grid Margin="40,20,20,20">
+        <Grid Margin="40,32,40,20">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
@@ -143,16 +143,16 @@
             </Grid.RowDefinitions>
 
         <!-- Header Section -->
-        <Grid Grid.Row="0" Margin="0,0,0,32">
+        <Grid Grid.Row="0" Margin="0,0,0,24" MinHeight="60">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="{Binding HabitsManager, Source={StaticResource Loc}}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
+            <StackPanel Grid.Column="0" VerticalAlignment="Top">
+                <TextBlock Text="{Binding HabitsManager, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                 <TextBlock Text="{Binding WhatPlanToAchieve, Source={StaticResource Loc}}" 
-                           Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                           FontSize="14" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,4,0,0"/>
             </StackPanel>
             
             <Button Grid.Column="1" VerticalAlignment="Top"
@@ -162,6 +162,7 @@
                     FontWeight="Bold" 
                     FontSize="16"
                     Padding="24,14" 
+                    Height="52"
                     BorderThickness="0" 
                     Cursor="Hand">
                 <Button.Template>

@@ -67,24 +67,30 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Margin="40,32,40,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/> <!-- Top Bar -->
             <RowDefinition Height="*"/>    <!-- Body -->
         </Grid.RowDefinitions>
 
         <!-- Top Search/Actions Bar -->
-        <Grid Grid.Row="0" Margin="48, 24">
-            <TextBlock Text="{Binding Home, Source={StaticResource Loc}}" 
-                       FontSize="28" 
-                       FontWeight="Bold" 
-                       Foreground="{DynamicResource TextMainBrush}" 
-                       VerticalAlignment="Center"/>
+        <Grid Grid.Row="0" Margin="0,0,0,24" MinHeight="60">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Top">
+                <TextBlock Text="{Binding Home, Source={StaticResource Loc}}" 
+                           FontSize="28" 
+                           FontWeight="Bold" 
+                           Foreground="{DynamicResource TextMainBrush}" />
+                <TextBlock Text="{Binding HomeSubtitle, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+            </StackPanel>
         </Grid>
 
         <!-- Dashboard Content -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="48, 0, 48, 48">
+            <StackPanel Margin="0, 0, 0, 48">
                 
                 <!-- Welcome Hero -->
                 <Border Background="{DynamicResource CardBgBrush}" CornerRadius="24" Padding="40" Margin="0,0,0,32">

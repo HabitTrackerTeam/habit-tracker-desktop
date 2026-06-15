@@ -15,7 +15,7 @@
 
     <Grid>
         <!-- Main Layout -->
-        <Grid Margin="40,20,20,20">
+        <Grid Margin="40,32,40,20">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
@@ -37,18 +37,18 @@
             </Grid.RowDefinitions>
 
             <!-- Header Row -->
-            <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid Grid.Row="0" Margin="0,0,0,24" MinHeight="60">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0">
+                <StackPanel Grid.Column="0" VerticalAlignment="Top">
                     <TextBlock Text="{Binding BodyMeasurements, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                    <TextBlock Text="{Binding TrackPhysicalProgression, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding TrackPhysicalProgression, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
                 </StackPanel>
 
-                <Button Grid.Column="1" Command="{Binding OpenLogModalCommand}" Background="{DynamicResource AccentGreenBrush}" Foreground="White" FontWeight="Bold" FontSize="16" Padding="24,14" BorderThickness="0" Cursor="Hand" VerticalAlignment="Top">
+                <Button Grid.Column="1" VerticalAlignment="Top" Command="{Binding OpenLogModalCommand}" Background="{DynamicResource AccentGreenBrush}" Foreground="White" FontWeight="Bold" FontSize="16" Padding="24,14" Height="52" BorderThickness="0" Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border Background="{TemplateBinding Background}" CornerRadius="12" Padding="{TemplateBinding Padding}">
