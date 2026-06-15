@@ -205,12 +205,17 @@ namespace HabitTracker.Services
 
         /// <summary>
         /// Returns the weight multiplier for a habit's priority.
-        /// Priority value IS the weight: 3 = High (×3), 2 = Medium (×2), 1 = Low (×1).
-        /// Falls back to 1.0 for any unexpected value.
+        /// Database convention: Priority 1 = High, 2 = Medium, 3 = Low.
+        /// Mapped to weights:   1 → ×3,  2 → ×2,  3 → ×1.
         /// </summary>
         private static double GetPriorityWeight(int priority)
         {
-            return priority >= 1 ? (double)priority : 1.0;
+            return priority switch
+            {
+                1 => 3.0, // High   → ×3
+                2 => 2.0, // Medium → ×2
+                _ => 1.0  // Low    → ×1
+            };
         }
 
         /// <summary>
