@@ -295,8 +295,31 @@ namespace HabitTracker.ViewModels{
         public int GrowthQuotient
         {
             get => _growthQuotient;
-            set { _growthQuotient = value; OnPropertyChanged(); }
+            set { _growthQuotient = value; OnPropertyChanged(); OnPropertyChanged(nameof(GrowthQuotientDashArray)); }
         }
+
+        public string GrowthQuotientDashArray => $"{(_growthQuotient * 25.13 / 100.0).ToString("F2", CultureInfo.InvariantCulture)} 25.13";
+
+        private bool _isPositiveGrowthTrend;
+        public bool IsPositiveGrowthTrend
+        {
+            get => _isPositiveGrowthTrend;
+            set { _isPositiveGrowthTrend = value; OnPropertyChanged(); }
+        }
+
+        private string _weeklyCompletionDateRange = "";
+        public string WeeklyCompletionDateRange
+        {
+            get => _weeklyCompletionDateRange;
+            set { _weeklyCompletionDateRange = value; OnPropertyChanged(); }
+        }
+
+        private int _weeklyCompletionOffset = 0;
+
+        public bool CanNavigateNextWeek => _weeklyCompletionOffset < 0;
+
+        public ICommand PreviousWeekCommand { get; }
+        public ICommand NextWeekCommand { get; }
 
         private string _growthQuotientTrend;
         public string GrowthQuotientTrend
@@ -352,6 +375,8 @@ namespace HabitTracker.ViewModels{
             SelectDayCommand = new RelayCommand(param => SelectDay(param as CalendarDayViewModel));
             OpenHabitStatisticsCommand = new RelayCommand(param => OpenHabitStatistics(param as HabitPerformanceViewModel));
             CloseHabitStatisticsCommand = new RelayCommand(_ => IsStatisticsModalOpen = false);
+            PreviousWeekCommand = new RelayCommand(async _ => await NavigateWeek(-1));
+            NextWeekCommand = new RelayCommand(async _ => await NavigateWeek(1));
             GenerateCalendarPlaceholder();
             
             // Initialize filter options
@@ -484,6 +509,8 @@ namespace HabitTracker.ViewModels{
             IsSettingsVisible = false;
             IsCalendarVisible = false;
             IsStatisticsVisible = true;
+            _weeklyCompletionOffset = 0;
+            OnPropertyChanged(nameof(CanNavigateNextWeek));
         }
 
         private void SetStatus(string message, string color = "#FFFFFF")
@@ -575,11 +602,19 @@ namespace HabitTracker.ViewModels{
 
                 Habits = new ObservableCollection<Habits>(habitsList);
                 
-                // Default view used by HomeTab (only show active habits)
+                // Default view used by HomeTab (only show active habits scheduled for today)
                 var defaultView = CollectionViewSource.GetDefaultView(Habits);
                 defaultView.Filter = (obj) => 
                 {
-                    if (obj is Habits h) return !h.IsArchived;
+                    if (obj is Habits h)
+                    {
+                        if (h.IsArchived) return false;
+                        // Flexible habits are always shown (user decides when to do them)
+                        if (h.IsFlexible) return true;
+                        // Hide habits not scheduled for today
+                        if (!DailyScoreCalculator.IsScheduledForDay(h.DaysOfWeek, DateTime.Today.DayOfWeek)) return false;
+                        return true;
+                    }
                     return true;
                 };
 
@@ -1071,33 +1106,43 @@ namespace HabitTracker.ViewModels{
                 var date = startDate.AddDays(i);
                 bool isCurrentMonth = date.Month == _currentCalendarDate.Month;
                 bool isToday = date.Date == DateTime.Today;
+                bool isFutureDay = date.Date > DateTime.Today;
 
-                DailyScoreCalculator.DailyScoreResult scoreResult;
+                int percentage = -1;
+                string badgeColor, dotColor;
 
-                if (isToday && Habits != null && Habits.Count > 0)
+                if (isFutureDay)
                 {
-                    // TODAY: use in-memory state to guarantee the calendar percentage
-                    // matches the home dashboard exactly (avoids DB race conditions).
-                    var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
-                    scoreResult = DailyScoreCalculator.CalculateFromLiveState(activeHabits, habitTypeMap);
+                    // Future days: no score calculation, no percentage, no colored dot
+                    GetDayColors(-1, false, out badgeColor, out dotColor);
                 }
                 else
                 {
-                    // Historical days: use database logs
-                    var dayLogsList = logsByDate.TryGetValue(date.Date, out var dayLogs) ? dayLogs : new List<HabitLogs>();
-                    scoreResult = DailyScoreCalculator.CalculateDailyScore(date, userHabits, dayLogsList, habitTypeMap);
+                    DailyScoreCalculator.DailyScoreResult scoreResult;
+
+                    if (isToday && Habits != null && Habits.Count > 0)
+                    {
+                        // TODAY: use in-memory state to guarantee the calendar percentage
+                        // matches the home dashboard exactly (avoids DB race conditions).
+                        var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
+                        scoreResult = DailyScoreCalculator.CalculateFromLiveState(activeHabits, habitTypeMap);
+                    }
+                    else
+                    {
+                        // Historical days: use database logs
+                        var dayLogsList = logsByDate.TryGetValue(date.Date, out var dayLogs) ? dayLogs : new List<HabitLogs>();
+                        scoreResult = DailyScoreCalculator.CalculateDailyScore(date, userHabits, dayLogsList, habitTypeMap);
+                    }
+
+                    percentage = scoreResult.PlannedCount > 0 ? scoreResult.Percentage : -1;
+                    GetDayColors(percentage, isToday, out badgeColor, out dotColor);
                 }
-
-                int percentage = scoreResult.PlannedCount > 0 ? scoreResult.Percentage : -1;
-
-                string badgeColor, dotColor;
-                GetDayColors(percentage, isToday, out badgeColor, out dotColor);
 
                 days.Add(new CalendarDayViewModel
                 {
                     Date = date,
                     DayNumber = date.ToString("dd"),
-                    PercentageText = isCurrentMonth && percentage >= 0 ? $"{percentage}%" : "",
+                    PercentageText = isCurrentMonth && !isFutureDay && percentage >= 0 ? $"{percentage}%" : "",
                     IsCurrentMonth = isCurrentMonth,
                     IsToday = isToday,
                     IsSelected = isToday,
@@ -1275,6 +1320,14 @@ namespace HabitTracker.ViewModels{
             IsStatisticsModalOpen = true;
         }
 
+        private async Task NavigateWeek(int direction)
+        {
+            if (direction > 0 && _weeklyCompletionOffset >= 0) return;
+            _weeklyCompletionOffset += direction;
+            OnPropertyChanged(nameof(CanNavigateNextWeek));
+            await LoadStatisticsDataAsync();
+        }
+
         /// <summary>
         /// Loads detailed habit performances for the Statistics tab.
         /// </summary>
@@ -1304,11 +1357,11 @@ namespace HabitTracker.ViewModels{
                 }
                 catch { }
 
-                // Fetch last 30 days of logs (with UTC boundaries)
-                var thirtyDaysAgo = DateTime.SpecifyKind(DateTime.Today.AddDays(-30), DateTimeKind.Utc);
-                var todayEndUtc = DateTime.SpecifyKind(DateTime.Today.AddDays(1), DateTimeKind.Utc);
+                // Fetch last 90 days of logs (with UTC boundaries)
+                var ninetyDaysAgo = DateTime.SpecifyKind(DateTime.Today.AddDays(-90), DateTimeKind.Utc);
+                var todayEndUtc = DateTime.SpecifyKind(DateTime.Today.AddDays(14), DateTimeKind.Utc);
                 var logsResponse = await SupabaseService.Client.From<HabitLogs>()
-                    .Filter("log_date", Constants.Operator.GreaterThanOrEqual, thirtyDaysAgo.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Filter("log_date", Constants.Operator.GreaterThanOrEqual, ninetyDaysAgo.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
                     .Filter("log_date", Constants.Operator.LessThan, todayEndUtc.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
                     .Get();
                 var habitIds = new HashSet<string>(userHabits.Select(h => h.Id));
@@ -1406,7 +1459,7 @@ namespace HabitTracker.ViewModels{
 
         private void CalculateTopStatistics(List<Habits> userHabits, Dictionary<string, HabitTypes> typeMap, List<HabitLogs> allLogs)
         {
-            var today = DateTime.Today;
+            var today = DateTime.Today.AddDays(_weeklyCompletionOffset * 7);
             int daysSinceMonday = ((int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek) - 1;
             var startOfWeek = today.AddDays(-daysSinceMonday);
             var startOfLastWeek = startOfWeek.AddDays(-7);
@@ -1420,12 +1473,14 @@ namespace HabitTracker.ViewModels{
             // Initialize weekly completion days
             for (int i = 0; i < 7; i++)
             {
+                var dDate = startOfWeek.AddDays(i);
                 weeklyCompletionDays.Add(new WeeklyCompletionDay
                 {
                     DayName = dayNames[i],
                     Value = 0,
                     MaxValue = 0,
-                    BarColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 50, 138, 93))
+                    BarColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 50, 138, 93)),
+                    IsFuture = dDate.Date > DateTime.Today
                 });
             }
 
@@ -1443,9 +1498,14 @@ namespace HabitTracker.ViewModels{
                     var date = startOfLastWeek.AddDays(d);
                     if (habit.CreatedDate.Date > date) continue;
                     if (!DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
-
                     bool isThisWeek = d >= 7;
-                    if (isThisWeek) thisWeekPlanned++;
+                    if (isThisWeek)
+                    {
+                        if (date.Date <= DateTime.Today)
+                        {
+                            thisWeekPlanned++;
+                        }
+                    }
                     else lastWeekPlanned++;
 
                     if (isThisWeek) weeklyCompletionDays[d - 7].MaxValue++;
@@ -1460,7 +1520,10 @@ namespace HabitTracker.ViewModels{
                             {
                                 if (isThisWeek) 
                                 {
-                                    thisWeekCompleted++;
+                                    if (date.Date <= DateTime.Today)
+                                    {
+                                        thisWeekCompleted++;
+                                    }
                                     weeklyCompletionDays[d - 7].Value++;
                                 }
                                 else lastWeekCompleted++;
@@ -1474,7 +1537,11 @@ namespace HabitTracker.ViewModels{
             int lastWeekGrowth = lastWeekPlanned > 0 ? (int)Math.Round((double)lastWeekCompleted / lastWeekPlanned * 100) : 0;
             int diff = GrowthQuotient - lastWeekGrowth;
             GrowthQuotientTrend = diff >= 0 ? $"+{diff}% from last week" : $"{diff}% from last week";
+            IsPositiveGrowthTrend = diff >= 0;
             WeeklyCompletionDays = weeklyCompletionDays;
+
+            var endOfWeek = startOfWeek.AddDays(6);
+            WeeklyCompletionDateRange = $"{startOfWeek:dd.MM.yyyy} - {endOfWeek:dd.MM.yyyy}";
 
             // Top Habits (Sort by best completion percentage all-time or last 30 days)
             var topList = new List<TopHabitViewModel>();

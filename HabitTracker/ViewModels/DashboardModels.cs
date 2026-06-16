@@ -9,6 +9,7 @@ namespace HabitTracker.ViewModels
         public int MaxValue { get; set; }
         public Brush BarColor { get; set; }
         public double BarHeight => MaxValue > 0 ? ((double)Value / MaxValue) * 80 : 0;
+        public bool IsFuture { get; set; }
     }
 
     public class TopHabitViewModel
