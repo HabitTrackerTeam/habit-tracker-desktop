@@ -575,11 +575,19 @@ namespace HabitTracker.ViewModels{
 
                 Habits = new ObservableCollection<Habits>(habitsList);
                 
-                // Default view used by HomeTab (only show active habits)
+                // Default view used by HomeTab (only show active habits scheduled for today)
                 var defaultView = CollectionViewSource.GetDefaultView(Habits);
                 defaultView.Filter = (obj) => 
                 {
-                    if (obj is Habits h) return !h.IsArchived;
+                    if (obj is Habits h)
+                    {
+                        if (h.IsArchived) return false;
+                        // Flexible habits are always shown (user decides when to do them)
+                        if (h.IsFlexible) return true;
+                        // Hide habits not scheduled for today
+                        if (!DailyScoreCalculator.IsScheduledForDay(h.DaysOfWeek, DateTime.Today.DayOfWeek)) return false;
+                        return true;
+                    }
                     return true;
                 };
 
