@@ -78,10 +78,44 @@
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="{Binding GrowthQuotient, Source={StaticResource Loc}}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                             <TextBlock Text="{Binding GrowthQuotientDesc, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" MaxWidth="280" HorizontalAlignment="Left" Margin="0,8,0,24"/>
-                            <Border Background="#F0FDF4" CornerRadius="20" Padding="12,6" HorizontalAlignment="Left">
+                            <Border CornerRadius="20" Padding="12,6" HorizontalAlignment="Left">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#F0FDF4"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPositiveGrowthTrend}" Value="False">
+                                                <Setter Property="Background" Value="#FEF2F2"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <StackPanel Orientation="Horizontal">
-                                    <Path Data="M7,14L12,9L17,14H7Z" Fill="{DynamicResource AccentGreenBrush}" Width="12" Height="12" Margin="0,0,4,0"/>
-                                    <TextBlock Text="{Binding GrowthQuotientTrend}" FontSize="13" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold"/>
+                                    <Path Width="12" Height="12" Margin="0,0,4,0" Stretch="Uniform">
+                                        <Path.Style>
+                                            <Style TargetType="Path">
+                                                <Setter Property="Data" Value="M7,14L12,9L17,14H7Z"/>
+                                                <Setter Property="Fill" Value="{DynamicResource AccentGreenBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPositiveGrowthTrend}" Value="False">
+                                                        <Setter Property="Data" Value="M7,10L12,15L17,10H7Z"/>
+                                                        <Setter Property="Fill" Value="#EF4444"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Path.Style>
+                                    </Path>
+                                    <TextBlock Text="{Binding GrowthQuotientTrend}" FontSize="13" FontWeight="Bold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPositiveGrowthTrend}" Value="False">
+                                                        <Setter Property="Foreground" Value="#EF4444"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -91,9 +125,23 @@
                             <Ellipse Stroke="{DynamicResource InputBgBrush}" StrokeThickness="16"/>
                             <Path Stroke="{DynamicResource AccentGreenBrush}" StrokeThickness="16" StrokeStartLineCap="Round" 
                                   Data="M 80,80 m 0,-64 a 64,64 0 1 1 0,128 a 64,64 0 1 1 0,-128" 
-                                  StrokeDashArray="8 1" Opacity="1"/>
+                                  StrokeDashArray="{Binding GrowthQuotientDashArray}" Opacity="1">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding GrowthQuotient}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                                <Path.RenderTransform>
+                                    <RotateTransform Angle="-90" CenterX="80" CenterY="80"/>
+                                </Path.RenderTransform>
+                            </Path>
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <TextBlock Text="84%" FontSize="40" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding GrowthQuotient, StringFormat={}{0}%}" FontSize="40" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" HorizontalAlignment="Center"/>
                                 <TextBlock Text="{Binding OverallScore, Source={StaticResource Loc}}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
@@ -157,11 +205,42 @@
                                 <TextBlock Text="{Binding WeeklyCompletionDesc, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
                             </StackPanel>
                             <!-- Date Selector -->
-                            <Border HorizontalAlignment="Right" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Padding="12,8">
+                            <Border HorizontalAlignment="Right" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Padding="6,4">
                                 <StackPanel Orientation="Horizontal">
-                                    <Path Data="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" Fill="{DynamicResource TextMutedBrush}" Width="12" Height="12" Margin="0,0,16,0"/>
-                                    <TextBlock Text="10.05.2026 - 17.05.2026" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
-                                    <Path Data="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" Fill="{DynamicResource TextMutedBrush}" Width="12" Height="12" Margin="16,0,0,0"/>
+                                    <Button Command="{Binding PreviousWeekCommand}" Width="32" Height="32" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                        <Path Data="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" Fill="{DynamicResource TextMutedBrush}" Width="12" Height="12" Stretch="Uniform"/>
+                                    </Button>
+                                    
+                                    <TextBlock Text="{Binding WeeklyCompletionDateRange}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" Margin="12,0"/>
+                                    
+                                    <Button Command="{Binding NextWeekCommand}" IsEnabled="{Binding CanNavigateNextWeek}" Width="32" Height="32" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Opacity" Value="1.0"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Opacity" Value="0.3"/>
+                                                        <Setter Property="Cursor" Value="Arrow"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Path Data="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" Fill="{DynamicResource TextMutedBrush}" Width="12" Height="12" Stretch="Uniform"/>
+                                    </Button>
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -182,6 +261,15 @@
                                         </Grid.RowDefinitions>
                                         
                                         <Border Grid.Row="0" Width="16" Height="80" CornerRadius="8" Background="{DynamicResource InputBgBrush}" VerticalAlignment="Bottom" Margin="0,0,0,8">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsFuture}" Value="True">
+                                                            <Setter Property="Visibility" Value="Hidden"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
                                             <Border Width="16" Height="{Binding BarHeight}" 
                                                     CornerRadius="8" Background="{Binding BarColor}" VerticalAlignment="Bottom"/>
                                         </Border>
@@ -332,9 +420,9 @@
                                                 </StackPanel>
                                             </Border>
                                             <Button Grid.Column="4" Content="{Binding ViewStatistics, Source={StaticResource Loc}}" 
-                                                    Command="{Binding DataContext.OpenHabitStatisticsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                    CommandParameter="{Binding Habit}"
-                                                    Background="Transparent" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Right" Cursor="Hand"/>
+                                                     Command="{Binding DataContext.OpenHabitStatisticsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                     CommandParameter="{Binding}"
+                                                     Background="Transparent" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Right" Cursor="Hand"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -347,7 +435,7 @@
     </ScrollViewer>
 
     <!-- Modal Overlay (Habit Statistics) -->
-    <Grid Visibility="{Binding IsStatisticsModalOpen, Converter={StaticResource BoolToVis}}" Panel.ZIndex="999">
+    <Grid Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding IsStatisticsModalOpen, Converter={StaticResource BoolToVis}}" Panel.ZIndex="999">
         <Border Background="#4D000000" />
         <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Margin="0" Padding="32" Width="850" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Border.Effect>
@@ -372,7 +460,7 @@
                         </StackPanel>
                     </StackPanel>
                     
-                    <Button Content="✕" Command="{Binding DataContext.CloseHabitStatisticsCommand, RelativeSource={RelativeSource AncestorType=Grid}}" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMutedBrush}" FontSize="20" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                    <Button Content="✕" Command="{Binding DataContext.CloseHabitStatisticsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMutedBrush}" FontSize="20" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                 </Grid>
 
                 <!-- Content -->
