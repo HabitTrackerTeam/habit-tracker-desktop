@@ -1071,33 +1071,43 @@ namespace HabitTracker.ViewModels{
                 var date = startDate.AddDays(i);
                 bool isCurrentMonth = date.Month == _currentCalendarDate.Month;
                 bool isToday = date.Date == DateTime.Today;
+                bool isFutureDay = date.Date > DateTime.Today;
 
-                DailyScoreCalculator.DailyScoreResult scoreResult;
+                int percentage = -1;
+                string badgeColor, dotColor;
 
-                if (isToday && Habits != null && Habits.Count > 0)
+                if (isFutureDay)
                 {
-                    // TODAY: use in-memory state to guarantee the calendar percentage
-                    // matches the home dashboard exactly (avoids DB race conditions).
-                    var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
-                    scoreResult = DailyScoreCalculator.CalculateFromLiveState(activeHabits, habitTypeMap);
+                    // Future days: no score calculation, no percentage, no colored dot
+                    GetDayColors(-1, false, out badgeColor, out dotColor);
                 }
                 else
                 {
-                    // Historical days: use database logs
-                    var dayLogsList = logsByDate.TryGetValue(date.Date, out var dayLogs) ? dayLogs : new List<HabitLogs>();
-                    scoreResult = DailyScoreCalculator.CalculateDailyScore(date, userHabits, dayLogsList, habitTypeMap);
+                    DailyScoreCalculator.DailyScoreResult scoreResult;
+
+                    if (isToday && Habits != null && Habits.Count > 0)
+                    {
+                        // TODAY: use in-memory state to guarantee the calendar percentage
+                        // matches the home dashboard exactly (avoids DB race conditions).
+                        var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
+                        scoreResult = DailyScoreCalculator.CalculateFromLiveState(activeHabits, habitTypeMap);
+                    }
+                    else
+                    {
+                        // Historical days: use database logs
+                        var dayLogsList = logsByDate.TryGetValue(date.Date, out var dayLogs) ? dayLogs : new List<HabitLogs>();
+                        scoreResult = DailyScoreCalculator.CalculateDailyScore(date, userHabits, dayLogsList, habitTypeMap);
+                    }
+
+                    percentage = scoreResult.PlannedCount > 0 ? scoreResult.Percentage : -1;
+                    GetDayColors(percentage, isToday, out badgeColor, out dotColor);
                 }
-
-                int percentage = scoreResult.PlannedCount > 0 ? scoreResult.Percentage : -1;
-
-                string badgeColor, dotColor;
-                GetDayColors(percentage, isToday, out badgeColor, out dotColor);
 
                 days.Add(new CalendarDayViewModel
                 {
                     Date = date,
                     DayNumber = date.ToString("dd"),
-                    PercentageText = isCurrentMonth && percentage >= 0 ? $"{percentage}%" : "",
+                    PercentageText = isCurrentMonth && !isFutureDay && percentage >= 0 ? $"{percentage}%" : "",
                     IsCurrentMonth = isCurrentMonth,
                     IsToday = isToday,
                     IsSelected = isToday,
