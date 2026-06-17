@@ -13,6 +13,11 @@ namespace HabitTracker.Models{
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public void NotifyDisplayPeriodChanged()
+        {
+            OnPropertyChanged(nameof(DisplayPeriod));
+        }
+
         [PrimaryKey("id", false)] //false bo Supabase sama wygeneruje UUID
         public string Id {get;set;}
 
@@ -274,7 +279,7 @@ namespace HabitTracker.Models{
                     if ((DaysOfWeek & 1) != 0) daysList.Add(loc.SundayShort);
                     
                     if (daysList.Count > 0)
-                        return string.Join(", ", daysList);
+                        return string.Join(" - ", daysList);
                 }
                 
                 // Optional: Localize other periods too, if needed, or leave them.

@@ -448,6 +448,13 @@ namespace HabitTracker.ViewModels{
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Services.LocalizationService.CurrentLanguage))
             {
                 UpdateFilterTranslations();
+                if (Habits != null)
+                {
+                    foreach (var habit in Habits)
+                    {
+                        habit.NotifyDisplayPeriodChanged();
+                    }
+                }
             }
         }
 
