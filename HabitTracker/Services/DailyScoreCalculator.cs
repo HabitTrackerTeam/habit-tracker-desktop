@@ -87,7 +87,7 @@ namespace HabitTracker.Services
 
             var logsByHabitId = (dayLogs ?? Enumerable.Empty<HabitLogs>())
                 .GroupBy(l => l.HabitId)
-                .ToDictionary(g => g.Key, g => g.First());
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(l => l.UpdatedTime).First());
 
             var details = new List<HabitScoreDetail>();
             double totalWeight = 0.0;

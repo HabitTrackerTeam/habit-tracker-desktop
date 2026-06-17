@@ -650,7 +650,7 @@ namespace HabitTracker.ViewModels{
                     }
 
                     var habitLogs = allPeriodLogs.Where(l => l.HabitId == habit.Id).ToList();
-                    var todayLog = habitLogs.FirstOrDefault(l => l.LogDate >= todayStart && l.LogDate < todayEnd);
+                    var todayLog = habitLogs.OrderByDescending(l => l.UpdatedTime).FirstOrDefault(l => l.LogDate >= todayStart && l.LogDate < todayEnd);
 
                     if (todayLog != null)
                     {
@@ -1588,7 +1588,7 @@ namespace HabitTracker.ViewModels{
                         if (!DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
                         scheduledDays++;
 
-                        var log = habitLogs.FirstOrDefault(l => l.LogDate.Date == date.Date);
+                        var log = habitLogs.OrderByDescending(l => l.UpdatedTime).FirstOrDefault(l => l.LogDate.Date == date.Date);
                         if (log != null)
                         {
                             bool done = typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency;
@@ -1605,7 +1605,7 @@ namespace HabitTracker.ViewModels{
                         if (habit.CreatedDate.Date > date.Date) break;
                         if (!DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
 
-                        var log = habitLogs.FirstOrDefault(l => l.LogDate.Date == date.Date);
+                        var log = habitLogs.OrderByDescending(l => l.UpdatedTime).FirstOrDefault(l => l.LogDate.Date == date.Date);
                         bool done = log != null && (typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency);
 
                         if (done) currentStreak++;
@@ -1620,7 +1620,7 @@ namespace HabitTracker.ViewModels{
                         if (habit.CreatedDate.Date > date.Date) continue;
                         if (!DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
 
-                        var log = habitLogs.FirstOrDefault(l => l.LogDate.Date == date.Date);
+                        var log = habitLogs.OrderByDescending(l => l.UpdatedTime).FirstOrDefault(l => l.LogDate.Date == date.Date);
                         bool done = log != null && (typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency);
 
                         if (d < 7) { recent7Total++; if (done) recent7++; }
