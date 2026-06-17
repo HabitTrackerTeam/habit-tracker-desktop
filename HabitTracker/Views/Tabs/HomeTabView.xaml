@@ -29,7 +29,7 @@
             <Setter Property="CornerRadius" Value="16"/>
             <Setter Property="Padding" Value="16"/>
             <Setter Property="Margin" Value="0,0,0,12"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="Effect">
                 <Setter.Value>
@@ -37,6 +37,9 @@
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPartiallyCompleted}" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentGreenBrush}"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsGreenHighlighted}" Value="True">
                     <Setter Property="Background" Value="{DynamicResource HabitCheckedBgBrush}"/>
                     <Setter Property="BorderBrush" Value="{DynamicResource HabitCheckedBorderBrush}"/>
@@ -65,6 +68,77 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <DataTemplate x:Key="HabitItemTemplate">
+            <Border Style="{StaticResource HabitItemStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Width="48" Height="48" Margin="0,0,16,0">
+                        <TextBlock Text="{Binding Icon, FallbackValue=🌱}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="{DynamicResource TextMainBrush}"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextMainBrush}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Period}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
+                            <!-- Progress indicator for weekly/monthly -->
+                            <TextBlock Text="{Binding PeriodProgressText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource AccentGreenBrush}" Margin="8,0,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Period}" Value="weekly">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Period}" Value="monthly">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Period}" Value="Weekly">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Period}" Value="Monthly">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Checkbox Habit Input -->
+                    <CheckBox Grid.Column="2" 
+                                Style="{StaticResource ModernCheckBox}"
+                                IsChecked="{Binding IsCompleted, Mode=TwoWay}"
+                                Visibility="{Binding IsCheckboxType, Converter={StaticResource BoolToVis}}"
+                                VerticalAlignment="Center"/>
+                                
+                    <!-- Numeric/Timer Habit Input -->
+                    <StackPanel Grid.Column="2" 
+                                Orientation="Horizontal" 
+                                VerticalAlignment="Center"
+                                Visibility="{Binding IsNumericOrTimerType, Converter={StaticResource BoolToVis}}">
+                        <Border Background="{DynamicResource InputBgBrush}" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" Width="60" Height="36">
+                            <TextBox Style="{StaticResource CenteredTextBoxStyle}"
+                                        Text="{Binding CurrentProgressText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource TextMainBrush}"/>
+                        </Border>
+                        <TextBlock Text=" / " FontSize="14" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                        <TextBlock Text="{Binding TargetFrequency}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding DisplayUnit}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid Margin="40,32,40,20">
@@ -142,69 +216,57 @@
                         <TextBlock Text="{Binding DashboardHabitsPlaceholder, Source={StaticResource Loc}}" Foreground="#64748B" TextWrapping="Wrap" Margin="0,0,0,16">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Habits.Count}" Value="0">
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding DailyHabits.Count}" Value="0"/>
+                                                <Condition Binding="{Binding WeeklyHabits.Count}" Value="0"/>
+                                                <Condition Binding="{Binding MonthlyHabits.Count}" Value="0"/>
+                                            </MultiDataTrigger.Conditions>
                                             <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
+                                        </MultiDataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
 
-                        <!-- Habit Items -->
-                        <ItemsControl ItemsSource="{Binding Habits}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{StaticResource HabitItemStyle}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Border Grid.Column="0" Background="{DynamicResource InputBgBrush}" CornerRadius="12" Width="48" Height="48" Margin="0,0,16,0">
-                                                <TextBlock Text="{Binding Icon, FallbackValue=🌱}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="{DynamicResource TextMainBrush}"/>
-                                            </Border>
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextMainBrush}"/>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Period}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
-                                                </StackPanel>
-                                            </StackPanel>
-                                            
-                                            <!-- Checkbox Habit Input -->
-                                            <CheckBox Grid.Column="2" 
-                                                      Style="{StaticResource ModernCheckBox}"
-                                                      IsChecked="{Binding IsCompleted, Mode=TwoWay}"
-                                                      Visibility="{Binding IsCheckboxType, Converter={StaticResource BoolToVis}}"
-                                                      VerticalAlignment="Center"/>
-                                                      
-                                            <!-- Numeric/Timer Habit Input -->
-                                            <StackPanel Grid.Column="2" 
-                                                        Orientation="Horizontal" 
-                                                        VerticalAlignment="Center"
-                                                        Visibility="{Binding IsNumericOrTimerType, Converter={StaticResource BoolToVis}}">
-                                                <Border Background="{DynamicResource InputBgBrush}" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" Width="60" Height="36">
-                                                    <TextBox Style="{StaticResource CenteredTextBoxStyle}"
-                                                             Text="{Binding CurrentProgressText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                             Background="Transparent"
-                                                             BorderThickness="0"
-                                                             VerticalContentAlignment="Center"
-                                                             HorizontalContentAlignment="Center"
-                                                             FontSize="14"
-                                                             FontWeight="SemiBold"
-                                                             Foreground="{DynamicResource TextMainBrush}"/>
-                                                </Border>
-                                                <TextBlock Text=" / " FontSize="14" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="4,0,0,0"/>
-                                                <TextBlock Text="{Binding TargetFrequency}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                                <TextBlock Text="{Binding DisplayUnit}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <!-- Daily Habits -->
+                        <ItemsControl ItemsSource="{Binding DailyHabits}" ItemTemplate="{StaticResource HabitItemTemplate}"/>
+
+                        <!-- Weekly Habits Divider -->
+                        <StackPanel Margin="0,16,0,16">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding WeeklyHabits.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <Border Height="1" Background="{DynamicResource InputBorderBrush}" Margin="0,0,0,16"/>
+                            <TextBlock Text="{Binding Get, Source={StaticResource Loc}, ConverterParameter='Tygodniowe|Weekly'}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
+                            <ItemsControl ItemsSource="{Binding WeeklyHabits}" ItemTemplate="{StaticResource HabitItemTemplate}"/>
+                        </StackPanel>
+
+                        <!-- Monthly Habits Divider -->
+                        <StackPanel Margin="0,0,0,16">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MonthlyHabits.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <Border Height="1" Background="{DynamicResource InputBorderBrush}" Margin="0,0,0,16"/>
+                            <TextBlock Text="{Binding Get, Source={StaticResource Loc}, ConverterParameter='Miesięczne|Monthly'}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
+                            <ItemsControl ItemsSource="{Binding MonthlyHabits}" ItemTemplate="{StaticResource HabitItemTemplate}"/>
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- Reflection Section -->
