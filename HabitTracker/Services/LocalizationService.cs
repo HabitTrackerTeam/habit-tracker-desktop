@@ -257,6 +257,8 @@ namespace HabitTracker.Services
         public string SelectedDay => Get("WYBRANY DZIEŃ", "SELECTED DAY");
         public string DailyHabits => Get("Nawyki dnia", "Daily Habits");
         public string Reflections => Get("Refleksje", "Reflections");
+        public string HabitsTitle => Get("Nawyki", "Habits");
+        public string NotesTitle => Get("Notatki", "Notes");
         public string NoReflections => Get("Brak refleksji dla tego dnia.", "No reflections recorded for this day.");
         public string CalDayMonShort => Get("PN", "MON");
         public string CalDayTueShort => Get("WT", "TUE");

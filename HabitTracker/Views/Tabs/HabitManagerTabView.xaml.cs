@@ -358,7 +358,7 @@ namespace HabitTracker.Views.Tabs
                 _dashboardVM.NewHabitPriority = habit.Priority;
                 _dashboardVM.NewHabitFrequency = habit.Period ?? "Daily";
                 _dashboardVM.NewHabitDaysOfWeek = habit.DaysOfWeek;
-                _dashboardVM.NewHabitIcon = habit.Icon ?? "❓";
+                _dashboardVM.NewHabitIcon = string.IsNullOrEmpty(habit.Icon) ? "❓" : habit.Icon;
                 _dashboardVM.NewHabitGoal = habit.TargetFrequency;
                 _dashboardVM.NewHabitUnit = habit.Unit ?? habit.DefaultUnit ?? "count";
                 _dashboardVM.ModalTitle = "Edit Habit";
@@ -419,7 +419,7 @@ namespace HabitTracker.Views.Tabs
                 // Icon Preview
                 if (SelectedIconPreview != null)
                 {
-                    SelectedIconPreview.Text = habit.Icon ?? "❓";
+                    SelectedIconPreview.Text = string.IsNullOrEmpty(habit.Icon) ? "❓" : habit.Icon;
                 }
                 
                 // Frequency RadioButtons
