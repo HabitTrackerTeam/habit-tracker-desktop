@@ -967,9 +967,10 @@ namespace HabitTracker.ViewModels{
 
                 if (EditingHabit != null)
                 {
+                    string iconToSave = NewHabitIcon == "❓" ? "" : NewHabitIcon;
                     EditingHabit.Name = NewHabitName;
                     EditingHabit.HabitTypeId = habitType.Id;
-                    EditingHabit.Icon = NewHabitIcon;
+                    EditingHabit.Icon = iconToSave;
                     EditingHabit.Period = NewHabitFrequency;
                     EditingHabit.TargetFrequency = (int)NewHabitGoal;
                     EditingHabit.DaysOfWeek = NewHabitDaysOfWeek;
@@ -988,7 +989,7 @@ namespace HabitTracker.ViewModels{
                         Name = NewHabitName,
                         HabitTypeId = habitType.Id,
                         UserId = SupabaseService.Client.Auth.CurrentUser.Id,
-                        Icon = NewHabitIcon,
+                        Icon = NewHabitIcon == "❓" ? "" : NewHabitIcon,
                         Period = NewHabitFrequency,
                         TargetFrequency = (int)NewHabitGoal,
                         DaysOfWeek = NewHabitDaysOfWeek,
@@ -1346,25 +1347,52 @@ namespace HabitTracker.ViewModels{
             }
             catch { }
 
-            // 5-tier color scale: Red / Orange / Yellow / Green / Blue
-            if (isDark)
+            if (percentage < 0)
             {
-                if (percentage < 0)       { badgeColor = "#2D2D2D"; dotColor = "Transparent"; } // No habits
-                else if (percentage < 30) { badgeColor = "#4A1A1A"; dotColor = "#E57373"; }    // Red
-                else if (percentage < 50) { badgeColor = "#4A2E1A"; dotColor = "#FF8C42"; }    // Orange
-                else if (percentage < 70) { badgeColor = "#3D3A1A"; dotColor = "#F5C842"; }    // Yellow
-                else if (percentage < 90) { badgeColor = "#1A3D2E"; dotColor = "#66BB6A"; }    // Green
-                else                      { badgeColor = "#1A2D4A"; dotColor = "#64B5F6"; }    // Blue (≥90%)
+                badgeColor = isDark ? "#2A2A2A" : "#E5E7EB";
+                dotColor = isDark ? "#A0A0A0" : "#6B7280"; // Gray text for future days
+                return;
             }
-            else
+
+            dotColor = (percentage >= 25 && percentage <= 70) ? "#374151" : "#FFFFFF"; // Dark text on yellow/orange, white on red/green
+
+            // Snap percentage to nearest 5%
+            percentage = (percentage / 5) * 5;
+
+            // Keyframes for smooth gradient (SLIGHTLY MISTY VIBRANT)
+            // Red -> Orange -> Yellow -> Light Green -> Dark Green
+            (int p, byte r, byte g, byte b)[] lightFrames = {
+                (0,   226,  92,  92), // Misty Red
+                (25,  235, 132,  70), // Misty Orange
+                (50,  224, 186,  67), // Misty Yellow
+                (75,   82, 191, 122), // Misty Light Green
+                (100,  47, 143,  81)  // Misty Dark Green
+            };
+
+            (int p, byte r, byte g, byte b)[] darkFrames = {
+                (0,   189,  64,  64), // Dark Misty Red
+                (25,  196, 103,  49), // Dark Misty Orange
+                (50,  186, 148,  45), // Dark Misty Yellow
+                (75,   46, 148,  83), // Dark Misty Light Green
+                (100,  34, 107,  59)  // Dark Misty Dark Green
+            };
+
+            var frames = isDark ? darkFrames : lightFrames;
+
+            for (int i = 0; i < frames.Length - 1; i++)
             {
-                if (percentage < 0)       { badgeColor = "#F0F2F5"; dotColor = "Transparent"; } // No habits
-                else if (percentage < 30) { badgeColor = "#FFF0F0"; dotColor = "#D32F2F"; }    // Red
-                else if (percentage < 50) { badgeColor = "#FFF4ED"; dotColor = "#E65100"; }    // Orange
-                else if (percentage < 70) { badgeColor = "#FFFFF0"; dotColor = "#F9A825"; }    // Yellow
-                else if (percentage < 90) { badgeColor = "#E6F4EA"; dotColor = "#328A5D"; }    // Green
-                else                      { badgeColor = "#E8F0FE"; dotColor = "#1565C0"; }    // Blue (≥90%)
+                if (percentage >= frames[i].p && percentage <= frames[i+1].p)
+                {
+                    float t = (float)(percentage - frames[i].p) / (frames[i+1].p - frames[i].p);
+                    byte r = (byte)(frames[i].r + t * (frames[i+1].r - frames[i].r));
+                    byte g = (byte)(frames[i].g + t * (frames[i+1].g - frames[i].g));
+                    byte b = (byte)(frames[i].b + t * (frames[i+1].b - frames[i].b));
+                    badgeColor = $"#{r:X2}{g:X2}{b:X2}";
+                    return;
+                }
             }
+
+            badgeColor = $"#{frames[^1].r:X2}{frames[^1].g:X2}{frames[^1].b:X2}";
         }
 
         /// <summary>

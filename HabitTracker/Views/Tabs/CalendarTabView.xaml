@@ -183,34 +183,40 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border>
+                            <Border Background="{Binding BadgeColor}" CornerRadius="12" Margin="6" Height="100" BorderBrush="{DynamicResource InputBgBrush}" BorderThickness="1" Cursor="Hand">
                                 <Border.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
                                                   Command="{Binding DataContext.SelectDayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                   CommandParameter="{Binding}" />
                                 </Border.InputBindings>
                                 <Border.Style>
-                                    <Style TargetType="Border" BasedOn="{StaticResource CalendarDayStyle}">
+                                    <Style TargetType="Border">
                                         <Setter Property="Opacity" Value="1.0" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
                                                 <Setter Property="Opacity" Value="0.3" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                <Setter Property="Background" Value="{DynamicResource AccentGreenBrush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource TextMainBrush}" />
+                                                <Setter Property="BorderThickness" Value="3" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding DayNumber}" HorizontalAlignment="Center">
+                                
+                                <Grid>
+                                    <!-- Day Number (Top Left) -->
+                                    <TextBlock Text="{Binding DayNumber}" 
+                                               HorizontalAlignment="Left" 
+                                               VerticalAlignment="Top" 
+                                               Margin="8,8,0,0" 
+                                               FontSize="14">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
-                                                <Setter Property="FontWeight" Value="Normal" />
+                                                <Setter Property="Foreground" Value="{Binding DotColor}" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Foreground" Value="White" />
                                                         <Setter Property="FontWeight" Value="Bold" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -218,39 +224,30 @@
                                         </TextBlock.Style>
                                     </TextBlock>
                                     
-                                    <!-- Percentage text: color from DotColor via Style setter so IsSelected trigger can override to White -->
-                                    <TextBlock Text="{Binding PercentageText}">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock" BasedOn="{StaticResource DayPercentStyle}">
-                                                <Setter Property="Foreground" Value="{Binding DotColor}" />
+                                    <!-- Center percentage circle -->
+                                    <Border Width="44" Height="44" 
+                                            CornerRadius="22" 
+                                            Background="{DynamicResource CardBgBrush}"
+                                            HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
                                                 <Setter Property="Visibility" Value="Visible" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding PercentageText}" Value="">
                                                         <Setter Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Foreground" Value="White" />
-                                                        <Setter Property="Opacity" Value="0.9" />
-                                                    </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-
-                                    <!-- Dot: color from DotColor via Style setter so IsSelected trigger can override to White -->
-                                    <Ellipse>
-                                        <Ellipse.Style>
-                                            <Style TargetType="Ellipse" BasedOn="{StaticResource DayDotStyle}">
-                                                <Setter Property="Fill" Value="{Binding DotColor}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Fill" Value="White" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Ellipse.Style>
-                                    </Ellipse>
-                                </StackPanel>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding PercentageText}" 
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center" 
+                                                   Foreground="{DynamicResource TextMutedBrush}" 
+                                                   FontWeight="Bold" 
+                                                   FontSize="12" />
+                                    </Border>
+                                </Grid>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -290,8 +287,8 @@
                         <!-- Daily Habits Section -->
                         <StackPanel Margin="0,0,0,40">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
-                                <Path Data="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Margin="0,0,12,0"/>
-                                <TextBlock Text="{Binding DailyHabits, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                                <Path Data="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Stretch="Uniform" Margin="0,0,12,0"/>
+                                <TextBlock Text="{Binding HabitsTitle, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <!-- Dynamic Habit Items -->
@@ -382,8 +379,8 @@
                         <!-- Reflections Section -->
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
-                                <Path Data="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Margin="0,0,12,0"/>
-                                <TextBlock Text="{Binding Reflections, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
+                                <Path Data="M21,2C21,2 21,2 21,2C21,2 21,2 21,2V2.5V3L20,4H19L18.5,4.5L18,5H17L16,6H15C13,8 11.5,10.5 11,13C10,11 8,9.5 6,9C6.34,10 7.03,10.87 8,11.5L4.5,15H3C2,16 1,17.5 1,19V22H4L7,19.5L10.5,16C11.13,16.97 12,17.66 13,18C12.5,16 11,14 13,13C15.5,12.5 18,11 20,9V8L20.5,7.5L21,7V6L21.5,5.5L22,5V4V3C22,2 21.5,2 21,2Z" Fill="{DynamicResource AccentGreenBrush}" Width="18" Height="18" Stretch="Uniform" Margin="0,0,12,0"/>
+                                <TextBlock Text="{Binding NotesTitle, Source={StaticResource Loc}}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
                             
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="16" Padding="24">
