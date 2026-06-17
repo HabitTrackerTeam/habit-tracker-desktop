@@ -71,6 +71,11 @@ namespace HabitTracker.ViewModels
 
             // Determine habit type
             var type = habitTypes.FirstOrDefault(t => t.Id == habit.HabitTypeId);
+            if (type != null)
+            {
+                habit.DisplayTypeName = type.DisplayType;
+                habit.DefaultUnit = type.DefaultUnit;
+            }
             HabitTypeName = type?.DisplayType ?? "Checkbox";
             IsNumericOrTimer = !string.Equals(HabitTypeName, "Checkbox", StringComparison.OrdinalIgnoreCase);
 
@@ -134,27 +139,6 @@ namespace HabitTracker.ViewModels
             }
         }
 
-        /// <summary>
-        /// Checks if a habit is scheduled on a given day of week using the DaysOfWeek bitmask.
-        /// Bitmask: Mon=1, Tue=2, Wed=4, Thu=8, Fri=16, Sat=32, Sun=64
-        /// </summary>
-        public static bool IsScheduledOnDay(Habits habit, DateTime date)
-        {
-            // Map DayOfWeek enum to bitmask position
-            int bit = date.DayOfWeek switch
-            {
-                DayOfWeek.Monday => 64,
-                DayOfWeek.Tuesday => 32,
-                DayOfWeek.Wednesday => 16,
-                DayOfWeek.Thursday => 8,
-                DayOfWeek.Friday => 4,
-                DayOfWeek.Saturday => 2,
-                DayOfWeek.Sunday => 1,
-                _ => 0
-            };
-            return (habit.DaysOfWeek & bit) != 0;
-        }
-
         private void CalculateStreaks(Habits habit, HashSet<DateTime> completedDates)
         {
             // Walk backwards from today through scheduled days
@@ -169,7 +153,7 @@ namespace HabitTracker.ViewModels
             // Iterate from today backwards to habit creation date
             for (var date = today; date >= startDate; date = date.AddDays(-1))
             {
-                if (!IsScheduledOnDay(habit, date)) continue;
+                if (!DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
 
                 // Skip future scheduled days that haven't passed yet (shouldn't happen going backwards from today)
                 if (completedDates.Contains(date))
@@ -209,7 +193,7 @@ namespace HabitTracker.ViewModels
 
             while (scheduledCount < 7 && date >= startDate)
             {
-                if (IsScheduledOnDay(habit, date))
+                if (DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek))
                 {
                     scheduledCount++;
                     if (completedDates.Contains(date))
@@ -244,7 +228,7 @@ namespace HabitTracker.ViewModels
             for (int d = 1; d <= daysInMonth; d++)
             {
                 var date = new DateTime(referenceDate.Year, referenceDate.Month, d);
-                bool isScheduled = IsScheduledOnDay(habit, date) && date >= habit.CreatedDate.Date;
+                bool isScheduled = DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek) && date >= habit.CreatedDate.Date;
                 bool isCompleted = completedDates.Contains(date);
                 bool isFuture = date > DateTime.Today;
 
