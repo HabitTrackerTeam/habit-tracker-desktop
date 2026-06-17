@@ -1608,7 +1608,7 @@ namespace HabitTracker.ViewModels{
                     {
                         Habit = habit,
                         HabitName = habit.Name,
-                        HabitDescription = $"{type?.DisplayType ?? typeName}",
+                        HabitDescription = $"{habitType?.DisplayType ?? typeName}",
                         Consistency = consistency,
                         TrendText = trendText,
                         IsPositiveTrend = trendChange >= 0,
