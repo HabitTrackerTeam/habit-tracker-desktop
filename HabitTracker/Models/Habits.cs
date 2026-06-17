@@ -213,9 +213,11 @@ namespace HabitTracker.Models{
         {
             get
             {
-                if (string.Equals(Period, "daily", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(Period))
+                if (string.Equals(Period, "daily", StringComparison.OrdinalIgnoreCase) || 
+                    string.Equals(Period, "specific", StringComparison.OrdinalIgnoreCase) || 
+                    string.IsNullOrEmpty(Period))
                 {
-                    // For daily, it's just based on today's progress
+                    // For daily/specific, it's just based on today's progress
                     if (IsCheckboxType) return IsCompleted;
                     return CurrentProgress >= TargetFrequency;
                 }
@@ -235,7 +237,9 @@ namespace HabitTracker.Models{
             get
             {
                 // Only applicable to weekly/monthly
-                if (string.Equals(Period, "daily", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(Period))
+                if (string.Equals(Period, "daily", StringComparison.OrdinalIgnoreCase) || 
+                    string.Equals(Period, "specific", StringComparison.OrdinalIgnoreCase) || 
+                    string.IsNullOrEmpty(Period))
                 {
                     return false;
                 }
@@ -246,6 +250,41 @@ namespace HabitTracker.Models{
                 // Otherwise, it's partially completed if it was done *today*
                 if (IsCheckboxType) return IsCompleted;
                 return CurrentProgress > 0;
+            }
+        }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public string DisplayPeriod
+        {
+            get
+            {
+                if (string.Equals(Period, "specific", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (DaysOfWeek == 0) return Period;
+                    
+                    var loc = HabitTracker.Services.LocalizationService.Instance;
+                    var daysList = new System.Collections.Generic.List<string>();
+                    
+                    if ((DaysOfWeek & 64) != 0) daysList.Add(loc.MondayShort);
+                    if ((DaysOfWeek & 32) != 0) daysList.Add(loc.TuesdayShort);
+                    if ((DaysOfWeek & 16) != 0) daysList.Add(loc.WednesdayShort);
+                    if ((DaysOfWeek & 8) != 0) daysList.Add(loc.ThursdayShort);
+                    if ((DaysOfWeek & 4) != 0) daysList.Add(loc.FridayShort);
+                    if ((DaysOfWeek & 2) != 0) daysList.Add(loc.SaturdayShort);
+                    if ((DaysOfWeek & 1) != 0) daysList.Add(loc.SundayShort);
+                    
+                    if (daysList.Count > 0)
+                        return string.Join(", ", daysList);
+                }
+                
+                // Optional: Localize other periods too, if needed, or leave them.
+                // Right now Period is stored as "daily", "weekly", "monthly".
+                var locSvc = HabitTracker.Services.LocalizationService.Instance;
+                if (string.Equals(Period, "daily", StringComparison.OrdinalIgnoreCase)) return locSvc.FreqDaily;
+                if (string.Equals(Period, "weekly", StringComparison.OrdinalIgnoreCase)) return locSvc.FreqWeekly;
+                if (string.Equals(Period, "monthly", StringComparison.OrdinalIgnoreCase)) return locSvc.FreqMonthly;
+
+                return Period;
             }
         }
 

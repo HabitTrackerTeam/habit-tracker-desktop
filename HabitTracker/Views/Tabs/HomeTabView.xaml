@@ -38,7 +38,7 @@
             </Setter>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsPartiallyCompleted}" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource AccentGreenBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource HabitCheckedBorderBrush}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsGreenHighlighted}" Value="True">
                     <Setter Property="Background" Value="{DynamicResource HabitCheckedBgBrush}"/>
@@ -83,7 +83,7 @@
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextMainBrush}"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Period}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
+                            <TextBlock Text="{Binding DisplayPeriod}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
                             <!-- Progress indicator for weekly/monthly -->
                             <TextBlock Text="{Binding PeriodProgressText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource AccentGreenBrush}" Margin="8,0,0,0">
                                 <TextBlock.Style>
@@ -232,10 +232,23 @@
                         </TextBlock>
 
                         <!-- Daily Habits -->
-                        <ItemsControl ItemsSource="{Binding DailyHabits}" ItemTemplate="{StaticResource HabitItemTemplate}"/>
+                        <StackPanel Margin="0,0,0,16">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DailyHabits.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text="{Binding TodaySection, Source={StaticResource Loc}}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
+                            <ItemsControl ItemsSource="{Binding DailyHabits}" ItemTemplate="{StaticResource HabitItemTemplate}"/>
+                        </StackPanel>
 
                         <!-- Weekly Habits Divider -->
-                        <StackPanel Margin="0,16,0,16">
+                        <StackPanel Margin="0,0,0,16">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Visible"/>
@@ -247,7 +260,7 @@
                                 </Style>
                             </StackPanel.Style>
                             <Border Height="1" Background="{DynamicResource InputBorderBrush}" Margin="0,0,0,16"/>
-                            <TextBlock Text="{Binding Get, Source={StaticResource Loc}, ConverterParameter='Tygodniowe|Weekly'}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
+                            <TextBlock Text="{Binding ThisWeekSection, Source={StaticResource Loc}}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
                             <ItemsControl ItemsSource="{Binding WeeklyHabits}" ItemTemplate="{StaticResource HabitItemTemplate}"/>
                         </StackPanel>
 
@@ -264,7 +277,7 @@
                                 </Style>
                             </StackPanel.Style>
                             <Border Height="1" Background="{DynamicResource InputBorderBrush}" Margin="0,0,0,16"/>
-                            <TextBlock Text="{Binding Get, Source={StaticResource Loc}, ConverterParameter='Miesięczne|Monthly'}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
+                            <TextBlock Text="{Binding ThisMonthSection, Source={StaticResource Loc}}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12"/>
                             <ItemsControl ItemsSource="{Binding MonthlyHabits}" ItemTemplate="{StaticResource HabitItemTemplate}"/>
                         </StackPanel>
                     </StackPanel>
