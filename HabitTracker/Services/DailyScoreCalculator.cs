@@ -103,6 +103,10 @@ namespace HabitTracker.Services
                 // Flexible habits ("3× per week") are EXCLUDED from daily scoring
                 if (habit.IsFlexible) continue;
 
+                // Weekly and Monthly habits are EXCLUDED from daily scoring
+                if (string.Equals(habit.Period, "weekly", StringComparison.OrdinalIgnoreCase) || 
+                    string.Equals(habit.Period, "monthly", StringComparison.OrdinalIgnoreCase)) continue;
+
                 // Check day-of-week schedule (mask == 0 means "every day")
                 if (!IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
 

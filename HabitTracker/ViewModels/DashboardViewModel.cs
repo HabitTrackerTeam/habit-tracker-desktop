@@ -27,6 +27,10 @@ namespace HabitTracker.ViewModels{
         //Lista automatycznie odswiezajaca XAML, gdy pojawia sie w niej nowe dane
         private ObservableCollection<Habits> _habits = new ObservableCollection<Habits>();
 
+        public ObservableCollection<Habits> DailyHabits { get; set; } = new ObservableCollection<Habits>();
+        public ObservableCollection<Habits> WeeklyHabits { get; set; } = new ObservableCollection<Habits>();
+        public ObservableCollection<Habits> MonthlyHabits { get; set; } = new ObservableCollection<Habits>();
+
         public ObservableCollection<HabitTypes> HabitTypes {get;set;} = new();
         public ObservableCollection<Colors> Colors {get;set;} = new();
         
@@ -366,6 +370,8 @@ namespace HabitTracker.ViewModels{
         public ICommand OpenHabitStatisticsCommand { get; }
         public ICommand CloseHabitStatisticsCommand { get; }
 
+        private DispatcherTimer _midnightTimer;
+
         public DashboardViewModel()
         {
             PreviousMonthCommand = new RelayCommand(_ => ChangeMonth(-1));
@@ -389,6 +395,8 @@ namespace HabitTracker.ViewModels{
             timer.Tick += (s, e) => UpdateTodayDate();
             timer.Start();
 
+            SetupMidnightTimer();
+
             // Subscribe to theme changes to refresh calendar color dots
             HabitTracker.MainWindow.ThemeChanged += OnThemeChanged;
             
@@ -396,11 +404,57 @@ namespace HabitTracker.ViewModels{
             Services.LocalizationService.Instance.PropertyChanged += OnLocalizationPropertyChanged;
         }
 
+        private void SetupMidnightTimer()
+        {
+            _midnightTimer = new DispatcherTimer();
+            _midnightTimer.Interval = GetTimeUntilMidnight();
+            _midnightTimer.Tick += OnMidnight;
+            _midnightTimer.Start();
+        }
+
+        private TimeSpan GetTimeUntilMidnight()
+        {
+            return DateTime.Today.AddDays(1) - DateTime.Now;
+        }
+
+        private async void OnMidnight(object sender, EventArgs e)
+        {
+            // Stop the timer and restart it for the next day
+            _midnightTimer.Stop();
+            _midnightTimer.Interval = GetTimeUntilMidnight();
+            _midnightTimer.Start();
+
+            await ResetHabits();
+        }
+
+        private async Task ResetHabits()
+        {
+            var allHabits = DailyHabits.Concat(WeeklyHabits).Concat(MonthlyHabits);
+            foreach (var habit in allHabits)
+            {
+                habit.IsCompleted = false;
+                habit.CurrentProgress = 0;
+                // We do NOT reset PeriodProgress here. It will be recalculated
+                // correctly upon next Initialization (or we could just leave it,
+                // and it will naturally reset when the week/month boundaries are crossed during a reload).
+            }
+
+            // Reload habits to apply daily logic
+            await LoadHabitsAsync();
+        }
+
         private void OnLocalizationPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Services.LocalizationService.CurrentLanguage))
             {
                 UpdateFilterTranslations();
+                if (Habits != null)
+                {
+                    foreach (var habit in Habits)
+                    {
+                        habit.NotifyDisplayPeriodChanged();
+                    }
+                }
             }
         }
 
@@ -554,19 +608,31 @@ namespace HabitTracker.ViewModels{
                     HabitTypes.Add(new HabitTypes { Id = "dc75347f-83a0-42b6-a824-e3ac7428fae5", Type = "checkbox", DisplayType = "Checkbox", RequiresValue = false, DefaultUnit = null });
                 }
 
-                List<HabitLogs> todayLogs = new List<HabitLogs>();
+                var todayStart = DateTime.UtcNow.Date;
+                var todayEnd = todayStart.AddDays(1);
+
+                // Calculate week start (assuming Monday)
+                int diff = (7 + (todayStart.DayOfWeek - DayOfWeek.Monday)) % 7;
+                var weekStart = todayStart.AddDays(-1 * diff);
+                var weekEnd = weekStart.AddDays(7);
+
+                // Calculate month start
+                var monthStart = new DateTime(todayStart.Year, todayStart.Month, 1);
+                var monthEnd = monthStart.AddMonths(1);
+
+                var earliestStart = weekStart < monthStart ? weekStart : monthStart;
+
+                List<HabitLogs> allPeriodLogs = new List<HabitLogs>();
                 try
                 {
-                    var todayStart = DateTime.UtcNow.Date;
-                    var todayEnd = todayStart.AddDays(1);
                     var logsResponse = await SupabaseService.Client.From<HabitLogs>()
-                        .Filter("log_date", Constants.Operator.GreaterThanOrEqual, todayStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                        .Filter("log_date", Constants.Operator.GreaterThanOrEqual, earliestStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
                         .Filter("log_date", Constants.Operator.LessThan, todayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
                         .Order("created_date", Constants.Ordering.Descending)
                         .Get();
                     if (logsResponse.Models != null)
                     {
-                        todayLogs = logsResponse.Models;
+                        allPeriodLogs = logsResponse.Models;
                     }
                 }
                 catch (Exception logEx)
@@ -583,16 +649,40 @@ namespace HabitTracker.ViewModels{
                         habit.DefaultUnit = type.DefaultUnit;
                     }
 
-                    var log = todayLogs.FirstOrDefault(l => l.HabitId == habit.Id);
-                    if (log != null)
+                    var habitLogs = allPeriodLogs.Where(l => l.HabitId == habit.Id).ToList();
+                    var todayLog = habitLogs.FirstOrDefault(l => l.LogDate >= todayStart && l.LogDate < todayEnd);
+
+                    if (todayLog != null)
                     {
-                        habit.IsCompleted = log.IsCompleted;
-                        habit.CurrentProgress = log.NumericValue;
+                        habit.IsCompleted = todayLog.IsCompleted;
+                        habit.CurrentProgress = todayLog.NumericValue;
                     }
                     else
                     {
                         habit.IsCompleted = false;
                         habit.CurrentProgress = 0;
+                    }
+
+                    // Calculate Period Progress
+                    if (string.Equals(habit.Period, "weekly", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var weeklyLogs = habitLogs.Where(l => l.LogDate >= weekStart && l.LogDate < weekEnd).ToList();
+                        if (habit.IsCheckboxType)
+                            habit.PeriodProgress = weeklyLogs.Count(l => l.IsCompleted);
+                        else
+                            habit.PeriodProgress = weeklyLogs.Sum(l => l.NumericValue);
+                    }
+                    else if (string.Equals(habit.Period, "monthly", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var monthlyLogs = habitLogs.Where(l => l.LogDate >= monthStart && l.LogDate < monthEnd).ToList();
+                        if (habit.IsCheckboxType)
+                            habit.PeriodProgress = monthlyLogs.Count(l => l.IsCompleted);
+                        else
+                            habit.PeriodProgress = monthlyLogs.Sum(l => l.NumericValue);
+                    }
+                    else
+                    {
+                        habit.PeriodProgress = habit.CurrentProgress;
                     }
 
                     // Wire up PropertyChanged to save progress to DB
@@ -601,17 +691,46 @@ namespace HabitTracker.ViewModels{
                 }
 
                 Habits = new ObservableCollection<Habits>(habitsList);
+
+                // Populate segregated collections for the Home view
+                DailyHabits.Clear();
+                WeeklyHabits.Clear();
+                MonthlyHabits.Clear();
+
+                foreach (var h in habitsList)
+                {
+                    if (h.IsArchived) continue;
+
+                    if (string.Equals(h.Period, "weekly", StringComparison.OrdinalIgnoreCase))
+                    {
+                        WeeklyHabits.Add(h);
+                    }
+                    else if (string.Equals(h.Period, "monthly", StringComparison.OrdinalIgnoreCase))
+                    {
+                        MonthlyHabits.Add(h);
+                    }
+                    else
+                    {
+                        // Daily or Flexible
+                        // For non-flexible daily, it must be scheduled for today
+                        if (h.IsFlexible || DailyScoreCalculator.IsScheduledForDay(h.DaysOfWeek, DateTime.Today.DayOfWeek))
+                        {
+                            DailyHabits.Add(h);
+                        }
+                    }
+                }
+                OnPropertyChanged(nameof(DailyHabits));
+                OnPropertyChanged(nameof(WeeklyHabits));
+                OnPropertyChanged(nameof(MonthlyHabits));
                 
-                // Default view used by HomeTab (only show active habits scheduled for today)
+                // Default view used by Habit Manager (if any) or old UI
                 var defaultView = CollectionViewSource.GetDefaultView(Habits);
                 defaultView.Filter = (obj) => 
                 {
                     if (obj is Habits h)
                     {
                         if (h.IsArchived) return false;
-                        // Flexible habits are always shown (user decides when to do them)
                         if (h.IsFlexible) return true;
-                        // Hide habits not scheduled for today
                         if (!DailyScoreCalculator.IsScheduledForDay(h.DaysOfWeek, DateTime.Today.DayOfWeek)) return false;
                         return true;
                     }
@@ -666,9 +785,58 @@ namespace HabitTracker.ViewModels{
             if (sender is Habits habit && (e.PropertyName == nameof(habit.IsCompleted) || e.PropertyName == nameof(habit.CurrentProgress)))
             {
                 await SaveHabitLogAsync(habit);
+                
+                // Optimistically update PeriodProgress without reloading from DB
+                if (string.Equals(habit.Period, "weekly", StringComparison.OrdinalIgnoreCase) || 
+                    string.Equals(habit.Period, "monthly", StringComparison.OrdinalIgnoreCase))
+                {
+                    // To do this perfectly we should reload logs.
+                    // But an optimistic update works for simple cases. 
+                    // However, we just trigger a full refresh in background to be safe.
+                    _ = Task.Run(async () => {
+                        await App.Current.Dispatcher.InvokeAsync(async () => {
+                            await RecalculatePeriodProgress(habit);
+                        });
+                    });
+                }
+                else
+                {
+                    habit.PeriodProgress = habit.CurrentProgress;
+                }
+
                 RecalculateDailyProgress();
                 _ = GenerateCalendarAsync(); // Keep calendar in sync with home
             }
+        }
+
+        private async Task RecalculatePeriodProgress(Habits habit)
+        {
+            // Simple logic: fetch this week's / month's logs for this specific habit to update its period progress
+            var todayStart = DateTime.UtcNow.Date;
+            var todayEnd = todayStart.AddDays(1);
+            int diff = (7 + (todayStart.DayOfWeek - DayOfWeek.Monday)) % 7;
+            var weekStart = todayStart.AddDays(-1 * diff);
+            var monthStart = new DateTime(todayStart.Year, todayStart.Month, 1);
+            
+            var start = string.Equals(habit.Period, "monthly", StringComparison.OrdinalIgnoreCase) ? monthStart : weekStart;
+
+            try
+            {
+                var logsResponse = await SupabaseService.Client.From<HabitLogs>()
+                    .Filter("habit_id", Constants.Operator.Equals, habit.Id)
+                    .Filter("log_date", Constants.Operator.GreaterThanOrEqual, start.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Filter("log_date", Constants.Operator.LessThan, todayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                    .Get();
+                
+                if (logsResponse.Models != null)
+                {
+                    if (habit.IsCheckboxType)
+                        habit.PeriodProgress = logsResponse.Models.Count(l => l.IsCompleted);
+                    else
+                        habit.PeriodProgress = logsResponse.Models.Sum(l => l.NumericValue);
+                }
+            }
+            catch { /* Ignore errors during optimistic update */ }
         }
 
         public async Task SaveHabitLogAsync(Habits habit)
@@ -1373,7 +1541,7 @@ namespace HabitTracker.ViewModels{
 
                 foreach (var habit in userHabits)
                 {
-                    habitTypeMap.TryGetValue(habit.HabitTypeId, out var habitType);
+                    habitTypeMap.TryGetValue(habit.HabitTypeId ?? "", out var habitType);
                     if (habitType != null)
                     {
                         habit.DisplayTypeName = habitType.DisplayType;

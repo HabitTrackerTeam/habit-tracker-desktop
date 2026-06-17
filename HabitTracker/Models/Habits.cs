@@ -13,6 +13,11 @@ namespace HabitTracker.Models{
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public void NotifyDisplayPeriodChanged()
+        {
+            OnPropertyChanged(nameof(DisplayPeriod));
+        }
+
         [PrimaryKey("id", false)] //false bo Supabase sama wygeneruje UUID
         public string Id {get;set;}
 
@@ -106,6 +111,7 @@ namespace HabitTracker.Models{
                     _isCompleted = value; 
                     OnPropertyChanged(); 
                     OnPropertyChanged(nameof(IsGreenHighlighted)); 
+                    OnPropertyChanged(nameof(IsPartiallyCompleted)); 
                 }
             }
         }
@@ -123,9 +129,32 @@ namespace HabitTracker.Models{
                     OnPropertyChanged(); 
                     OnPropertyChanged(nameof(CurrentProgressText));
                     OnPropertyChanged(nameof(IsGreenHighlighted)); 
+                    OnPropertyChanged(nameof(IsPartiallyCompleted)); 
                 }
             }
         }
+
+        private double _periodProgress;
+        [Newtonsoft.Json.JsonIgnore]
+        public double PeriodProgress
+        {
+            get => _periodProgress;
+            set
+            {
+                if (_periodProgress != value)
+                {
+                    _periodProgress = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(PeriodProgressText));
+                    OnPropertyChanged(nameof(IsGreenHighlighted));
+                    OnPropertyChanged(nameof(IsPartiallyCompleted));
+                    OnPropertyChanged(nameof(IsPeriodCompleted));
+                }
+            }
+        }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public string PeriodProgressText => $"{PeriodProgress}/{TargetFrequency} {(TargetFrequency == 1 ? "" : (IsCheckboxType ? "dni" : DisplayUnit))}".Trim();
 
         [Newtonsoft.Json.JsonIgnore]
         public string CurrentProgressText
@@ -157,6 +186,7 @@ namespace HabitTracker.Models{
                 OnPropertyChanged(nameof(IsCheckboxType));
                 OnPropertyChanged(nameof(IsNumericOrTimerType));
                 OnPropertyChanged(nameof(IsGreenHighlighted));
+                OnPropertyChanged(nameof(PeriodProgressText));
             }
         }
 
@@ -170,6 +200,7 @@ namespace HabitTracker.Models{
                 _defaultUnit = value; 
                 OnPropertyChanged(); 
                 OnPropertyChanged(nameof(DisplayUnit)); 
+                OnPropertyChanged(nameof(PeriodProgressText));
             }
         }
 
@@ -183,18 +214,91 @@ namespace HabitTracker.Models{
         public bool IsNumericOrTimerType => !IsCheckboxType;
 
         [Newtonsoft.Json.JsonIgnore]
+        public bool IsPeriodCompleted
+        {
+            get
+            {
+                if (string.Equals(Period, "daily", StringComparison.OrdinalIgnoreCase) || 
+                    string.Equals(Period, "specific", StringComparison.OrdinalIgnoreCase) || 
+                    string.IsNullOrEmpty(Period))
+                {
+                    // For daily/specific, it's just based on today's progress
+                    if (IsCheckboxType) return IsCompleted;
+                    return CurrentProgress >= TargetFrequency;
+                }
+                else
+                {
+                    // For weekly/monthly, based on period progress
+                    // But if TargetFrequency is 0 or 1, maybe just simple logic
+                    if (TargetFrequency <= 0) return PeriodProgress > 0;
+                    return PeriodProgress >= TargetFrequency;
+                }
+            }
+        }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public bool IsPartiallyCompleted
+        {
+            get
+            {
+                // Only applicable to weekly/monthly
+                if (string.Equals(Period, "daily", StringComparison.OrdinalIgnoreCase) || 
+                    string.Equals(Period, "specific", StringComparison.OrdinalIgnoreCase) || 
+                    string.IsNullOrEmpty(Period))
+                {
+                    return false;
+                }
+
+                // If fully completed for the period, it's not "partially" completed
+                if (IsPeriodCompleted) return false;
+
+                // Otherwise, it's partially completed if it was done *today*
+                if (IsCheckboxType) return IsCompleted;
+                return CurrentProgress > 0;
+            }
+        }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public string DisplayPeriod
+        {
+            get
+            {
+                if (string.Equals(Period, "specific", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (DaysOfWeek == 0) return Period;
+                    
+                    var loc = HabitTracker.Services.LocalizationService.Instance;
+                    var daysList = new System.Collections.Generic.List<string>();
+                    
+                    if ((DaysOfWeek & 64) != 0) daysList.Add(loc.MondayShort);
+                    if ((DaysOfWeek & 32) != 0) daysList.Add(loc.TuesdayShort);
+                    if ((DaysOfWeek & 16) != 0) daysList.Add(loc.WednesdayShort);
+                    if ((DaysOfWeek & 8) != 0) daysList.Add(loc.ThursdayShort);
+                    if ((DaysOfWeek & 4) != 0) daysList.Add(loc.FridayShort);
+                    if ((DaysOfWeek & 2) != 0) daysList.Add(loc.SaturdayShort);
+                    if ((DaysOfWeek & 1) != 0) daysList.Add(loc.SundayShort);
+                    
+                    if (daysList.Count > 0)
+                        return string.Join(" - ", daysList);
+                }
+                
+                // Optional: Localize other periods too, if needed, or leave them.
+                // Right now Period is stored as "daily", "weekly", "monthly".
+                var locSvc = HabitTracker.Services.LocalizationService.Instance;
+                if (string.Equals(Period, "daily", StringComparison.OrdinalIgnoreCase)) return locSvc.FreqDaily;
+                if (string.Equals(Period, "weekly", StringComparison.OrdinalIgnoreCase)) return locSvc.FreqWeekly;
+                if (string.Equals(Period, "monthly", StringComparison.OrdinalIgnoreCase)) return locSvc.FreqMonthly;
+
+                return Period;
+            }
+        }
+
+        [Newtonsoft.Json.JsonIgnore]
         public bool IsGreenHighlighted
         {
             get
             {
-                if (IsCheckboxType)
-                {
-                    return IsCompleted;
-                }
-                else
-                {
-                    return CurrentProgress >= TargetFrequency;
-                }
+                return IsPeriodCompleted;
             }
         }
     }
