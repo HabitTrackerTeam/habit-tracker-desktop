@@ -1541,8 +1541,13 @@ namespace HabitTracker.ViewModels{
 
                 foreach (var habit in userHabits)
                 {
-                    habitTypeMap.TryGetValue(habit.HabitTypeId ?? "", out var type);
-                    var typeName = type?.Type?.ToLower() ?? "checkbox";
+                    habitTypeMap.TryGetValue(habit.HabitTypeId ?? "", out var habitType);
+                    if (habitType != null)
+                    {
+                        habit.DisplayTypeName = habitType.DisplayType;
+                        habit.DefaultUnit = habitType.DefaultUnit;
+                    }
+                    var typeName = habitType?.Type?.ToLower() ?? "checkbox";
                     logsByHabit.TryGetValue(habit.Id, out var habitLogs);
                     habitLogs ??= new List<HabitLogs>();
 

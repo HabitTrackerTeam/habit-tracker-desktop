@@ -123,7 +123,7 @@
                         <!-- Circular Score -->
                         <Grid HorizontalAlignment="Right" Width="160" Height="160">
                             <Ellipse Stroke="{DynamicResource InputBgBrush}" StrokeThickness="16"/>
-                            <Path Stroke="{DynamicResource AccentGreenBrush}" StrokeThickness="16" StrokeStartLineCap="Round" 
+                            <Path Stroke="{DynamicResource AccentGreenBrush}" StrokeThickness="16" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   Data="M 80,80 m 0,-64 a 64,64 0 1 1 0,128 a 64,64 0 1 1 0,-128" 
                                   StrokeDashArray="{Binding GrowthQuotientDashArray}" Opacity="1">
                                 <Path.Style>
@@ -309,8 +309,8 @@
                                             <!-- Mini Progress Bar -->
                                             <Grid Height="6" Background="{DynamicResource InputBgBrush}" Margin="0,0,32,0"  VerticalAlignment="Center">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="{Binding CompletionPercentage, StringFormat={}{0}*}" />
-                                                    <ColumnDefinition Width="100*" />
+                                                    <ColumnDefinition Width="{Binding CompletionGridLength}" />
+                                                    <ColumnDefinition Width="{Binding InverseCompletionGridLength}" />
                                                 </Grid.ColumnDefinitions>
                                                 <Border Grid.Column="0" CornerRadius="3" Background="{Binding IconFgColor}"/>
                                             </Grid>
@@ -477,7 +477,7 @@
                         <UniformGrid Columns="2" Margin="0,0,0,16">
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,8,0">
                                 <StackPanel>
-                                    <Path Data="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10-4.48 10-10S17.52,2 12,2zm1,15h-2v-2h2v2zm0-4h-2V7h2v6z" Fill="#F59E0B" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                                    <Path Data="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z" Fill="#F97316" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                                     <TextBlock Text="{Binding CurrentStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                                     <TextBlock Text="{Binding CurrentStreakLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
@@ -485,7 +485,7 @@
 
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="8,0,0,0">
                                 <StackPanel>
-                                    <Path Data="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z" Fill="#818CF8" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                                    <Path Data="M18 2H6v2H2v6c0 3.31 2.69 6 6 6h1.22c.81 1.45 2.16 2.52 3.78 2.87V21H9v2h6v-2h-4v-2.13c1.62-.35 2.97-1.42 3.78-2.87H16c3.31 0 6-2.69 6-6V4h-4V2zM4 10V6h2v4c0 2.21-1.79 4-4 4zm14 0c0-2.21 1.79-4 4-4v4c0 2.21 1.79 4-4 4z" Fill="#F59E0B" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8" Stretch="Uniform"/>
                                     <TextBlock Text="{Binding LongestStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                                     <TextBlock Text="{Binding LongestStreakLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
@@ -493,7 +493,7 @@
                         </UniformGrid>
 
                         <!-- Weekly Success -->
-                        <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,16,0">
+                        <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
                             <StackPanel>
                                 <Grid Margin="0,0,0,12">
                                     <TextBlock Text="{Binding WeeklySuccessLabel, Source={StaticResource Loc}}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>

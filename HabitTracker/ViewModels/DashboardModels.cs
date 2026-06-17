@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Media;
 
 namespace HabitTracker.ViewModels
@@ -19,6 +20,10 @@ namespace HabitTracker.ViewModels
         public Brush IconBgColor { get; set; }
         public Brush IconFgColor { get; set; }
         public string IconPath { get; set; }
+        public int InverseCompletionPercentage => 100 - CompletionPercentage;
+
+        public GridLength CompletionGridLength => new GridLength(CompletionPercentage, GridUnitType.Star);
+        public GridLength InverseCompletionGridLength => new GridLength(100 - CompletionPercentage, GridUnitType.Star);
     }
 
     public class MilestoneViewModel
