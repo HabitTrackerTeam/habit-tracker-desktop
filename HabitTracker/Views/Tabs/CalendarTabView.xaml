@@ -96,71 +96,7 @@
                 <TextBlock Text="{Binding CurrentProtocolText}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
 
-            <!-- View Toggle -->
-            <Border Grid.Row="2" Background="{DynamicResource InputBgBrush}" CornerRadius="12" HorizontalAlignment="Right" Padding="4" Margin="0,0,0,32">
-                <StackPanel Orientation="Horizontal">
-                    <Button Command="{Binding SetMonthlyViewCommand}" BorderThickness="0" Cursor="Hand" Background="Transparent" Padding="0">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border CornerRadius="8" Padding="16,8" Background="{TemplateBinding Background}">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsMonthlyView}" Value="True">
-                                                    <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock Text="{Binding MonthlyView, Source={StaticResource Loc}}" FontWeight="SemiBold">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsMonthlyView}" Value="True">
-                                                        <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </Border>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
-                    <Button Command="{Binding SetWeeklyViewCommand}" BorderThickness="0" Cursor="Hand" Background="Transparent" Padding="0">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border CornerRadius="8" Padding="16,8" Background="{TemplateBinding Background}">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsMonthlyView}" Value="False">
-                                                    <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock Text="{Binding WeeklyView, Source={StaticResource Loc}}" FontWeight="SemiBold">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsMonthlyView}" Value="False">
-                                                        <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </Border>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
-                </StackPanel>
-            </Border>
+
 
             <!-- Days of Week Headers -->
             <UniformGrid Grid.Row="3" Columns="7" Margin="0,0,0,16">
