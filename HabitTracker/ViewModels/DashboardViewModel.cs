@@ -608,7 +608,7 @@ namespace HabitTracker.ViewModels{
                     HabitTypes.Add(new HabitTypes { Id = "dc75347f-83a0-42b6-a824-e3ac7428fae5", Type = "checkbox", DisplayType = "Checkbox", RequiresValue = false, DefaultUnit = null });
                 }
 
-                var todayStart = DateTime.UtcNow.Date;
+                var todayStart = DateTime.Today;
                 var todayEnd = todayStart.AddDays(1);
 
                 // Calculate week start (assuming Monday)
@@ -812,7 +812,7 @@ namespace HabitTracker.ViewModels{
         private async Task RecalculatePeriodProgress(Habits habit)
         {
             // Simple logic: fetch this week's / month's logs for this specific habit to update its period progress
-            var todayStart = DateTime.UtcNow.Date;
+            var todayStart = DateTime.Today;
             var todayEnd = todayStart.AddDays(1);
             int diff = (7 + (todayStart.DayOfWeek - DayOfWeek.Monday)) % 7;
             var weekStart = todayStart.AddDays(-1 * diff);
@@ -846,7 +846,7 @@ namespace HabitTracker.ViewModels{
 
             try
             {
-                var todayStart = DateTime.UtcNow.Date;
+                var todayStart = DateTime.Today;
                 var todayEnd = todayStart.AddDays(1);
                 
                 var logsResponse = await SupabaseService.Client.From<HabitLogs>()

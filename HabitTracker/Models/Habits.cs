@@ -112,6 +112,24 @@ namespace HabitTracker.Models{
                     OnPropertyChanged(); 
                     OnPropertyChanged(nameof(IsGreenHighlighted)); 
                     OnPropertyChanged(nameof(IsPartiallyCompleted)); 
+                    OnPropertyChanged(nameof(IsCheckedInUI)); 
+                }
+            }
+        }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public bool IsCheckedInUI
+        {
+            get
+            {
+                if (IsPeriodCompleted) return true;
+                return IsCompleted;
+            }
+            set
+            {
+                if (IsCompleted != value)
+                {
+                    IsCompleted = value;
                 }
             }
         }
@@ -149,6 +167,7 @@ namespace HabitTracker.Models{
                     OnPropertyChanged(nameof(IsGreenHighlighted));
                     OnPropertyChanged(nameof(IsPartiallyCompleted));
                     OnPropertyChanged(nameof(IsPeriodCompleted));
+                    OnPropertyChanged(nameof(IsCheckedInUI));
                 }
             }
         }
