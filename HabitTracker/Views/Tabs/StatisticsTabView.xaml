@@ -43,19 +43,7 @@
                 <TextBlock Text="{Binding ViewProgressAchievements, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
             </StackPanel>
             
-            <Button Grid.Column="1" VerticalAlignment="Top" Background="{DynamicResource AccentGreenBrush}" Foreground="White" FontWeight="Bold" FontSize="16" BorderThickness="0" Padding="24,14" Height="52" Cursor="Hand">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="12" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
-                <StackPanel Orientation="Horizontal">
-                    <Path Data="M19,12V19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19M12.5,3L15.03,5.53L10.5,10.06L11.94,11.5L16.47,6.97L19,9.5V3H12.5Z" Fill="White" Width="18" Height="18" Margin="0,0,8,0" Stretch="Uniform"/>
-                    <TextBlock Text="{Binding ExportToPdf, Source={StaticResource Loc}}" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Button>
+
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">

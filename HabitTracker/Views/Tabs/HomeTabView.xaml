@@ -112,7 +112,7 @@
                     <!-- Checkbox Habit Input -->
                     <CheckBox Grid.Column="2" 
                                 Style="{StaticResource ModernCheckBox}"
-                                IsChecked="{Binding IsCompleted, Mode=TwoWay}"
+                                IsChecked="{Binding IsCheckedInUI, Mode=TwoWay}"
                                 Visibility="{Binding IsCheckboxType, Converter={StaticResource BoolToVis}}"
                                 VerticalAlignment="Center"/>
                                 
