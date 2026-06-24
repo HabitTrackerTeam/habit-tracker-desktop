@@ -25,11 +25,25 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="40,32,40,20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <Grid Margin="40,32,40,20">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsStatisticsModalOpen}" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="15" KernelType="Gaussian" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
         <!-- Header Section -->
         <Grid Grid.Row="0" Margin="0,0,0,24" MinHeight="60">
@@ -421,9 +435,10 @@
             </StackPanel>
         </StackPanel>
     </ScrollViewer>
+    </Grid>
 
     <!-- Modal Overlay (Habit Statistics) -->
-    <Grid Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding IsStatisticsModalOpen, Converter={StaticResource BoolToVis}}" Panel.ZIndex="999">
+    <Grid Visibility="{Binding IsStatisticsModalOpen, Converter={StaticResource BoolToVis}}" Panel.ZIndex="999">
         <Border Background="#4D000000" />
         <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Margin="0" Padding="32" Width="850" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Border.Effect>
@@ -465,7 +480,11 @@
                         <UniformGrid Columns="2" Margin="0,0,0,16">
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,8,0">
                                 <StackPanel>
-                                    <Path Data="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z" Fill="#F97316" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                                    <Grid Width="24" Height="24" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <Viewbox Margin="1">
+                                            <Path Data="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z" Fill="#F97316"/>
+                                        </Viewbox>
+                                    </Grid>
                                     <TextBlock Text="{Binding CurrentStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                                     <TextBlock Text="{Binding CurrentStreakLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
@@ -473,7 +492,11 @@
 
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="8,0,0,0">
                                 <StackPanel>
-                                    <Path Data="M18 2H6v2H2v6c0 3.31 2.69 6 6 6h1.22c.81 1.45 2.16 2.52 3.78 2.87V21H9v2h6v-2h-4v-2.13c1.62-.35 2.97-1.42 3.78-2.87H16c3.31 0 6-2.69 6-6V4h-4V2zM4 10V6h2v4c0 2.21-1.79 4-4 4zm14 0c0-2.21 1.79-4 4-4v4c0 2.21 1.79 4-4 4z" Fill="#F59E0B" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8" Stretch="Uniform"/>
+                                    <Grid Width="24" Height="24" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <Viewbox Margin="1">
+                                            <Path Data="M18 2H6v2H2v6c0 3.31 2.69 6 6 6h1.22c.81 1.45 2.16 2.52 3.78 2.87V21H9v2h6v-2h-4v-2.13c1.62-.35 2.97-1.42 3.78-2.87H16c3.31 0 6-2.69 6-6V4h-4V2zM4 10V6h2v4c0 2.21-1.79 4-4 4zm14 0c0-2.21 1.79-4 4-4v4c0 2.21 1.79 4-4 4z" Fill="#F59E0B"/>
+                                        </Viewbox>
+                                    </Grid>
                                     <TextBlock Text="{Binding LongestStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                                     <TextBlock Text="{Binding LongestStreakLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>

@@ -84,7 +84,15 @@ namespace HabitTracker.ViewModels
                 .Filter("habit_id", Constants.Operator.Equals, habit.Id)
                 .Order("log_date", Constants.Ordering.Ascending)
                 .Get();
-            var allLogs = logsResponse.Models ?? new List<HabitLogs>();
+            var allLogsRaw = logsResponse.Models ?? new List<HabitLogs>();
+
+            // Clean up logs: group by local Date to fix timezone issues (LogDate may be UTC from Supabase)
+            // and take the latest updated log per day to fix the chart plotting every edit.
+            var allLogs = allLogsRaw
+                .GroupBy(l => l.LogDate.ToLocalTime().Date)
+                .Select(g => g.OrderByDescending(l => l.UpdatedTime).First())
+                .OrderBy(l => l.LogDate)
+                .ToList();
 
             // Build a dictionary of completed dates for fast lookup
             var completedDates = new HashSet<DateTime>();
@@ -92,7 +100,7 @@ namespace HabitTracker.ViewModels
             {
                 if (IsHabitCompleted(habit, log))
                 {
-                    completedDates.Add(log.LogDate.Date);
+                    completedDates.Add(log.LogDate.ToLocalTime().Date);
                 }
             }
 
@@ -105,7 +113,7 @@ namespace HabitTracker.ViewModels
             CalculateWeeklySuccess(habit, completedDates);
 
             // Monthly completions mini-calendar
-            BuildMiniCalendar(habit, completedDates, DateTime.Now);
+            BuildMiniCalendar(habit, completedDates, allLogs, DateTime.Now);
 
             // Chart for numeric/timer habits
             if (IsNumericOrTimer)
@@ -207,7 +215,7 @@ namespace HabitTracker.ViewModels
             WeeklySuccessRate = scheduledCount > 0 ? (int)Math.Round((double)completedCount / scheduledCount * 100) : 0;
         }
 
-        private void BuildMiniCalendar(Habits habit, HashSet<DateTime> completedDates, DateTime referenceDate)
+        private void BuildMiniCalendar(Habits habit, HashSet<DateTime> completedDates, List<HabitLogs> allLogs, DateTime referenceDate)
         {
             MiniCalendarMonthYear = referenceDate.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("en-US"));
 
@@ -229,21 +237,31 @@ namespace HabitTracker.ViewModels
             {
                 var date = new DateTime(referenceDate.Year, referenceDate.Month, d);
                 bool isScheduled = DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek) && date >= habit.CreatedDate.Date;
-                bool isCompleted = completedDates.Contains(date);
                 bool isFuture = date > DateTime.Today;
 
-                string dotColor;
-                if (isFuture || !isScheduled)
+                string dotColor = "#E5E7EB"; // Default gray - not scheduled or future
+                bool isCompleted = false;
+
+                if (!isFuture && isScheduled)
                 {
-                    dotColor = "#E5E7EB"; // Gray - not scheduled or future
-                }
-                else if (isCompleted)
-                {
-                    dotColor = "#059669"; // Green - completed
-                }
-                else
-                {
-                    dotColor = "#EF4444"; // Red - missed
+                    // Find the last log for this day
+                    var log = allLogs.LastOrDefault(l => l.LogDate.ToLocalTime().Date == date);
+                    
+                    string typeName = HabitTypeName?.ToLower() ?? "checkbox";
+                    // Actually, the main view uses typeName = habitType?.Type?.ToLower() ?? "checkbox"; 
+                    // But here HabitTypeName is a DisplayType ("Numeric", "Checkbox"). 
+                    // We can just pass the internal name from habit if available, or just map it.
+                    if (string.Equals(HabitTypeName, "Numeric", StringComparison.OrdinalIgnoreCase)) typeName = "numeric";
+                    if (string.Equals(HabitTypeName, "Timer", StringComparison.OrdinalIgnoreCase)) typeName = "timer";
+                    if (string.Equals(HabitTypeName, "Checkbox", StringComparison.OrdinalIgnoreCase)) typeName = "checkbox";
+
+                    double rawScore = DailyScoreCalculator.ScoreHabit(log, habit, typeName);
+                    int percentage = (int)Math.Round(rawScore * 100);
+                    isCompleted = percentage >= 100;
+
+                    // Fetch the exact same gradient color as the main calendar uses!
+                    DailyScoreCalculator.GetDayColors(percentage, out string badgeColor, out string _);
+                    dotColor = badgeColor;
                 }
 
                 days.Add(new MiniCalendarDay
@@ -261,16 +279,19 @@ namespace HabitTracker.ViewModels
 
         private void BuildValueTrendChart(List<HabitLogs> allLogs)
         {
-            var sortedLogs = allLogs.OrderBy(l => l.LogDate).ToList();
+            var values = new List<double>();
+            var labels = new List<string>();
 
-            if (!sortedLogs.Any())
+            // We want the last 7 days ending today
+            var endDate = DateTime.Today;
+            var startDate = endDate.AddDays(-6);
+
+            for (var d = startDate; d <= endDate; d = d.AddDays(1))
             {
-                ChartSeries = Array.Empty<ISeries>();
-                return;
+                var log = allLogs.FirstOrDefault(l => l.LogDate.ToLocalTime().Date == d);
+                values.Add(log != null ? log.NumericValue : 0);
+                labels.Add(d.ToString("dd MMM", CultureInfo.InvariantCulture));
             }
-
-            var values = sortedLogs.Select(l => l.NumericValue).ToList();
-            var labels = sortedLogs.Select(l => l.LogDate.ToString("dd MMM", CultureInfo.InvariantCulture)).ToList();
 
             ChartSeries = new ISeries[]
             {
@@ -278,10 +299,11 @@ namespace HabitTracker.ViewModels
                 {
                     Values = values,
                     Name = "Value",
-                    Fill = new SolidColorPaint(new SKColor(50, 138, 93).WithAlpha(50)),
-                    Stroke = new SolidColorPaint(new SKColor(50, 138, 93)) { StrokeThickness = 3 },
+                    Fill = new SolidColorPaint(new SKColor(22, 101, 52).WithAlpha(50)),
+                    Stroke = new SolidColorPaint(new SKColor(22, 101, 52)) { StrokeThickness = 3 },
                     GeometryFill = new SolidColorPaint(new SKColor(255, 255, 255)),
-                    GeometryStroke = new SolidColorPaint(new SKColor(50, 138, 93)) { StrokeThickness = 2 }
+                    GeometryStroke = new SolidColorPaint(new SKColor(22, 101, 52)) { StrokeThickness = 2 },
+                    LineSmoothness = 0.65 // Make the line smoother for a trend look
                 }
             };
 

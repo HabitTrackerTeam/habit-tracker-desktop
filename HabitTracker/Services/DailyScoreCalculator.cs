@@ -193,7 +193,7 @@ namespace HabitTracker.Services
         /// Checkbox → binary (0 or 1).
         /// Numeric/Timer → proportional (actual / target), capped at 1.0.
         /// </summary>
-        private static double ScoreHabit(HabitLogs? log, Habits habit, string typeName)
+        public static double ScoreHabit(HabitLogs? log, Habits habit, string typeName)
         {
             if (log == null) return 0.0;
 
@@ -270,6 +270,70 @@ namespace HabitTracker.Services
             };
 
             return (daysOfWeekMask & bit) != 0;
+        }
+
+        public static void GetDayColors(int percentage, out string badgeColor, out string dotColor)
+        {
+            // Detect current theme by checking a known dark-mode brush value
+            bool isDark = false;
+            try
+            {
+                var appBgBrush = System.Windows.Application.Current.Resources["AppBgBrush"] as System.Windows.Media.SolidColorBrush;
+                if (appBgBrush != null)
+                {
+                    // Dark mode AppBgBrush is dark (R+G+B < 300)
+                    var c = appBgBrush.Color;
+                    isDark = (c.R + c.G + c.B) < 300;
+                }
+            }
+            catch { }
+
+            if (percentage < 0)
+            {
+                badgeColor = isDark ? "#2A2A2A" : "#E5E7EB";
+                dotColor = isDark ? "#A0A0A0" : "#6B7280"; // Gray text for future days
+                return;
+            }
+
+            dotColor = (percentage >= 25 && percentage <= 70) ? "#374151" : "#FFFFFF"; // Dark text on yellow/orange, white on red/green
+
+            // Snap percentage to nearest 5%
+            percentage = (percentage / 5) * 5;
+
+            // Keyframes for smooth gradient (SLIGHTLY MISTY VIBRANT)
+            // Red -> Orange -> Yellow -> Light Green -> Dark Green
+            (int p, byte r, byte g, byte b)[] lightFrames = {
+                (0,   226,  92,  92), // Misty Red
+                (25,  235, 132,  70), // Misty Orange
+                (50,  224, 186,  67), // Misty Yellow
+                (75,   82, 191, 122), // Misty Light Green
+                (100,  47, 143,  81)  // Misty Dark Green
+            };
+
+            (int p, byte r, byte g, byte b)[] darkFrames = {
+                (0,   189,  64,  64), // Dark Misty Red
+                (25,  196, 103,  49), // Dark Misty Orange
+                (50,  186, 148,  45), // Dark Misty Yellow
+                (75,   46, 148,  83), // Dark Misty Light Green
+                (100,  34, 107,  59)  // Dark Misty Dark Green
+            };
+
+            var frames = isDark ? darkFrames : lightFrames;
+
+            for (int i = 0; i < frames.Length - 1; i++)
+            {
+                if (percentage >= frames[i].p && percentage <= frames[i+1].p)
+                {
+                    float t = (float)(percentage - frames[i].p) / (frames[i+1].p - frames[i].p);
+                    byte r = (byte)(frames[i].r + t * (frames[i+1].r - frames[i].r));
+                    byte g = (byte)(frames[i].g + t * (frames[i+1].g - frames[i].g));
+                    byte b = (byte)(frames[i].b + t * (frames[i+1].b - frames[i].b));
+                    badgeColor = $"#{r:X2}{g:X2}{b:X2}";
+                    return;
+                }
+            }
+
+            badgeColor = $"#{frames[^1].r:X2}{frames[^1].g:X2}{frames[^1].b:X2}";
         }
     }
 }
