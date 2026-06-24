@@ -25,11 +25,25 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="40,32,40,20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <Grid Margin="40,32,40,20">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsStatisticsModalOpen}" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="15" KernelType="Gaussian" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
         <!-- Header Section -->
         <Grid Grid.Row="0" Margin="0,0,0,24" MinHeight="60">
@@ -46,15 +60,18 @@
 
         </Grid>
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="0,0,0,0">
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
             <!-- Top Charts Row -->
-            <Grid Margin="0,0,0,32">
+            <Grid Grid.Row="0" Margin="0,0,0,32">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="24"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Growth Quotient Card -->
@@ -63,7 +80,7 @@
                         <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.02" ShadowDepth="0"/>
                     </Border.Effect>
                     <Grid>
-                        <StackPanel VerticalAlignment="Center">
+                        <StackPanel VerticalAlignment="Top">
                             <TextBlock Text="{Binding GrowthQuotient, Source={StaticResource Loc}}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                             <TextBlock Text="{Binding GrowthQuotientDesc, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" MaxWidth="280" HorizontalAlignment="Left" Margin="0,8,0,24"/>
                             <Border CornerRadius="20" Padding="12,6" HorizontalAlignment="Left">
@@ -136,53 +153,8 @@
                     </Grid>
                 </Border>
 
-                <!-- Growth Milestones -->
-                <Border Grid.Column="2" Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="24">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.02" ShadowDepth="0"/>
-                    </Border.Effect>
-                    <ItemsControl ItemsSource="{Binding Milestones}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="20" Margin="0,0,0,16">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <!-- Icon -->
-                                        <Border Grid.Column="0" Width="48" Height="48" CornerRadius="12" Background="{Binding IconBgColor}" Margin="0,0,16,0">
-                                            <Path Data="{Binding IconPath}" Fill="{Binding IconFgColor}" Stretch="Uniform" Width="24" Height="24"/>
-                                        </Border>
-
-                                        <!-- Info -->
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4"/>
-                                            <TextBlock Text="{Binding FormattedProgress}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}"/>
-                                        </StackPanel>
-
-                                        <!-- Action (Arrow) -->
-                                        <Path Grid.Column="2" Data="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" Fill="{DynamicResource TextMutedBrush}" Stretch="Uniform" Width="24" Height="24" VerticalAlignment="Center"/>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
-            </Grid>
-
-            <!-- Weekly Completion & Top Habits Row -->
-            <Grid Margin="0,0,0,32">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="24"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
                 <!-- Weekly Completion Section -->
-                <Border Grid.Column="0" Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="32">
+                <Border Grid.Column="2" Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="32">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.02" ShadowDepth="0"/>
                     </Border.Effect>
@@ -269,65 +241,32 @@
                         </ItemsControl>
                     </StackPanel>
                 </Border>
-
-                <!-- Top Performance Habits -->
-                <Border Grid.Column="2" Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="24">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.02" ShadowDepth="0"/>
-                    </Border.Effect>
-                    <ItemsControl ItemsSource="{Binding TopHabits}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Padding="20" Margin="0,0,0,16">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <!-- Icon -->
-                                        <Border Grid.Column="0" Width="48" Height="48" CornerRadius="12" Background="{Binding IconBgColor}" Margin="0,0,16,0">
-                                            <Path Data="{Binding IconPath}" Fill="{Binding IconFgColor}" Stretch="Uniform" Width="24" Height="24"/>
-                                        </Border>
-                                        
-                                        <!-- Info -->
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4"/>
-                                            <!-- Mini Progress Bar -->
-                                            <Grid Height="6" Background="{DynamicResource InputBgBrush}" Margin="0,0,32,0"  VerticalAlignment="Center">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="{Binding CompletionGridLength}" />
-                                                    <ColumnDefinition Width="{Binding InverseCompletionGridLength}" />
-                                                </Grid.ColumnDefinitions>
-                                                <Border Grid.Column="0" CornerRadius="3" Background="{Binding IconFgColor}"/>
-                                            </Grid>
-                                        </StackPanel>
-                                        
-                                        <!-- Score -->
-                                        <TextBlock Grid.Column="2" Text="{Binding CompletionPercentage, StringFormat={}{0}%}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
             </Grid>
 
+
+
             <!-- Detailed Performance Table -->
-            <StackPanel>
-                <Grid Margin="0,0,0,24">
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Row="0" Margin="0,0,0,24">
                     <StackPanel>
                         <TextBlock Text="{Binding DetailedPerformance, Source={StaticResource Loc}}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                         <TextBlock Text="{Binding DetailedPerformanceDesc, Source={StaticResource Loc}}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
                     </StackPanel>
-                    <TextBlock Text="{Binding ViewAll, Source={StaticResource Loc}}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" Cursor="Hand"/>
                 </Grid>
 
-                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16">
-                    <StackPanel>
+                <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}" CornerRadius="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
                         <!-- Headers -->
-                        <Border Background="{DynamicResource AppBgBrush}" Padding="24,16" Margin="0">
+                        <Border Grid.Row="0" Background="{DynamicResource AppBgBrush}" Padding="24,16" Margin="0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -345,7 +284,8 @@
                         </Border>
 
                         <!-- Dynamic Rows -->
-                        <ItemsControl ItemsSource="{Binding DetailedHabitPerformances}">
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding DetailedHabitPerformances}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="0,1,0,0" Padding="24,16">
@@ -415,17 +355,18 @@
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
                 </Border>
-            </StackPanel>
-        </StackPanel>
-    </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
 
     <!-- Modal Overlay (Habit Statistics) -->
-    <Grid Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding IsStatisticsModalOpen, Converter={StaticResource BoolToVis}}" Panel.ZIndex="999">
+    <Grid Visibility="{Binding IsStatisticsModalOpen, Converter={StaticResource BoolToVis}}" Panel.ZIndex="999">
         <Border Background="#4D000000" />
-        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Margin="0" Padding="32" Width="850" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border Background="{DynamicResource CardBgBrush}" CornerRadius="16" Margin="0" Padding="32" Width="950" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Border.Effect>
                 <DropShadowEffect Color="Black" Opacity="0.2" BlurRadius="25" ShadowDepth="10" />
             </Border.Effect>
@@ -465,7 +406,11 @@
                         <UniformGrid Columns="2" Margin="0,0,0,16">
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,8,0">
                                 <StackPanel>
-                                    <Path Data="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z" Fill="#F97316" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                                    <Viewbox Width="22" Height="22" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <Canvas Width="24" Height="24">
+                                            <Path Data="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z" Fill="#F97316"/>
+                                        </Canvas>
+                                    </Viewbox>
                                     <TextBlock Text="{Binding CurrentStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                                     <TextBlock Text="{Binding CurrentStreakLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
@@ -473,7 +418,11 @@
 
                             <Border Background="{DynamicResource AppBgBrush}" CornerRadius="12" Padding="20" Margin="8,0,0,0">
                                 <StackPanel>
-                                    <Path Data="M18 2H6v2H2v6c0 3.31 2.69 6 6 6h1.22c.81 1.45 2.16 2.52 3.78 2.87V21H9v2h6v-2h-4v-2.13c1.62-.35 2.97-1.42 3.78-2.87H16c3.31 0 6-2.69 6-6V4h-4V2zM4 10V6h2v4c0 2.21-1.79 4-4 4zm14 0c0-2.21 1.79-4 4-4v4c0 2.21 1.79 4-4 4z" Fill="#F59E0B" Width="20" Height="20" HorizontalAlignment="Left" Margin="0,0,0,8" Stretch="Uniform"/>
+                                    <Viewbox Width="22" Height="22" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <Canvas Width="24" Height="24">
+                                            <Path Data="M18 2H6v2H2v6c0 3.31 2.69 6 6 6h1.22c.81 1.45 2.16 2.52 3.78 2.87V21H9v2h6v-2h-4v-2.13c1.62-.35 2.97-1.42 3.78-2.87H16c3.31 0 6-2.69 6-6V4h-4V2zM4 10V6h2v4c0 2.21-1.79 4-4 4zm14 0c0-2.21 1.79-4 4-4v4c0 2.21 1.79 4-4 4z" Fill="#F59E0B"/>
+                                        </Canvas>
+                                    </Viewbox>
                                     <TextBlock Text="{Binding LongestStreak}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"/>
                                     <TextBlock Text="{Binding LongestStreakLabel, Source={StaticResource Loc}}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>

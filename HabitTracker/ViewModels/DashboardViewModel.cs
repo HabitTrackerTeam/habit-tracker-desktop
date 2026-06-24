@@ -339,19 +339,7 @@ namespace HabitTracker.ViewModels{
             set { _weeklyCompletionDays = value; OnPropertyChanged(); }
         }
 
-        private ObservableCollection<TopHabitViewModel> _topHabits = new();
-        public ObservableCollection<TopHabitViewModel> TopHabits
-        {
-            get => _topHabits;
-            set { _topHabits = value; OnPropertyChanged(); }
-        }
 
-        private ObservableCollection<MilestoneViewModel> _milestones = new();
-        public ObservableCollection<MilestoneViewModel> Milestones
-        {
-            get => _milestones;
-            set { _milestones = value; OnPropertyChanged(); }
-        }
 
         private HabitStatisticsViewModel _selectedHabitStats;
         public HabitStatisticsViewModel SelectedHabitStats
@@ -874,7 +862,7 @@ namespace HabitTracker.ViewModels{
                     {
                         HabitId = habit.Id,
                         UserId = userId,
-                        LogDate = todayStart,
+                        LogDate = DateTime.SpecifyKind(todayStart, DateTimeKind.Utc),
                         IsCompleted = habit.IsCompleted,
                         NumericValue = habit.CurrentProgress,
                         CreatedDate = DateTime.UtcNow,
@@ -1333,66 +1321,7 @@ namespace HabitTracker.ViewModels{
 
         private void GetDayColors(int percentage, bool isToday, out string badgeColor, out string dotColor)
         {
-            // Detect current theme by checking a known dark-mode brush value
-            bool isDark = false;
-            try
-            {
-                var appBgBrush = System.Windows.Application.Current.Resources["AppBgBrush"] as System.Windows.Media.SolidColorBrush;
-                if (appBgBrush != null)
-                {
-                    // Dark mode AppBgBrush is dark (R+G+B < 300)
-                    var c = appBgBrush.Color;
-                    isDark = (c.R + c.G + c.B) < 300;
-                }
-            }
-            catch { }
-
-            if (percentage < 0)
-            {
-                badgeColor = isDark ? "#2A2A2A" : "#E5E7EB";
-                dotColor = isDark ? "#A0A0A0" : "#6B7280"; // Gray text for future days
-                return;
-            }
-
-            dotColor = (percentage >= 25 && percentage <= 70) ? "#374151" : "#FFFFFF"; // Dark text on yellow/orange, white on red/green
-
-            // Snap percentage to nearest 5%
-            percentage = (percentage / 5) * 5;
-
-            // Keyframes for smooth gradient (SLIGHTLY MISTY VIBRANT)
-            // Red -> Orange -> Yellow -> Light Green -> Dark Green
-            (int p, byte r, byte g, byte b)[] lightFrames = {
-                (0,   226,  92,  92), // Misty Red
-                (25,  235, 132,  70), // Misty Orange
-                (50,  224, 186,  67), // Misty Yellow
-                (75,   82, 191, 122), // Misty Light Green
-                (100,  47, 143,  81)  // Misty Dark Green
-            };
-
-            (int p, byte r, byte g, byte b)[] darkFrames = {
-                (0,   189,  64,  64), // Dark Misty Red
-                (25,  196, 103,  49), // Dark Misty Orange
-                (50,  186, 148,  45), // Dark Misty Yellow
-                (75,   46, 148,  83), // Dark Misty Light Green
-                (100,  34, 107,  59)  // Dark Misty Dark Green
-            };
-
-            var frames = isDark ? darkFrames : lightFrames;
-
-            for (int i = 0; i < frames.Length - 1; i++)
-            {
-                if (percentage >= frames[i].p && percentage <= frames[i+1].p)
-                {
-                    float t = (float)(percentage - frames[i].p) / (frames[i+1].p - frames[i].p);
-                    byte r = (byte)(frames[i].r + t * (frames[i+1].r - frames[i].r));
-                    byte g = (byte)(frames[i].g + t * (frames[i+1].g - frames[i].g));
-                    byte b = (byte)(frames[i].b + t * (frames[i+1].b - frames[i].b));
-                    badgeColor = $"#{r:X2}{g:X2}{b:X2}";
-                    return;
-                }
-            }
-
-            badgeColor = $"#{frames[^1].r:X2}{frames[^1].g:X2}{frames[^1].b:X2}";
+            DailyScoreCalculator.GetDayColors(percentage, out badgeColor, out dotColor);
         }
 
         /// <summary>
@@ -1767,7 +1696,7 @@ namespace HabitTracker.ViewModels{
                     DayName = dayNames[i],
                     Value = 0,
                     MaxValue = 0,
-                    BarColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 50, 138, 93)),
+                    BarColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 22, 101, 52)),
                     IsFuture = dDate.Date > DateTime.Today
                 });
             }
@@ -1831,66 +1760,7 @@ namespace HabitTracker.ViewModels{
             var endOfWeek = startOfWeek.AddDays(6);
             WeeklyCompletionDateRange = $"{startOfWeek:dd.MM.yyyy} - {endOfWeek:dd.MM.yyyy}";
 
-            // Top Habits (Sort by best completion percentage all-time or last 30 days)
-            var topList = new List<TopHabitViewModel>();
-            foreach (var habit in userHabits)
-            {
-                logsByHabit.TryGetValue(habit.Id, out var hLogs);
-                hLogs ??= new List<HabitLogs>();
-                typeMap.TryGetValue(habit.HabitTypeId ?? "", out var type);
-                var typeName = type?.Type?.ToLower() ?? "checkbox";
 
-                int sched = 0, comp = 0;
-                for (int d = 0; d < 30; d++)
-                {
-                    var date = today.AddDays(-d);
-                    if (habit.CreatedDate.Date > date) continue;
-                    if (!DailyScoreCalculator.IsScheduledForDay(habit.DaysOfWeek, date.DayOfWeek)) continue;
-                    sched++;
-                    var log = hLogs.FirstOrDefault(l => l.LogDate.Date == date);
-                    if (log != null && (typeName == "checkbox" ? log.IsCompleted : log.NumericValue >= habit.TargetFrequency))
-                        comp++;
-                }
-
-                int perc = sched > 0 ? (int)Math.Round((double)comp / sched * 100) : 0;
-                if (perc > 0)
-                {
-                    topList.Add(new TopHabitViewModel
-                    {
-                        Name = habit.Name,
-                        CompletionPercentage = perc,
-                        IconPath = habit.Icon,
-                        IconFgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 50, 138, 93)),
-                        IconBgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 230, 248, 240))
-                    });
-                }
-            }
-
-            TopHabits = new ObservableCollection<TopHabitViewModel>(topList.OrderByDescending(h => h.CompletionPercentage).Take(4));
-
-            // Milestones
-            int totalCompletions = allLogs.Count(l => l.IsCompleted || l.NumericValue > 0); // Simplified total completion check
-            Milestones = new ObservableCollection<MilestoneViewModel>
-            {
-                new MilestoneViewModel
-                {
-                    Title = "Total Completions",
-                    CurrentValue = totalCompletions,
-                    TargetValue = totalCompletions < 100 ? 100 : (totalCompletions < 500 ? 500 : 1000),
-                    IconPath = "M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z",
-                    IconFgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 245, 158, 11)),
-                    IconBgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 245, 158, 11))
-                },
-                new MilestoneViewModel
-                {
-                    Title = "Consistency King",
-                    CurrentValue = GrowthQuotient,
-                    TargetValue = 100,
-                    IconPath = "M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,15.53 16.39,18.43 13,18.92V21.95C18.05,21.43 22,17.18 22,12C22,6.82 18.05,2.57 13,2.05M11,2.05C5.95,2.57 2,6.82 2,12C2,17.18 5.95,21.43 11,21.95V18.92C7.61,18.43 5,15.53 5,12C5,8.47 7.61,5.57 11,5.08V2.05M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z",
-                    IconFgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 59, 130, 246)),
-                    IconBgColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 59, 130, 246))
-                }
-            };
         }
 
         // ===== Daily Note Auto-Save Methods =====
