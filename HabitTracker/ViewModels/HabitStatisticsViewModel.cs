@@ -313,7 +313,9 @@ namespace HabitTracker.ViewModels
                 {
                     Labels = labels,
                     LabelsPaint = new SolidColorPaint(SKColors.Gray),
-                    TextSize = 11
+                    TextSize = 11,
+                    MinStep = 1,
+                    ForceStepToMin = true
                 }
             };
 
