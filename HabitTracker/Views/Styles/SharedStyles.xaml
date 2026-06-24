@@ -129,7 +129,7 @@
                                                                  Value="True">
                                                                 <Setter TargetName="Border"
                                                                         Property="Background"
-                                                                        Value="#FF328A5D"/>
+                                                                        Value="#FF166534"/>
                                                                 <Trigger.EnterActions>
                                                                         <BeginStoryboard>
                                                                                 <Storyboard>
@@ -680,7 +680,7 @@
                                                                                 <Storyboard>
                                                                                         <ColorAnimation Storyboard.TargetName="LinkForeground"
                                                                                                         Storyboard.TargetProperty="Color"
-                                                                                                        To="#FF328A5D"
+                                                                                                        To="#FF166534"
                                                                                                         Duration="0:0:0.18"/>
                                                                                 </Storyboard>
                                                                         </BeginStoryboard>

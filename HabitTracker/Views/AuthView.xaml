@@ -19,7 +19,7 @@
                                         <Border Width="46"
                                                 Height="46"
                                                 CornerRadius="12"
-                                                Background="#FF1F7D33">
+                                                Background="{DynamicResource AccentGreenBrush}">
                                                 <Image Source="/Assets/logo.png"
                                                        Width="28"
                                                        Height="28"
@@ -30,7 +30,7 @@
                                         <TextBlock Text="Habit Tracker"
                                                    FontSize="20"
                                                    FontWeight="Bold"
-                                                   Foreground="#FF1F7D33"
+                                                   Foreground="{DynamicResource AccentGreenBrush}"
                                                    Margin="14,0,0,0"
                                                    VerticalAlignment="Center"/>
                                 </StackPanel>
@@ -43,7 +43,7 @@
                                            TextWrapping="Wrap">
                                         <Run Text="{Binding AuthSlogan1, Source={StaticResource Loc}, Mode=OneWay}" />
                                         <Run Text="{Binding AuthSlogan2, Source={StaticResource Loc}, Mode=OneWay}"
-                                             Foreground="#FF1F7D33"/>
+                                             Foreground="{DynamicResource AccentGreenBrush}"/>
                                 </TextBlock>
 
                                 <TextBlock Text="{Binding AuthSubtitle, Source={StaticResource Loc}}"
@@ -55,7 +55,7 @@
 
                                 <Border Height="300"
                                         CornerRadius="28"
-                                        BorderBrush="#22328A5D"
+                                        BorderBrush="#22166534"
                                         BorderThickness="1"
                                         SnapsToDevicePixels="True">
                                         <Border.Background>
@@ -109,7 +109,7 @@
                                                                         </Style>
                                                                 </StackPanel.Style>
                                                                 <TextBlock Text="{Binding WelcomeBack, Source={StaticResource Loc}}"
-                                                                           FontSize="28"
+                                                                           FontSize="24"
                                                                            FontWeight="Bold"
                                                                            Foreground="{DynamicResource TextMainBrush}"/>
                                                                 <TextBlock Text="{Binding SelectAccount, Source={StaticResource Loc}}"
@@ -232,7 +232,7 @@
 
                                                                                 <TextBlock x:Name="LoginEyeIcon"
                                                                                            Text="👁"
-                                                                                           FontSize="15"
+                                                                                           FontSize="14"
                                                                                            VerticalAlignment="Center"
                                                                                            HorizontalAlignment="Center"/>
                                                                         </Button>
@@ -269,7 +269,7 @@
                                                                 <Button Height="56"
                                                                         Margin="0,0,0,24"
                                                                         HorizontalAlignment="Stretch"
-                                                                        Background="#FF1F7D33"
+                                                                        Background="{DynamicResource AccentGreenBrush}"
                                                                         Click="LoginButton_Click"
                                                                         Style="{StaticResource LoginLoadingButtonStyle}"
                                                                         Content="{Binding SignIn, Source={StaticResource Loc}}"
@@ -290,12 +290,12 @@
                                                                     Margin="0,0,0,8"
                                                                     Visibility="{Binding IsRegisterVisible, Converter={StaticResource BoolToVis}}">
                                                                 <TextBlock Margin="0,0,0,5"
-                                                                           FontSize="32"
+                                                                           FontSize="24"
                                                                            FontWeight="Bold"
-                                                                           Foreground="#FF328A5D"
+                                                                           Foreground="{DynamicResource AccentGreenBrush}"
                                                                            Text="{Binding CreateProfile, Source={StaticResource Loc}}"/>
                                                                 <TextBlock Margin="0,0,0,20"
-                                                                           FontSize="15"
+                                                                           FontSize="14"
                                                                            Foreground="{DynamicResource TextMutedBrush}"
                                                                            Text="{Binding SetupAccount, Source={StaticResource Loc}}"/>
 
@@ -324,7 +324,7 @@
                                                                                                 HorizontalAlignment="Right"
                                                                                                 Width="28"
                                                                                                 Height="28"
-                                                                                                Background="#FF328A5D"
+                                                                                                Background="{DynamicResource AccentGreenBrush}"
                                                                                                 Padding="0"
                                                                                                 Click="ChooseAvatar_Click"
                                                                                                 Cursor="Hand">
@@ -378,7 +378,7 @@
                                                                             Foreground="{DynamicResource TextMutedBrush}"
                                                                             Click="ToggleRegisterPassword_Click">
                                                                         <TextBlock Text="👁"
-                                                                                   FontSize="15"
+                                                                                   FontSize="14"
                                                                                    VerticalAlignment="Center"
                                                                                    HorizontalAlignment="Center"/>
                                                                     </Button>
@@ -395,7 +395,7 @@
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasMinLength}" Value="True">
                                                                                             <Setter Property="Text" Value="✓"/>
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -407,7 +407,7 @@
                                                                                     <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasMinLength}" Value="True">
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -424,7 +424,7 @@
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasUppercase}" Value="True">
                                                                                             <Setter Property="Text" Value="✓"/>
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -436,7 +436,7 @@
                                                                                     <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasUppercase}" Value="True">
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -453,7 +453,7 @@
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasLowercase}" Value="True">
                                                                                             <Setter Property="Text" Value="✓"/>
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -465,7 +465,7 @@
                                                                                     <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasLowercase}" Value="True">
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -482,7 +482,7 @@
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasDigit}" Value="True">
                                                                                             <Setter Property="Text" Value="✓"/>
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -494,7 +494,7 @@
                                                                                     <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasDigit}" Value="True">
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -511,7 +511,7 @@
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasSpecialChar}" Value="True">
                                                                                             <Setter Property="Text" Value="✓"/>
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -523,7 +523,7 @@
                                                                                     <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                     <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding HasSpecialChar}" Value="True">
-                                                                                            <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                         </DataTrigger>
                                                                                     </Style.Triggers>
                                                                                 </Style>
@@ -553,7 +553,7 @@
                                                                             Foreground="{DynamicResource TextMutedBrush}"
                                                                             Click="ToggleRegisterRepeatPassword_Click">
                                                                         <TextBlock Text="👁"
-                                                                                   FontSize="15"
+                                                                                   FontSize="14"
                                                                                    VerticalAlignment="Center"
                                                                                    HorizontalAlignment="Center"/>
                                                                     </Button>
@@ -561,7 +561,7 @@
 
                                                                 <Button Height="48"
                                                                         Margin="0,0,0,15"
-                                                                        Background="#FF328A5D"
+                                                                        Background="{DynamicResource AccentGreenBrush}"
                                                                         Click="RegisterButton_Click"
                                                                         Content="{Binding SignUp, Source={StaticResource Loc}}"
                                                                         Foreground="White"
@@ -586,9 +586,9 @@
                                                                     Margin="0,0,0,8"
                                                                     Visibility="{Binding IsForgotVisible, Converter={StaticResource BoolToVis}}">
                                                                 <TextBlock Margin="0,0,0,10"
-                                                                           FontSize="32"
+                                                                           FontSize="24"
                                                                            FontWeight="Bold"
-                                                                           Foreground="#FF328A5D"
+                                                                           Foreground="{DynamicResource AccentGreenBrush}"
                                                                            Text="{Binding ResetPasswordTitle, Source={StaticResource Loc}}"/>
 
                                                                 <StackPanel Visibility="{Binding IsForgotEmailStep, Converter={StaticResource BoolToVis}}">
@@ -603,7 +603,7 @@
                                                                                  Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
                                                                         <Button Height="48"
                                                                                 Margin="0,0,0,15"
-                                                                                Background="#FF328A5D"
+                                                                                Background="{DynamicResource AccentGreenBrush}"
                                                                                 Click="SendResetLink_Click"
                                                                                 Content="{Binding SendResetCode, Source={StaticResource Loc}}"
                                                                                 Foreground="White"
@@ -622,7 +622,7 @@
                                                                                  Text="{Binding ResetToken, UpdateSourceTrigger=PropertyChanged}"/>
                                                                         <Button Height="48"
                                                                                 Margin="0,0,0,15"
-                                                                                Background="#FF328A5D"
+                                                                                Background="{DynamicResource AccentGreenBrush}"
                                                                                 Click="VerifyOnlyCode_Click"
                                                                                 Content="{Binding VerifyCode, Source={StaticResource Loc}}"
                                                                                 Foreground="White"
@@ -658,7 +658,7 @@
                                                                                     Foreground="{DynamicResource TextMutedBrush}"
                                                                                     Click="ToggleForgotNewPassword_Click">
                                                                                 <TextBlock Text="👁"
-                                                                                           FontSize="15"
+                                                                                           FontSize="14"
                                                                                            VerticalAlignment="Center"
                                                                                            HorizontalAlignment="Center"/>
                                                                             </Button>
@@ -675,7 +675,7 @@
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasMinLength}" Value="True">
                                                                                                     <Setter Property="Text" Value="✓"/>
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -687,7 +687,7 @@
                                                                                             <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasMinLength}" Value="True">
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -704,7 +704,7 @@
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasUppercase}" Value="True">
                                                                                                     <Setter Property="Text" Value="✓"/>
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -716,7 +716,7 @@
                                                                                             <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasUppercase}" Value="True">
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -733,7 +733,7 @@
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasLowercase}" Value="True">
                                                                                                     <Setter Property="Text" Value="✓"/>
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -745,7 +745,7 @@
                                                                                             <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasLowercase}" Value="True">
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -762,7 +762,7 @@
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasDigit}" Value="True">
                                                                                                     <Setter Property="Text" Value="✓"/>
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -774,7 +774,7 @@
                                                                                             <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasDigit}" Value="True">
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -791,7 +791,7 @@
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasSpecialChar}" Value="True">
                                                                                                     <Setter Property="Text" Value="✓"/>
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -803,7 +803,7 @@
                                                                                             <Setter Property="Foreground" Value="#FFD32F2F"/>
                                                                                             <Style.Triggers>
                                                                                                 <DataTrigger Binding="{Binding HasSpecialChar}" Value="True">
-                                                                                                    <Setter Property="Foreground" Value="#FF328A5D"/>
+                                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}"/>
                                                                                                 </DataTrigger>
                                                                                             </Style.Triggers>
                                                                                         </Style>
@@ -833,14 +833,14 @@
                                                                                     Foreground="{DynamicResource TextMutedBrush}"
                                                                                     Click="ToggleForgotRepeatPassword_Click">
                                                                                 <TextBlock Text="👁"
-                                                                                           FontSize="15"
+                                                                                           FontSize="14"
                                                                                            VerticalAlignment="Center"
                                                                                            HorizontalAlignment="Center"/>
                                                                             </Button>
                                                                         </Grid>
                                                                         <Button Height="48"
                                                                                 Margin="0,0,0,15"
-                                                                                Background="#FF328A5D"
+                                                                                Background="{DynamicResource AccentGreenBrush}"
                                                                                 Click="SaveNewPassword_Click"
                                                                                 Content="Save new password"
                                                                                 Foreground="White"

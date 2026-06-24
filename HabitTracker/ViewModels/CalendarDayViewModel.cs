@@ -1,9 +1,16 @@
 using System;
+using HabitTracker.Services;
 
 namespace HabitTracker.ViewModels
 {
     public class CalendarDayViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Cached score result from calendar generation, reused in the detail panel
+        /// to guarantee the calendar cell and right-side panel always agree.
+        /// </summary>
+        public DailyScoreCalculator.DailyScoreResult ScoreResult { get; set; }
+
         private string _dayNumber;
         public string DayNumber
         {

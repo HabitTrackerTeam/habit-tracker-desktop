@@ -1279,6 +1279,7 @@ namespace HabitTracker.ViewModels{
 
                 int percentage = -1;
                 string badgeColor, dotColor;
+                DailyScoreCalculator.DailyScoreResult scoreResult = null;
 
                 if (isFutureDay)
                 {
@@ -1287,8 +1288,6 @@ namespace HabitTracker.ViewModels{
                 }
                 else
                 {
-                    DailyScoreCalculator.DailyScoreResult scoreResult;
-
                     if (isToday && Habits != null && Habits.Count > 0)
                     {
                         // TODAY: use in-memory state to guarantee the calendar percentage
@@ -1316,7 +1315,8 @@ namespace HabitTracker.ViewModels{
                     IsToday = isToday,
                     IsSelected = isToday,
                     BadgeColor = badgeColor,
-                    DotColor = dotColor
+                    DotColor = dotColor,
+                    ScoreResult = scoreResult
                 });
             }
 
@@ -1397,6 +1397,8 @@ namespace HabitTracker.ViewModels{
 
         /// <summary>
         /// Selects a day in the calendar and loads its habits + reflection from DB.
+        /// Reuses the cached ScoreResult from calendar generation to guarantee
+        /// the detail panel always matches the calendar cell percentage.
         /// </summary>
         private async void SelectDay(CalendarDayViewModel day)
         {
@@ -1415,62 +1417,72 @@ namespace HabitTracker.ViewModels{
 
             try
             {
-                Dictionary<string, HabitTypes> habitTypeMap = new();
-                try
+                // Reuse the cached score result from calendar generation.
+                // This guarantees the detail panel percentage ALWAYS matches
+                // the calendar cell — no separate DB query, no data race.
+                DailyScoreCalculator.DailyScoreResult scoreResult = day.ScoreResult;
+
+                if (scoreResult == null)
                 {
-                    if (HabitTypes != null && HabitTypes.Any())
-                        habitTypeMap = HabitTypes.ToDictionary(t => t.Id, t => t);
+                    // Fallback: if no cached result (e.g. future day), compute fresh.
+                    Dictionary<string, HabitTypes> habitTypeMap = new();
+                    try
+                    {
+                        if (HabitTypes != null && HabitTypes.Any())
+                            habitTypeMap = HabitTypes.ToDictionary(t => t.Id, t => t);
+                        else
+                        {
+                            var typesResp = await SupabaseService.Client.From<HabitTypes>().Get();
+                            habitTypeMap = (typesResp.Models ?? new List<HabitTypes>()).ToDictionary(t => t.Id, t => t);
+                        }
+                    }
+                    catch { }
+
+                    bool isToday = day.Date.Date == DateTime.Today;
+
+                    if (isToday && Habits != null && Habits.Count > 0)
+                    {
+                        var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
+                        scoreResult = DailyScoreCalculator.CalculateFromLiveState(activeHabits, habitTypeMap);
+                    }
                     else
                     {
-                        var typesResp = await SupabaseService.Client.From<HabitTypes>().Get();
-                        habitTypeMap = (typesResp.Models ?? new List<HabitTypes>()).ToDictionary(t => t.Id, t => t);
+                        var habitsResponse = await SupabaseService.Client.From<Habits>()
+                            .Filter("user_id", Constants.Operator.Equals, userId)
+                            .Filter("is_archived", Constants.Operator.Equals, "false")
+                            .Get();
+                        var userHabits = habitsResponse.Models ?? new List<Habits>();
+
+                        var utcDayStart = DateTime.SpecifyKind(day.Date.Date, DateTimeKind.Utc);
+                        var utcDayEnd = utcDayStart.AddDays(1);
+                        var logsResponse = await SupabaseService.Client.From<HabitLogs>()
+                            .Filter("log_date", Constants.Operator.GreaterThanOrEqual, utcDayStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                            .Filter("log_date", Constants.Operator.LessThan, utcDayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
+                            .Get();
+                        var habitIds = new HashSet<string>(userHabits.Select(h => h.Id));
+                        var rawLogs = logsResponse.Models ?? new List<HabitLogs>();
+                        var dayLogs = rawLogs.Where(l => habitIds.Contains(l.HabitId)).ToList();
+
+                        scoreResult = DailyScoreCalculator.CalculateDailyScore(day.Date, userHabits, dayLogs, habitTypeMap);
                     }
-                }
-                catch { }
-
-                DailyScoreCalculator.DailyScoreResult scoreResult;
-                bool isToday = day.Date.Date == DateTime.Today;
-
-                if (isToday && Habits != null && Habits.Count > 0)
-                {
-                    // TODAY: use in-memory state to guarantee the detail panel
-                    // matches the home dashboard exactly (avoids DB race conditions).
-                    var activeHabits = Habits.Where(h => !h.IsArchived).ToList();
-                    scoreResult = DailyScoreCalculator.CalculateFromLiveState(activeHabits, habitTypeMap);
-                }
-                else
-                {
-                    // Historical day: fetch from database
-                    var habitsResponse = await SupabaseService.Client.From<Habits>()
-                        .Filter("user_id", Constants.Operator.Equals, userId)
-                        .Filter("is_archived", Constants.Operator.Equals, "false")
-                        .Get();
-                    var userHabits = habitsResponse.Models ?? new List<Habits>();
-
-                    var utcDayStart = DateTime.SpecifyKind(day.Date.Date, DateTimeKind.Utc);
-                    var utcDayEnd = utcDayStart.AddDays(1);
-                    var logsResponse = await SupabaseService.Client.From<HabitLogs>()
-                        .Filter("log_date", Constants.Operator.GreaterThanOrEqual, utcDayStart.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
-                        .Filter("log_date", Constants.Operator.LessThan, utcDayEnd.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))
-                        .Order("created_date", Constants.Ordering.Descending)
-                        .Get();
-                    var habitIds = new HashSet<string>(userHabits.Select(h => h.Id));
-                    var rawLogs = logsResponse.Models ?? new List<HabitLogs>();
-                    var dayLogs = rawLogs.Where(l => habitIds.Contains(l.HabitId)).ToList();
-
-                    scoreResult = DailyScoreCalculator.CalculateDailyScore(day.Date, userHabits, dayLogs, habitTypeMap);
                 }
 
                 var habitStatuses = new ObservableCollection<DayHabitStatusViewModel>();
                 foreach (var detail in scoreResult.Details)
                 {
+                    int habitPct = (int)Math.Round(detail.RawScore * 100.0);
+                    GetHabitStatusColors(habitPct, out string statusColor, out string badgeBg, out string badgeFg);
+
                     habitStatuses.Add(new DayHabitStatusViewModel
                     {
                         HabitId = detail.HabitId,
                         HabitName = detail.HabitName,
                         IsCompleted = detail.IsCompleted,
                         StatusText = detail.StatusText,
-                        HabitType = detail.TypeName
+                        HabitType = detail.TypeName,
+                        StatusColor = statusColor,
+                        StatusBadgeBackground = badgeBg,
+                        StatusBadgeForeground = badgeFg
                     });
                 }
 
@@ -1501,6 +1513,81 @@ namespace HabitTracker.ViewModels{
                 System.Diagnostics.Debug.WriteLine($"Error loading day details: {ex.Message}");
                 SelectedDayLabel = "Error: " + ex.Message;
                 SelectedDayHabits = new ObservableCollection<DayHabitStatusViewModel>();
+            }
+        }
+
+        /// <summary>
+        /// Computes habit-level status colors using the same color gradient as calendar day tiles.
+        /// The percentage is the habit's individual completion (RawScore × 100).
+        /// </summary>
+        private void GetHabitStatusColors(int percentage, out string statusColor, out string badgeBg, out string badgeFg)
+        {
+            // Use the same color scale as GetDayColors for consistency
+            bool isDark = false;
+            try
+            {
+                var appBgBrush = System.Windows.Application.Current.Resources["AppBgBrush"] as System.Windows.Media.SolidColorBrush;
+                if (appBgBrush != null)
+                {
+                    var c = appBgBrush.Color;
+                    isDark = (c.R + c.G + c.B) < 300;
+                }
+            }
+            catch { }
+
+            // Snap to nearest 5%
+            int snapped = (percentage / 5) * 5;
+
+            (int p, byte r, byte g, byte b)[] lightFrames = {
+                (0,   226,  92,  92),
+                (25,  235, 132,  70),
+                (50,  224, 186,  67),
+                (75,   82, 191, 122),
+                (100,  47, 143,  81)
+            };
+
+            (int p, byte r, byte g, byte b)[] darkFrames = {
+                (0,   189,  64,  64),
+                (25,  196, 103,  49),
+                (50,  186, 148,  45),
+                (75,   46, 148,  83),
+                (100,  34, 107,  59)
+            };
+
+            var frames = isDark ? darkFrames : lightFrames;
+            byte cr = frames[^1].r, cg = frames[^1].g, cb = frames[^1].b;
+
+            for (int i = 0; i < frames.Length - 1; i++)
+            {
+                if (snapped >= frames[i].p && snapped <= frames[i + 1].p)
+                {
+                    float t = (float)(snapped - frames[i].p) / (frames[i + 1].p - frames[i].p);
+                    cr = (byte)(frames[i].r + t * (frames[i + 1].r - frames[i].r));
+                    cg = (byte)(frames[i].g + t * (frames[i + 1].g - frames[i].g));
+                    cb = (byte)(frames[i].b + t * (frames[i + 1].b - frames[i].b));
+                    break;
+                }
+            }
+
+            statusColor = $"#{cr:X2}{cg:X2}{cb:X2}";
+            badgeFg = statusColor;
+
+            // Create a lighter tint for the badge background (mix with white/dark bg)
+            if (isDark)
+            {
+                // Dark mode: semi-transparent tint
+                byte br2 = (byte)(cr / 4);
+                byte bg2 = (byte)(cg / 4);
+                byte bb = (byte)(cb / 4);
+                badgeBg = $"#{br2:X2}{bg2:X2}{bb:X2}";
+            }
+            else
+            {
+                // Light mode: very light tint (mix 85% white + 15% color)
+                byte br2 = (byte)(255 - (255 - cr) * 0.12);
+                byte bg2 = (byte)(255 - (255 - cg) * 0.12);
+                byte bb = (byte)(255 - (255 - cb) * 0.12);
+                badgeBg = $"#{br2:X2}{bg2:X2}{bb:X2}";
             }
         }
 

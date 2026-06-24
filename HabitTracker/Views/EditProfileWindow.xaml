@@ -25,8 +25,13 @@
             
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,24">
-                <TextBlock Text="{Binding EditProfile, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextMainBrush}" VerticalAlignment="Center"/>
-                <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMutedBrush}" FontSize="18" FontWeight="Bold" Cursor="Hand" Click="Close_Click"/>
+                <StackPanel>
+                    <TextBlock Text="{Binding EditProfile, Source={StaticResource Loc}}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="{Binding ManageAccount, Source={StaticResource Loc}}" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
+                </StackPanel>
+                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="Close_Click">
+                    <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" Fill="#64748B" Stretch="Uniform" Width="14"/>
+                </Button>
             </Grid>
             
             <!-- Avatar Section -->

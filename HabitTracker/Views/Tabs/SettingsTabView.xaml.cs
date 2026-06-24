@@ -47,6 +47,7 @@ namespace HabitTracker.Views.Tabs
         private async void ChangePassword_Click(object sender, MouseButtonEventArgs e)
         {
             DialogOverlay.Visibility = Visibility.Visible;
+            MainContentGrid.Effect = new System.Windows.Media.Effects.BlurEffect { Radius = 15, KernelType = System.Windows.Media.Effects.KernelType.Gaussian };
             var passwordWindow = new ChangePasswordWindow();
             passwordWindow.Owner = Window.GetWindow(this);
             if (passwordWindow.ShowDialog() == true)
@@ -72,12 +73,14 @@ namespace HabitTracker.Views.Tabs
                     MessageBox.Show(HabitTracker.Services.LocalizationService.Instance.PasswordChangeFailed + $"\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+            MainContentGrid.Effect = null;
             DialogOverlay.Visibility = Visibility.Collapsed;
         }
 
         private async void EditProfile_Click(object sender, RoutedEventArgs e)
         {
             DialogOverlay.Visibility = Visibility.Visible;
+            MainContentGrid.Effect = new System.Windows.Media.Effects.BlurEffect { Radius = 15, KernelType = System.Windows.Media.Effects.KernelType.Gaussian };
             var editProfileWindow = new EditProfileWindow(
                 _settingsVM?.UserName ?? string.Empty,
                 _settingsVM?.UserAvatarUrl);
@@ -96,6 +99,7 @@ namespace HabitTracker.Views.Tabs
                     await UploadAvatarAsync(editProfileWindow.SelectedPhotoPath);
                 }
             }
+            MainContentGrid.Effect = null;
             DialogOverlay.Visibility = Visibility.Collapsed;
         }
 
@@ -111,7 +115,9 @@ namespace HabitTracker.Views.Tabs
             {
                 string selectedPath = openFileDialog.FileName;
                 DialogOverlay.Visibility = Visibility.Visible;
+                MainContentGrid.Effect = new System.Windows.Media.Effects.BlurEffect { Radius = 15, KernelType = System.Windows.Media.Effects.KernelType.Gaussian };
                 await UploadAvatarAsync(selectedPath);
+                MainContentGrid.Effect = null;
                 DialogOverlay.Visibility = Visibility.Collapsed;
             }
         }

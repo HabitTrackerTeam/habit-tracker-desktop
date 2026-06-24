@@ -71,8 +71,9 @@ namespace HabitTracker.Views.Tabs
                     _dashboardVM.NewHabitGoal = 1;
 
                 // Units
-                if (UnitsCombo?.SelectedItem is System.Windows.Controls.ComboBoxItem unitItem)
-                    _dashboardVM.NewHabitUnit = unitItem.Content?.ToString() ?? "count";
+                _dashboardVM.NewHabitUnit = UnitsBox?.Text?.Trim();
+                if (string.IsNullOrWhiteSpace(_dashboardVM.NewHabitUnit))
+                    _dashboardVM.NewHabitUnit = "count";
 
 
 
@@ -380,17 +381,9 @@ namespace HabitTracker.Views.Tabs
                 {
                     GoalBox.Text = habit.TargetFrequency.ToString();
                 }
-                if (UnitsCombo != null)
+                if (UnitsBox != null)
                 {
-                    var targetUnit = habit.Unit ?? habit.DefaultUnit ?? "count";
-                    foreach (System.Windows.Controls.ComboBoxItem item in UnitsCombo.Items)
-                    {
-                        if (string.Equals(item.Content?.ToString(), targetUnit, StringComparison.OrdinalIgnoreCase))
-                        {
-                            UnitsCombo.SelectedItem = item;
-                            break;
-                        }
-                    }
+                    UnitsBox.Text = habit.Unit ?? habit.DefaultUnit ?? "count";
                 }
                 
                 // Habit Type Buttons
@@ -516,7 +509,7 @@ namespace HabitTracker.Views.Tabs
                 HabitNameBox.SetResourceReference(Control.ForegroundProperty, "TextMutedBrush");
             }
             if (GoalBox != null) GoalBox.Text = string.Empty;
-            if (UnitsCombo != null) UnitsCombo.SelectedIndex = 3; // default "count"
+            if (UnitsBox != null) UnitsBox.Text = string.Empty;
             if (FreqDaily != null) FreqDaily.IsChecked = true;
 
             // Reset buttons styles to default (Numeric, Medium, IconBtn1)

@@ -303,7 +303,7 @@ public partial class AuthView : System.Windows.Controls.UserControl
             // wyswietlenie zdjecia w okraglej ramce
             AvatarImageBrush.ImageSource = new BitmapImage(new Uri(selectedFilePath));
             //sukces-zmiana koloru obramowania
-            AvatarBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF328A5D");
+            AvatarBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFromString("#FF166534");
         }
     }
 
