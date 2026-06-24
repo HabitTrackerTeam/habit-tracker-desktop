@@ -5,7 +5,7 @@
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         WindowStartupLocation="CenterScreen"
         Topmost="True">
-    <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" BorderBrush="#FF328A5D" BorderThickness="2" Margin="15">
+    <Border Background="{DynamicResource CardBgBrush}" CornerRadius="15" BorderBrush="{DynamicResource AccentGreenBrush}" BorderThickness="2" Margin="15">
         <Border.Effect>
             <DropShadowEffect Color="Black" Opacity="0.3" BlurRadius="15" ShadowDepth="5" />
         </Border.Effect>
@@ -18,7 +18,7 @@
 
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,15">
-                <TextBlock x:Name="TitleText" Text="Notification" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                <TextBlock x:Name="TitleText" Text="Notification" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                 <Button Content="✕" Click="Close_Click" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextMutedBrush}" FontSize="16" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Right" />
             </Grid>
 
@@ -27,7 +27,7 @@
 
             <!-- Buttons -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                <Button Content="OK" Click="Ok_Click" Background="#FF328A5D" Foreground="White" FontWeight="Bold" Padding="30,10" BorderThickness="0" Cursor="Hand">
+                <Button Content="OK" Click="Ok_Click" Background="{DynamicResource AccentGreenBrush}" Foreground="White" FontWeight="Bold" Padding="30,10" BorderThickness="0" Cursor="Hand">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="8"/>

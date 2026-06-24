@@ -324,7 +324,7 @@ namespace HabitTracker.ViewModels
                 await UserSettingsService.SaveSettingsAsync(_currentSettings);
 
                 StatusMessage = LocalizationService.Instance.SaveSettings + " ✓";
-                StatusColor = "#FF328A5D";
+                StatusColor = "#FF166534";
             }
             catch (Exception ex)
             {

@@ -4,214 +4,216 @@
              xmlns:local="clr-namespace:HabitTracker"
              xmlns:views="clr-namespace:HabitTracker.Views"
              Background="Transparent">
-    <Grid Margin="40,32,40,20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid>
+        <Grid x:Name="MainContentGrid" Margin="40,32,40,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <!-- Header Section -->
-        <Grid Grid.Row="0" Margin="0,0,0,24" MinHeight="60">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" VerticalAlignment="Top">
-                <TextBlock Text="{Binding Settings, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
-                <TextBlock Text="{Binding ManageAccount, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
-            </StackPanel>
-        </Grid>
+            <!-- Header Section -->
+            <Grid Grid.Row="0" Margin="0,0,0,24" MinHeight="60">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" VerticalAlignment="Top">
+                    <TextBlock Text="{Binding Settings, Source={StaticResource Loc}}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                    <TextBlock Text="{Binding ManageAccount, Source={StaticResource Loc}}" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+                </StackPanel>
+            </Grid>
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,14,20">
-            <StackPanel Orientation="Vertical">
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,14,20">
+                <StackPanel Orientation="Vertical">
 
-                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="24,20" Margin="0,0,0,20">
-                    <Border.Effect>
-                        <DropShadowEffect Color="Black" Opacity="0.03" BlurRadius="15" ShadowDepth="2"/>
-                    </Border.Effect>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Avatar Container with rounded corners and border -->
-                        <Grid Grid.Column="0" Width="80" Height="80" VerticalAlignment="Center" Margin="0,0,20,0">
-                            <!-- Fallback Border with Initial -->
-                            <Border CornerRadius="16" Background="#E6F4EA" BorderBrush="#328A5D" BorderThickness="2">
-                                <TextBlock Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32" Foreground="#328A5D" FontWeight="Bold" />
-                            </Border>
-                            <!-- Actual Image Border (covers the fallback when loaded) -->
-                            <Border CornerRadius="16" BorderBrush="#328A5D" BorderThickness="2" ClipToBounds="True">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding HasAvatarImage}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <Border.Background>
-                                    <ImageBrush ImageSource="{Binding AvatarImageSource}" Stretch="UniformToFill"/>
-                                </Border.Background>
-                            </Border>
-                            <!-- Direct Camera Upload button overlay on the bottom right -->
-                            <Button Width="26" Height="26" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-6,-6" Background="#328A5D" BorderThickness="2" BorderBrush="White" Cursor="Hand" Click="DirectChangePhoto_Click">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Grid>
-                                            <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}"/>
-                                            <!-- Modern White Camera Icon path -->
-                                            <Path Data="M9,2L7.17,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4H16.83L15,2H9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z" 
-                                                  Fill="White" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </Grid>
-
-                        <!-- User Info Stack -->
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0">
-                            <TextBlock Text="{Binding UserName}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4"/>
-                            <TextBlock Text="{Binding UserEmail}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
-                        </StackPanel>
-
-                        <!-- Action Buttons (Right side) -->
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Vertical">
-                            <Button Content="{Binding EditProfile, Source={StaticResource Loc}}" Width="120" Height="36" Margin="0,0,0,12" Cursor="Hand" Click="EditProfile_Click">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="border" CornerRadius="18" Background="{DynamicResource InputBgBrush}" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" SnapsToDevicePixels="True">
-                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" TextBlock.Foreground="{DynamicResource TextMainBrush}" TextBlock.FontWeight="Bold" TextBlock.FontSize="13"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="border" Property="Background" Value="{DynamicResource InputBorderBrush}"/>
-                                            </Trigger>
-                                            <Trigger Property="IsPressed" Value="True">
-                                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                            
-                            <TextBlock Text="{Binding ChangePassword, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="ChangePassword_Click">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="TextDecorations" Value="Underline"/>
-                                                <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                            <TextBlock Text="⚙️" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding General, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
-                        </StackPanel>
-
+                    <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="24,20" Margin="0,0,0,20">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Opacity="0.03" BlurRadius="15" ShadowDepth="2"/>
+                        </Border.Effect>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                <TextBlock Text="{Binding Language, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
-                                <ComboBox ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding SelectedLanguage}" Height="36" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                <TextBlock Text="{Binding StartOfWeek, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
-                                <ComboBox ItemsSource="{Binding AvailableWeekStarts}" SelectedItem="{Binding SelectedWeekStart}" Height="36" />
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                            <TextBlock Text="🎨" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Appearance, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
-                        </StackPanel>
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding DarkMode, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
-                                <TextBlock Text="{Binding DarkModeDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                            <!-- Avatar Container with rounded corners and border -->
+                            <Grid Grid.Column="0" Width="80" Height="80" VerticalAlignment="Center" Margin="0,0,20,0">
+                                <!-- Fallback Border with Initial -->
+                                <Border CornerRadius="16" Background="{DynamicResource InputBgBrush}" BorderBrush="{DynamicResource AccentGreenBrush}" BorderThickness="2">
+                                    <TextBlock Text="{Binding UserInitial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32" Foreground="{DynamicResource AccentGreenBrush}" FontWeight="Bold" />
+                                </Border>
+                                <!-- Actual Image Border (covers the fallback when loaded) -->
+                                <Border CornerRadius="16" BorderBrush="{DynamicResource AccentGreenBrush}" BorderThickness="2" ClipToBounds="True">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasAvatarImage}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding AvatarImageSource}" Stretch="UniformToFill"/>
+                                    </Border.Background>
+                                </Border>
+                                <!-- Direct Camera Upload button overlay on the bottom right -->
+                                <Button Width="26" Height="26" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-6,-6" Background="{DynamicResource AccentGreenBrush}" BorderThickness="2" BorderBrush="White" Cursor="Hand" Click="DirectChangePhoto_Click">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid>
+                                                <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}"/>
+                                                <!-- Modern White Camera Icon path -->
+                                                <Path Data="M9,2L7.17,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4H16.83L15,2H9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z" 
+                                                      Fill="White" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+
+                            <!-- User Info Stack -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0">
+                                <TextBlock Text="{Binding UserName}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding UserEmail}" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
                             </StackPanel>
-                            <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" x:Name="DarkModeToggle" IsChecked="{Binding IsDarkMode, Mode=TwoWay}" />
+
+                            <!-- Action Buttons (Right side) -->
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Vertical">
+                                <Button Content="{Binding EditProfile, Source={StaticResource Loc}}" Width="120" Height="36" Margin="0,0,0,12" Cursor="Hand" Click="EditProfile_Click">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" CornerRadius="18" Background="{DynamicResource InputBgBrush}" BorderThickness="1" BorderBrush="{DynamicResource InputBorderBrush}" SnapsToDevicePixels="True">
+                                                <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" TextBlock.Foreground="{DynamicResource TextMainBrush}" TextBlock.FontWeight="Bold" TextBlock.FontSize="13"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="{DynamicResource InputBorderBrush}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                
+                                <TextBlock Text="{Binding ChangePassword, Source={StaticResource Loc}}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="ChangePassword_Click">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="TextDecorations" Value="Underline"/>
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
                         </Grid>
-                    </StackPanel>
-                </Border>
+                    </Border>
 
-                <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                            <TextBlock Text="🔔" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Notifications, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="#328A5D" VerticalAlignment="Center" />
-                        </StackPanel>
-
-                        <Grid Margin="0,0,0,16">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding DailyReminders, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
-                                <TextBlock Text="{Binding DailyRemindersDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <TextBlock Text="⚙️" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding General, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" VerticalAlignment="Center" />
                             </StackPanel>
 
-                            <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Padding="10,4" Margin="0,0,12,0" VerticalAlignment="Center">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="⏱" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}"/>
-                                    <ComboBox ItemsSource="{Binding AvailableReminderTimes}" SelectedItem="{Binding SelectedReminderTime}" Height="36" Width="130" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource TextMainBrush}" FontSize="13" VerticalContentAlignment="Center"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <TextBlock Text="{Binding Language, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
+                                    <ComboBox ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding SelectedLanguage}" Height="36" />
                                 </StackPanel>
-                            </Border>
 
-                            <ToggleButton Grid.Column="2" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsDailyReminder}" VerticalAlignment="Center"/>
-                        </Grid>
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                    <TextBlock Text="{Binding StartOfWeek, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,6" />
+                                    <ComboBox ItemsSource="{Binding AvailableWeekStarts}" SelectedItem="{Binding SelectedWeekStart}" Height="36" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding AchievementBadges, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
-                                <TextBlock Text="{Binding AchievementBadgesDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <TextBlock Text="🎨" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Appearance, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" VerticalAlignment="Center" />
                             </StackPanel>
-                            <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsAchievementBadgesEnabled}" VerticalAlignment="Center"/>
-                        </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{Binding DarkMode, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                    <TextBlock Text="{Binding DarkModeDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </StackPanel>
+                                <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" x:Name="DarkModeToggle" IsChecked="{Binding IsDarkMode, Mode=TwoWay}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <TextBlock Text="🔔" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Notifications, Source={StaticResource Loc}}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AccentGreenBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{Binding DailyReminders, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                    <TextBlock Text="{Binding DailyRemindersDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </StackPanel>
+
+                                <Border Grid.Column="1" Background="{DynamicResource InputBgBrush}" CornerRadius="8" Padding="10,4" Margin="0,0,12,0" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⏱" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}"/>
+                                        <ComboBox ItemsSource="{Binding AvailableReminderTimes}" SelectedItem="{Binding SelectedReminderTime}" Height="36" Width="130" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource TextMainBrush}" FontSize="13" VerticalContentAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <ToggleButton Grid.Column="2" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsDailyReminder}" VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{Binding AchievementBadges, Source={StaticResource Loc}}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextMainBrush}" Margin="0,0,0,2"/>
+                                    <TextBlock Text="{Binding AchievementBadgesDesc, Source={StaticResource Loc}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </StackPanel>
+                                <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsAchievementBadgesEnabled}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,40">
+                        <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,15,0" FontSize="13">
+                            <TextBlock.Foreground>
+                                <SolidColorBrush Color="{Binding StatusColor}" />
+                            </TextBlock.Foreground>
+                        </TextBlock>
+                        <Button Content="{Binding SaveSettings, Source={StaticResource Loc}}" Click="SaveSettings_Click" Background="{DynamicResource AccentGreenBrush}" Foreground="White" FontWeight="Bold" Padding="24,10" BorderThickness="0" Cursor="Hand" FontSize="14" />
                     </StackPanel>
-                </Border>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,40">
-                    <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,15,0" FontSize="13">
-                        <TextBlock.Foreground>
-                            <SolidColorBrush Color="{Binding StatusColor}" />
-                        </TextBlock.Foreground>
-                    </TextBlock>
-                    <Button Content="{Binding SaveSettings, Source={StaticResource Loc}}" Click="SaveSettings_Click" Background="#FF328A5D" Foreground="White" FontWeight="Bold" Padding="24,10" BorderThickness="0" Cursor="Hand" FontSize="14" />
                 </StackPanel>
-            </StackPanel>
-        </ScrollViewer>
+            </ScrollViewer>
+        </Grid>
 
-        <Border x:Name="DialogOverlay" Grid.RowSpan="2" Background="#4D000000" Visibility="Collapsed" Panel.ZIndex="999" />
+        <Border x:Name="DialogOverlay" Background="#4D000000" Visibility="Collapsed" Panel.ZIndex="999" />
     </Grid>
 </UserControl>

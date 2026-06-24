@@ -12,7 +12,7 @@ namespace HabitTracker.ViewModels
     {
         //Zmienne
         private const string ColorError = "#FFD32F2F";
-        private const string ColorSuccess = "#FF328A5D";
+        private const string ColorSuccess = "#FF166534";
         private const string ColorInfo = "#FF8B9AA2";
 
         private string _email = string.Empty;
