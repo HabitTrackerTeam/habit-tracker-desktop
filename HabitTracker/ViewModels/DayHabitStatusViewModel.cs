@@ -46,5 +46,36 @@ namespace HabitTracker.ViewModels
         /// The underlying habit ID (for potential future navigation)
         /// </summary>
         public string HabitId { get; set; }
+
+        /// <summary>
+        /// Color for the left border and status icon, derived from the habit's
+        /// completion percentage using the same color scale as calendar day tiles.
+        /// </summary>
+        private string _statusColor = "#EF4444";
+        public string StatusColor
+        {
+            get => _statusColor;
+            set { _statusColor = value; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Background color for the status badge (lighter tint of the status color).
+        /// </summary>
+        private string _statusBadgeBackground = "#FEF2F2";
+        public string StatusBadgeBackground
+        {
+            get => _statusBadgeBackground;
+            set { _statusBadgeBackground = value; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Foreground (text) color for the status badge.
+        /// </summary>
+        private string _statusBadgeForeground = "#EF4444";
+        public string StatusBadgeForeground
+        {
+            get => _statusBadgeForeground;
+            set { _statusBadgeForeground = value; OnPropertyChanged(); }
+        }
     }
 }

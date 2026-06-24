@@ -231,18 +231,8 @@
                             <ItemsControl ItemsSource="{Binding SelectedDayHabits}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Margin="0,0,0,8" CornerRadius="12" Padding="16,12" Background="{DynamicResource InputBgBrush}">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="BorderThickness" Value="2,0,0,0" />
-                                                    <Setter Property="BorderBrush" Value="#EF4444" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                            <Setter Property="BorderBrush" Value="{DynamicResource AccentGreenBrush}" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
+                                        <Border Margin="0,0,0,8" CornerRadius="12" Padding="16,12" Background="{DynamicResource InputBgBrush}"
+                                                BorderThickness="2,0,0,0" BorderBrush="{Binding StatusColor}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -251,15 +241,13 @@
                                                 </Grid.ColumnDefinitions>
 
                                                 <!-- Status Icon -->
-                                                <Path Grid.Column="0" Width="16" Height="16" Margin="0,0,12,0" Stretch="Uniform">
+                                                <Path Grid.Column="0" Width="16" Height="16" Margin="0,0,12,0" Stretch="Uniform" Fill="{Binding StatusColor}">
                                                     <Path.Style>
                                                         <Style TargetType="Path">
                                                             <Setter Property="Data" Value="M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59Z" />
-                                                            <Setter Property="Fill" Value="#EF4444" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsCompleted}" Value="True">
                                                                     <Setter Property="Data" Value="M12,2C6.5,2 2,6.5 2,12C2,17.5 6.5,22 12,22C17.5,22 22,17.5 22,12C22,6.5 17.5,2 12,2M10,17L5,12L6.41,10.59L10,14.17L17.59,6.58L19,8L10,17Z" />
-                                                                    <Setter Property="Fill" Value="#059669" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -267,43 +255,11 @@
                                                 </Path>
 
                                                 <!-- Habit Name -->
-                                                <TextBlock Grid.Column="1" Text="{Binding HabitName}" FontWeight="SemiBold" VerticalAlignment="Center">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                                    <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
+                                                <TextBlock Grid.Column="1" Text="{Binding HabitName}" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TextMainBrush}" />
 
                                                 <!-- Status Badge -->
-                                                <Border Grid.Column="2" CornerRadius="4" Padding="6,2">
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Setter Property="Background" Value="#FEF2F2" />
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                                    <Setter Property="Background" Value="#F0FDF4" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                    <TextBlock Text="{Binding StatusText}" FontSize="9" FontWeight="Bold">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="Foreground" Value="#EF4444" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                                        <Setter Property="Foreground" Value="{DynamicResource AccentGreenBrush}" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
+                                                <Border Grid.Column="2" CornerRadius="4" Padding="6,2" Background="{Binding StatusBadgeBackground}">
+                                                    <TextBlock Text="{Binding StatusText}" FontSize="9" FontWeight="Bold" Foreground="{Binding StatusBadgeForeground}" />
                                                 </Border>
                                             </Grid>
                                         </Border>
